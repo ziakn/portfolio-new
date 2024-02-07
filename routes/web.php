@@ -22,6 +22,7 @@ Route::controller(HomeController::class)->group(function () {
     Route::get('/blog','blog');
     Route::get('/blog/{slug}','blogDetail');
     Route::get('/contact-us','contactUs');
+    Route::post('/send-mail','sendMail')->name('send.mail');
 
 });
 

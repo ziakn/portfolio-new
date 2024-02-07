@@ -32,15 +32,36 @@
                     <h2>let’s <br>
                         Introduce about <br>
                         myself</h2>
-                    <p>
-                        Whose given. Were gathered. There first subdue greater. Bearing you Whales heaven
-                        midst their. Beast creepeth. Fish days.
-                    </p>
-                    <p>
+                        <p>
+							Software Engineer with over 5+ years of experience in:
+                            <br>
+                            • Software program/project management
+                            <br>
+                            • Large-scale data news software and vendor management
+                            <br>
+                            • Software analysis, design, and requirements gathering
+                            <br>
+                            • Development, implementation, and technical support
+                            <br>
+                            • Large-scale data migration across SDLC phases
+                            <br>
+                            • Skilled team player proficient in managing multiple teams and projects simultaneously in multinational environments
+                            <br>
+                            • Software analysis, architecture design, testing, and migration
+                            <br>
+                            • Requirement specification extraction for diverse enterprise solutions
+                            <br>
+                            • Laravel, Django, Vue.js, Nuxt.js, Vuetify, Vuex, Vue Router, MYSQL, SQL Server
+                            <br>
+                            • Google API, Currency API, RESTful APIs implementation for several mobile apps
+                            <br>
+                            • Git, GitHub, Bitbucket, PHP, Python JSON, JavaScript, TypeScript, HTML, CSS, Bootstrap, RestApi and Linux.
+						</p>
+                    {{-- <p>
                         Is give may shall likeness made yielding spirit a itself together created after sea
                         is in beast beginning signs open god you're gathering whose gathered cattle let.
                         Creature whales fruit unto meat the life beginning all in under give two.
-                    </p>
+                    </p> --}}
                     <a class="primary_btn" href="#"><span>Download CV</span></a>
                 </div>
             </div>
@@ -58,63 +79,63 @@
                     <div class="col-lg-4 col-md-4 col-sm-6">
                         <div class="single-brand-item d-table">
                             <div class="d-table-cell text-center">
-                                <img src="/assets/img/brands/logo1.png" alt="">
+                                <img src="/assets/img/brands/laravel.png" alt="">
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-6">
                         <div class="single-brand-item d-table">
                             <div class="d-table-cell text-center">
-                                <img src="/assets/img/brands/logo2.png" alt="">
+                                <img src="/assets/img/brands/Vue.png" alt="">
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-6">
                         <div class="single-brand-item d-table">
                             <div class="d-table-cell text-center">
-                                <img src="/assets/img/brands/logo3.png" alt="">
+                                <img src="/assets/img/brands/nuxt.png" alt="">
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-6">
                         <div class="single-brand-item d-table">
                             <div class="d-table-cell text-center">
-                                <img src="/assets/img/brands/logo4.png" alt="">
+                                <img src="/assets/img/brands/dj.png" alt="">
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-6">
                         <div class="single-brand-item d-table">
                             <div class="d-table-cell text-center">
-                                <img src="/assets/img/brands/logo5.png" alt="">
+                                <img src="/assets/img/brands/php.png" alt="">
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-6">
                         <div class="single-brand-item d-table">
                             <div class="d-table-cell text-center">
-                                <img src="/assets/img/brands/logo6.png" alt="">
+                                <img src="/assets/img/brands/js.png" alt="">
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-6">
                         <div class="single-brand-item d-table">
                             <div class="d-table-cell text-center">
-                                <img src="/assets/img/brands/logo7.png" alt="">
+                                <img src="/assets/img/brands/python.png" alt="">
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-6">
                         <div class="single-brand-item d-table">
                             <div class="d-table-cell text-center">
-                                <img src="/assets/img/brands/logo8.png" alt="">
+                                <img src="/assets/img/brands/rest.png" alt="">
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-6">
                         <div class="single-brand-item d-table">
                             <div class="d-table-cell text-center">
-                                <img src="/assets/img/brands/logo9.png" alt="">
+                                <img src="/assets/img/brands/ts.png" alt="">
                             </div>
                         </div>
                     </div>
@@ -123,7 +144,7 @@
             <div class="offset-lg-2 col-lg-4 col-md-6">
                 <div class="client-info">
                     <div class="d-flex mb-50">
-                        <span class="lage">10</span>
+                        <span class="lage">5</span>
                         <span class="smll">Years Experience Working</span>
                     </div>
                     <div class="call-now d-flex">
@@ -132,7 +153,7 @@
                         </div>
                         <div class="ml-15">
                             <p>call us now</p>
-                            <h3>(+1)-800-555-6789</h3>
+                            <h3>(+974)-50684583</h3>
                         </div>
                     </div>
                 </div>
@@ -143,7 +164,7 @@
 <!--================ End Brand Area =================-->
 
 <!--================ Start Testimonial Area =================-->
-<div class="testimonial_area section_gap_bottom">
+{{-- <div class="testimonial_area section_gap_bottom">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
@@ -237,11 +258,11 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 <!--================ End Testimonial Area =================-->
 
 <!--================ Start Newsletter Area =================-->
-<section class="newsletter_area">
+{{-- <section class="newsletter_area">
     <div class="container">
         <div class="row justify-content-center align-items-center">
             <div class="col-lg-12">
@@ -264,7 +285,7 @@
             </div>
         </div>
     </div>
-</section>
+</section> --}}
 <!--================ End Newsletter Area =================-->
 
 @endsection
