@@ -1,126 +1,130 @@
-
 @extends('web.layouts.master')
 @section('body')
-	 <!--================Blog Categorie Area =================-->
-     <section class="blog_categorie_area section_gap_top">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="categories_post">
-                        <img src="/assets/img/blog/cat-post/cat-post-3.jpg" alt="post">
-                        <div class="categories_details">
-                            <div class="categories_text">
-                                <a href="single-blog.html"><h5>Social Life</h5></a>
-                                <div class="border_line"></div>
-                                <p>Enjoy your social life together</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="categories_post">
-                        <img src="/assets/img/blog/cat-post/cat-post-2.jpg" alt="post">
-                        <div class="categories_details">
-                            <div class="categories_text">
-                                <a href="single-blog.html"><h5>Politics</h5></a>
-                                <div class="border_line"></div>
-                                <p>Be a part of politics</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="categories_post">
-                        <img src="/assets/img/blog/cat-post/cat-post-1.jpg" alt="post">
-                        <div class="categories_details">
-                            <div class="categories_text">
-                                <a href="single-blog.html"><h5>Food</h5></a>
-                                <div class="border_line"></div>
-                                <p>Let the food be finished</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!--================Blog Categorie Area =================-->
+        <!--================Blog Categorie Area =================-->
+        <section class="blog_categorie_area section_gap_top" style="padding-top:100px; padding-bottom: 20px">
+                <div class="container">
+                        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                                <div class="container-fluid">
 
-    <!--================Blog Area =================-->
-    <section class="blog_area">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="blog_left_sidebar">
-                        @foreach ($data as $key => $item)
+                                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                                                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                                    @foreach ($category as  $cat)
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" href="{{url()->current()."?category=".$cat->slug}}">{{$cat->title??""}}</a>
+                                                </li>
+                                                    @endforeach
 
-                        <article class="row blog_item">
-                            <div class="col-md-3">
-                                <div class="blog_info text-right">
-                                    <div class="post_tag">
-                                        {{-- <a href="#">Food,</a> --}}
-                                        <a class="active" href="#">{{$item->category?->title}}</a>
-                                        {{-- <a href="#">Politics,</a> --}}
-                                        {{-- <a href="#">Lifestyle</a> --}}
-                                    </div>
-                                    <ul class="blog_meta list">
-                                        {{-- <li><a href="#">Mark wiens<i class="lnr lnr-user"></i></a></li> --}}
-                                        <li><a href="#">{{$item->created_at}}<i class="lnr lnr-calendar-full"></i></a></li>
-                                        <li><a href="#">{{$item->viewed}} Views<i class="lnr lnr-eye"></i></a></li>
-                                        {{-- <li><a href="#">06 Comments<i class="lnr lnr-bubble"></i></a></li> --}}
-                                    </ul>
+                                                </ul>
+                                        </div>
                                 </div>
-                            </div>
-                            <div class="col-md-9">
-                                <a class="blog_post" href="{{url("blog", $item->slug)}}">
-                                    <img src="/assets/img/blog/main-blog/m-blog-1.jpg" alt="">
-                                    <div class="blog_details">
-                                        <a href="{{url("blog", $item->slug)}}"><h2>{{$item->title}}</h2></a>
-                                        <p>{!! \Illuminate\Support\Str::words($item->description, 30, $end = '...') !!}</p>
-                                        {{-- <a href="{{url("blog", $item->slug)}}" class="primary_btn"><span>View More</span></a> --}}
-                                    </div>
-                                </a>
-                            </div>
-                        </article>
-                        @endforeach
-                        <nav class="blog-pagination justify-content-center d-flex">
-                            <ul class="pagination">
-                                <li class="page-item">
-                                    <a href="{{ $data->previousPageUrl() }}" class="page-link" aria-label="Previous">
-                                        <span aria-hidden="true">
-                                            <span class="lnr lnr-chevron-left"></span>
-                                        </span>
-                                    </a>
-                                </li>
-                                @foreach ($data->getUrlRange(1, $data->lastPage()) as $page => $url)
-                                    <li class="page-item {{ $page == $data->currentPage() ? 'active' : '' }}">
-                                        <a href="{{ $url }}" class="page-link">{{ $page }}</a>
-                                    </li>
-                                @endforeach
-                                <li class="page-item">
-                                    <a href="{{ $data->nextPageUrl() }}" class="page-link" aria-label="Next">
-                                        <span aria-hidden="true">
-                                            <span class="lnr lnr-chevron-right"></span>
-                                        </span>
-                                    </a>
-                                </li>
-                            </ul>
                         </nav>
+                        {{-- <div class="blog_right_sidebar">
+                                <aside class="single_sidebar_widget search_widget">
+                                        <div class="input-group">
+                                                <input type="text" name="q" value="" class="form-control" placeholder="Search Posts">
+                                                <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="button"><i
+                                                                        class="lnr lnr-magnifier"></i></button>
+                                                </span>
+                                        </div>
+                                </aside>
+                        </div> --}}
 
-                    </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="blog_right_sidebar">
-                        <aside class="single_sidebar_widget search_widget">
+        </section>
+        <!--================Blog Categorie Area =================-->
+
+        <!--================Blog Area =================-->
+        <section class="blog_area">
+                <div class="container">
+                        <div class="row">
+                                <div class="col-lg-8">
+                                        <div class="blog_left_sidebar">
+                                                @foreach ($data as $key => $item)
+                                                        <article class="row blog_item">
+                                                                <div class="col-md-3">
+                                                                        <div class="blog_info text-right">
+                                                                                <div class="post_tag">
+                                                                                        {{-- <a href="#">Food,</a> --}}
+                                                                                        <a class="active"
+                                                                                                href="{{url()->current()."?category=".$item->category?->slug}}">{{ $item->category?->title }}</a>
+                                                                                        {{-- <a href="#">Politics,</a> --}}
+                                                                                        {{-- <a href="#">Lifestyle</a> --}}
+                                                                                </div>
+                                                                                <ul class="blog_meta list">
+                                                                                        {{-- <li><a href="#">Mark wiens<i class="lnr lnr-user"></i></a></li> --}}
+                                                                                        <li><a href="#">{{ $item->created_at->diffForHumans() }}<i
+                                                                                                                class="lnr lnr-calendar-full"></i></a>
+                                                                                        </li>
+                                                                                        <li><a href="#">{{ $item->viewed }}
+                                                                                                        Views<i
+                                                                                                                class="lnr lnr-eye"></i></a>
+                                                                                        </li>
+                                                                                        {{-- <li><a href="#">06 Comments<i class="lnr lnr-bubble"></i></a></li> --}}
+                                                                                </ul>
+                                                                        </div>
+                                                                </div>
+                                                                <div class="col-md-9">
+                                                                        <a class="blog_post"
+                                                                                href="{{ url('blog', $item->slug) }}">
+                                                                                <img src="/assets/img/blog/main-blog/m-blog-1.jpg"
+                                                                                        alt="">
+                                                                                <div class="blog_details">
+                                                                                        <a
+                                                                                                href="{{ url('blog', $item->slug) }}">
+                                                                                                <h2>{{ $item->title }}</h2>
+                                                                                        </a>
+                                                                                        <p>{!! \Illuminate\Support\Str::words($item->description, 30, $end = '...') !!}</p>
+                                                                                        {{-- <a href="{{url("blog", $item->slug)}}" class="primary_btn"><span>View More</span></a> --}}
+                                                                                </div>
+                                                                        </a>
+                                                                </div>
+                                                        </article>
+                                                @endforeach
+                                                <nav class="blog-pagination justify-content-center d-flex">
+                                                        <ul class="pagination">
+                                                                <li class="page-item">
+                                                                        <a href="{{ $data->previousPageUrl() }}"
+                                                                                class="page-link" aria-label="Previous">
+                                                                                <span aria-hidden="true">
+                                                                                        <span
+                                                                                                class="lnr lnr-chevron-left"></span>
+                                                                                </span>
+                                                                        </a>
+                                                                </li>
+                                                                @foreach ($data->getUrlRange(1, $data->lastPage()) as $page => $url)
+                                                                        <li
+                                                                                class="page-item {{ $page == $data->currentPage() ? 'active' : '' }}">
+                                                                                <a href="{{ $url }}"
+                                                                                        class="page-link">{{ $page }}</a>
+                                                                        </li>
+                                                                @endforeach
+                                                                <li class="page-item">
+                                                                        <a href="{{ $data->nextPageUrl() }}" class="page-link"
+                                                                                aria-label="Next">
+                                                                                <span aria-hidden="true">
+                                                                                        <span
+                                                                                                class="lnr lnr-chevron-right"></span>
+                                                                                </span>
+                                                                        </a>
+                                                                </li>
+                                                        </ul>
+                                                </nav>
+
+                                        </div>
+                                </div>
+                                <div class="col-lg-4">
+                                        <div class="blog_right_sidebar">
+                                                {{-- <aside class="single_sidebar_widget search_widget">
                             <div class="input-group">
                                 <input type="text" class="form-control" placeholder="Search Posts">
                                 <span class="input-group-btn">
                                     <button class="btn btn-default" type="button"><i class="lnr lnr-magnifier"></i></button>
                                 </span>
-                            </div><!-- /input-group -->
+                            </div>
                             <div class="br"></div>
-                        </aside>
-                        <aside class="single_sidebar_widget author_widget">
+                        </aside> --}}
+                                                {{-- <aside class="single_sidebar_widget author_widget">
                             <img class="author_img rounded-circle" src="/assets/img/blog/author.png" alt="">
                             <h4>Charlie Barber</h4>
                             <p>Senior blog writer</p>
@@ -132,8 +136,8 @@
                             </div>
                             <p>Boot camps have its supporters andit sdetractors. Some people do not understand why you should have to spend money on boot camp when you can get. Boot camps have itssuppor ters andits detractors.</p>
                             <div class="br"></div>
-                        </aside>
-                        <aside class="single_sidebar_widget popular_post_widget">
+                        </aside> --}}
+                                                {{-- <aside class="single_sidebar_widget popular_post_widget">
                             <h3 class="widget_title">Popular Posts</h3>
                             <div class="media post_item">
                                 <img src="/assets/img/blog/popular-post/post1.jpg" alt="post">
@@ -164,60 +168,27 @@
                                 </div>
                             </div>
                             <div class="br"></div>
-                        </aside>
-                        <aside class="single_sidebar_widget ads_widget">
-                            <a href="#"><img class="img-fluid" src="/assets/img/blog/add.jpg" alt=""></a>
-                            <div class="br"></div>
-                        </aside>
-                        <aside class="single_sidebar_widget post_category_widget">
-                            <h4 class="widget_title">Post Catgories</h4>
-                            <ul class="list cat-list">
-                                <li>
-                                    <a href="#" class="d-flex justify-content-between">
-                                        <p>Technology</p>
-                                        <p>37</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" class="d-flex justify-content-between">
-                                        <p>Lifestyle</p>
-                                        <p>24</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" class="d-flex justify-content-between">
-                                        <p>Fashion</p>
-                                        <p>59</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" class="d-flex justify-content-between">
-                                        <p>Art</p>
-                                        <p>29</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" class="d-flex justify-content-between">
-                                        <p>Food</p>
-                                        <p>15</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" class="d-flex justify-content-between">
-                                        <p>Architecture</p>
-                                        <p>09</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" class="d-flex justify-content-between">
-                                        <p>Adventure</p>
-                                        <p>44</p>
-                                    </a>
-                                </li>
-                            </ul>
-                            <div class="br"></div>
-                        </aside>
-                        <aside class="single-sidebar-widget newsletter_widget">
+                        </aside> --}}
+                                                <aside class="single_sidebar_widget ads_widget">
+                                                        <a href="#"><img class="img-fluid" src="/assets/img/blog/add.jpg"
+                                                                        alt=""></a>
+                                                        <div class="br"></div>
+                                                </aside>
+                                                <aside class="single_sidebar_widget post_category_widget">
+                                                        <h4 class="widget_title">Post Catgories</h4>
+                                                        <ul class="list cat-list">
+                                                            @foreach ($category as  $cat)
+                                                                <li>
+                                                                        <a href="{{url()->current()."?category=".$cat->slug}}"
+                                                                                class="d-flex justify-content-between">
+                                                                                <p>{{$cat->title}}</p>
+                                                                                {{-- <p>37</p> --}}
+                                                                        </a>
+                                                                </li>
+                                                                @endforeach
+                                                        </ul>
+                                                </aside>
+                                                {{-- <aside class="single-sidebar-widget newsletter_widget">
                             <h4 class="widget_title">Newsletter</h4>
                             <p>
                             Here, I focus on a range of items and features that we use in life without
@@ -251,12 +222,11 @@
                                 <li><a href="#">Lifestyle</a></li>
                                 <li><a href="#">Adventure</a></li>
                             </ul>
-                        </aside>
-                    </div>
+                        </aside> --}}
+                                        </div>
+                                </div>
+                        </div>
                 </div>
-            </div>
-        </div>
-    </section>
-    <!--================Blog Area =================-->
-
+        </section>
+        <!--================Blog Area =================-->
 @endsection

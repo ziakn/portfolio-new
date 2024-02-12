@@ -4,6 +4,7 @@ namespace App\Http\Controllers\WEB;
 
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
+use App\Models\Category;
 use App\Models\contactU;
 use Illuminate\Http\Request;
 
@@ -26,16 +27,43 @@ class HomeController extends Controller
     {
         return view("web.portfolio.index");
     }
-    public function blog()
+    public function blog(Request $request)
     {
-        $data = Blog::orderBy("created_at", "desc")->paginate(10);
+        $cat = null;
+        if(isset($request->category) && !empty($request->category))
+        {
+            $cat = Category::whereSlug($request->category)->first();
+
+        }
+        $data = Blog::orderBy("created_at", "desc");
+        if($request->q)
+        {
+            $data=$data->where("title", "%".$request->q."%");
+        }
+        if($cat)
+        {
+            $data=$data->where("category_id", $cat->id);
+        }
+        $data=$data->paginate(5);
+        $category = Category::get();
         return view("web.blog.index",[
-            "data" =>$data
+            "data" =>$data,
+            "category" =>$category
         ]);
     }
-    public function blogDetail()
+    public function blogDetail($slug)
     {
-        return view("web.blog.detail");
+
+        $data = Blog::whereSlug($slug)->first();
+        $popular = Blog::orderBy("created_at", "desc")->where("id", "!=", $data->id)->limit(4)->get();
+        $category = Category::get();
+
+        return view("web.blog.detail",[
+            "data" =>$data,
+            "popular" =>$popular,
+            "category" =>$category
+
+        ]);
     }
     public function contactUs()
     {
