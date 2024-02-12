@@ -57,6 +57,10 @@ class HomeController extends Controller
         $data = Blog::whereSlug($slug)->first();
         $popular = Blog::orderBy("created_at", "desc")->where("id", "!=", $data->id)->limit(4)->get();
         $category = Category::get();
+        if($data)
+        {
+            $data->increment('viewed');
+        }
 
         return view("web.blog.detail",[
             "data" =>$data,
