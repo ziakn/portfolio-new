@@ -1,0 +1,26 @@
+.navbar-brand.logo_h img{
+    max-width: 230px;
+}
+.footer_area{
+    /* padding: unset !important; */
+    padding: 60px 0 !important;
+}
+
+@media (max-width: 991px) {
+.header_area .navbar {
+    background: #beb0f140;
+}
+.navbar-toggler span{
+    background: #7d51e7;
+}
+.header_area .navbar .nav .nav-item .nav-link{
+    color: #906ae9;
+}
+}
+.container{
+    max-width: 75%;
+}
+.blog_post img{
+    width: 100%;
+    object-fit: cover;
+}
