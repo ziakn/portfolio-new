@@ -1,0 +1,10 @@
+<!-- SEO Optimization Icon (Light Yellow) -->
+<svg class="icon-seo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40" height="40" aria-hidden="true" role="img">
+  <g fill="none" stroke="hsl(45, 100%, 85%)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <!-- magnifying glass -->
+    <circle cx="11" cy="11" r="6"/>
+    <line x1="16.5" y1="16.5" x2="20" y2="20"/>
+    <!-- SEO graph -->
+    <polyline points="7,14 10,10 13,12 16,8" />
+  </g>
+</svg>

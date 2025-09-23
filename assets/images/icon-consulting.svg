@@ -1,0 +1,17 @@
+<!-- IT Consultation Icon (Light Yellow) -->
+<svg class="icon-consultation" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40" height="40" aria-hidden="true" role="img">
+  <g fill="none" stroke="hsl(45, 100%, 85%)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <!-- chat bubble -->
+    <path d="M4 4h16v12H5.5L4 17.5V4z"/>
+    <!-- gear -->
+    <circle cx="16" cy="7" r="2"/>
+    <line x1="16" y1="4.5" x2="16" y2="2.5"/>
+    <line x1="16" y1="9.5" x2="16" y2="11.5"/>
+    <line x1="13.5" y1="7" x2="11.5" y2="7"/>
+    <line x1="18.5" y1="7" x2="20.5" y2="7"/>
+    <line x1="14.5" y1="5.5" x2="13" y2="4"/>
+    <line x1="18.5" y1="8.5" x2="20" y2="10"/>
+    <line x1="14.5" y1="8.5" x2="13" y2="10"/>
+    <line x1="18.5" y1="5.5" x2="20" y2="4"/>
+  </g>
+</svg>
