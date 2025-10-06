@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link
+   rel="sitemap"
+   type="application/xml"
+   title="Sitemap"
+   href="/sitemap.xml"
+  />
 
   <!-- Primary SEO -->
   <title>
@@ -88,83 +94,218 @@
   <script type="application/ld+json">
    {
     "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Zia Muhammad",
-    "url": "https://www.ziamuhammad.com",
-    "sameAs": [
-     "https://twitter.com/ziamuhmmad2",
-     "https://www.linkedin.com/in/zia-software/",
-     "https://github.com/ziakn"
-    ],
-    "jobTitle": "Full Stack Software Engineer",
-    "worksFor": {
-     "@type": "Organization",
-     "name": "Dar Al-Sharq Group"
-    },
-    "description": "Full Stack Software Engineer with expertise in Laravel, React.js, Vue.js, Next.js, React Native, REST APIs, SEO, and building high-traffic platforms in Doha, Qatar.",
-    "image": "https://www.ziamuhammad.com/assets/images/profile.png",
-    "address": {
-     "@type": "PostalAddress",
-     "addressLocality": "Doha",
-     "addressCountry": "Qatar"
-    }
-   }
-  </script>
+    "@graph": [
+     {
+      "@type": "Person",
+      "name": "Zia Muhammad",
+      "url": "https://www.ziamuhammad.com",
+      "image": "https://www.ziamuhammad.com/assets/images/Profile-W.png",
+      "jobTitle": "Full Stack Software Engineer",
+      "worksFor": {
+       "@type": "Organization",
+       "name": "Dar Al-Sharq Group",
+       "url": "https://www.daralsharq.net"
+      },
+      "sameAs": [
+       "https://twitter.com/ziamuhmmad2",
+       "https://www.linkedin.com/in/zia-software/",
+       "https://github.com/ziakn"
+      ],
+      "alumniOf": {
+       "@type": "CollegeOrUniversity",
+       "name": "Institute of Management Sciences, Peshawar"
+      },
+      "knowsAbout": [
+       "Laravel",
+       "React.js",
+       "Vue.js",
+       "Next.js",
+       "React Native",
+       "REST APIs",
+       "JavaScript",
+       "TypeScript",
+       "MySQL",
+       "PostgreSQL",
+       "Docker",
+       "SEO Optimization"
+      ],
+      "address": {
+       "@type": "PostalAddress",
+       "addressLocality": "Doha",
+       "addressCountry": "Qatar"
+      },
+      "description": "Full Stack Software Engineer with 6+ years of experience delivering scalable Laravel, React.js, Vue.js, and Next.js solutions for high-traffic platforms like Al Sharq News and The Peninsula Qatar."
+     },
 
-  <script type="application/ld+json">
-   {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Zia Muhammad Portfolio",
-    "url": "https://www.ziamuhammad.com",
-    "potentialAction": {
-     "@type": "SearchAction",
-     "target": "https://www.ziamuhammad.com/?s={search_term_string}",
-     "query-input": "required name=search_term_string"
-    }
-   }
-  </script>
+     {
+      "@type": "Organization",
+      "name": "Zia Muhammad Portfolio",
+      "url": "https://www.ziamuhammad.com",
+      "logo": "https://www.ziamuhammad.com/assets/images/logo.png",
+      "sameAs": [
+       "https://twitter.com/ziamuhmmad2",
+       "https://www.linkedin.com/in/zia-software/",
+       "https://github.com/ziakn"
+      ],
+      "founder": {
+       "@type": "Person",
+       "name": "Zia Muhammad"
+      }
+     },
 
-  <script type="application/ld+json">
-   {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
      {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "Home",
-      "item": "https://www.ziamuhammad.com"
+      "@type": "WebSite",
+      "name": "Zia Muhammad Portfolio",
+      "url": "https://www.ziamuhammad.com",
+      "potentialAction": {
+       "@type": "SearchAction",
+       "target": "https://www.ziamuhammad.com/?s={search_term_string}",
+       "query-input": "required name=search_term_string"
+      }
      },
+
      {
-      "@type": "ListItem",
-      "position": 2,
-      "name": "Portfolio",
-      "item": "https://www.ziamuhammad.com/#portfolio"
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+       {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://www.ziamuhammad.com"
+       },
+       {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Portfolio",
+        "item": "https://www.ziamuhammad.com/#portfolio"
+       },
+       {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Resume",
+        "item": "https://www.ziamuhammad.com/#resume"
+       },
+       {
+        "@type": "ListItem",
+        "position": 4,
+        "name": "Contact",
+        "item": "https://www.ziamuhammad.com/#contact"
+       }
+      ]
      },
+
      {
-      "@type": "ListItem",
-      "position": 3,
-      "name": "Resume",
-      "item": "https://www.ziamuhammad.com/#resume"
-     },
-     {
-      "@type": "ListItem",
-      "position": 4,
-      "name": "Contact",
-      "item": "https://www.ziamuhammad.com/#contact"
+      "@type": "ItemList",
+      "name": "Portfolio Projects",
+      "itemListElement": [
+       {
+        "@type": "CreativeWork",
+        "position": 1,
+        "name": "Al Sharq News",
+        "url": "https://al-sharq.com/",
+        "about": "Leading Arabic daily in Qatar with 85M+ annual views."
+       },
+       {
+        "@type": "CreativeWork",
+        "position": 2,
+        "name": "The Peninsula Qatar",
+        "url": "https://thepeninsulaqatar.com/",
+        "about": "English news site serving millions of readers monthly."
+       },
+       {
+        "@type": "CreativeWork",
+        "position": 3,
+        "name": "Alarab News",
+        "url": "https://alarab.qa/",
+        "about": "Global Middle East news hub built on Laravel and React."
+       },
+       {
+        "@type": "CreativeWork",
+        "position": 4,
+        "name": "Lusail News",
+        "url": "https://lusailnews.net/",
+        "about": "Mobile news API and backend development."
+       },
+       {
+        "@type": "CreativeWork",
+        "position": 5,
+        "name": "Qatar Press Center",
+        "url": "https://qatarpressc.qa/",
+        "about": "Journalist and influencer media hub platform."
+       },
+       {
+        "@type": "CreativeWork",
+        "position": 6,
+        "name": "Dar Al Sharq Group",
+        "url": "https://daralsharq.net/",
+        "about": "Centralized publishing systems for media."
+       },
+       {
+        "@type": "CreativeWork",
+        "position": 7,
+        "name": "Thakira Al Sharq",
+        "url": "https://thakiratalsharq.com/",
+        "about": "Archival & analytics platform for newspaper content."
+       },
+       {
+        "@type": "CreativeWork",
+        "position": 8,
+        "name": "Kids Expo",
+        "url": "https://kidsexpo.qa/",
+        "about": "Event platform for education, health, and government."
+       },
+       {
+        "@type": "CreativeWork",
+        "position": 9,
+        "name": "Top Solution Qatar",
+        "url": "https://topsolutionsqatar.com/",
+        "about": "Turnkey exhibition and booth services."
+       },
+       {
+        "@type": "CreativeWork",
+        "position": 10,
+        "name": "Al Waraq Printing Press",
+        "url": "https://alwaraq.qa/",
+        "about": "Printing ERP & workflow automation system."
+       },
+       {
+        "@type": "CreativeWork",
+        "position": 11,
+        "name": "Bon and Bean",
+        "url": "https://bonandbean.com/",
+        "about": "Specialty coffee e-commerce platform."
+       },
+       {
+        "@type": "CreativeWork",
+        "position": 12,
+        "name": "Al Mahbrah",
+        "url": "https://almahbrah.com/",
+        "about": "Custom gift design and printing e-commerce."
+       },
+       {
+        "@type": "CreativeWork",
+        "position": 13,
+        "name": "Little Sailor",
+        "url": "https://www.littlesailor.com.qa/",
+        "about": "Restaurant dine-in and takeaway app."
+       },
+       {
+        "@type": "CreativeWork",
+        "position": 14,
+        "name": "Almass Water",
+        "url": "https://almaswater.com/",
+        "about": "Bottled water distribution & delivery system."
+       },
+       {
+        "@type": "CreativeWork",
+        "position": 15,
+        "name": "UET Peshawar",
+        "url": "https://uetpeshawar.edu.pk/",
+        "about": "Academic system lifecycle participation."
+       }
+      ]
      }
     ]
-   }
-  </script>
-
-  <script type="application/ld+json">
-   {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Zia Muhammad Portfolio",
-    "url": "https://www.ziamuhammad.com",
-    "logo": "https://www.ziamuhammad.com/assets/images/logo.png"
    }
   </script>
  </head>
