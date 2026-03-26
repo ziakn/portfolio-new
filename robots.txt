@@ -1,4 +1,8 @@
 User-agent: *
-Disallow: /admin/
 Allow: /
-Sitemap: https://www.ziamuhammad.com/sitemap.xml
+Disallow: /admin/
+Disallow: /login/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /*?ref=*
+Sitemap: https://ziamuhammad.com/sitemap.xml
