@@ -119,6 +119,50 @@ for (let i = 0; i < filterBtn.length; i++) {
 
 
 
+// AJAX contact form submission
+const contactForm = document.querySelector("[data-form]");
+const submitBtn = document.querySelector("[data-form-btn]");
+
+if (contactForm && submitBtn) {
+  contactForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    // Disable button and show loading state
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.setAttribute("disabled", "");
+    submitBtn.innerHTML = "<ion-icon name='sync-outline'></ion-icon><span>Sending...</span>";
+
+    const formData = new FormData(contactForm);
+
+    fetch(contactForm.action, {
+      method: "POST",
+      body: formData,
+      headers: {
+        'Accept': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      submitBtn.innerHTML = "<ion-icon name='checkmark-circle-outline'></ion-icon><span>Message Sent!</span>";
+      contactForm.reset();
+      
+      setTimeout(() => {
+        submitBtn.removeAttribute("disabled");
+        submitBtn.innerHTML = originalBtnText;
+      }, 4000);
+    })
+    .catch(error => {
+      console.error(error);
+      submitBtn.innerHTML = "<ion-icon name='alert-circle-outline'></ion-icon><span>Error. Try Again</span>";
+      submitBtn.removeAttribute("disabled");
+      
+      setTimeout(() => {
+        submitBtn.innerHTML = originalBtnText;
+      }, 4000);
+    });
+  });
+}
+
 // page navigation variables
 const navigationLinks = document.querySelectorAll("[data-nav-link]");
 const pages = document.querySelectorAll("[data-page]");
