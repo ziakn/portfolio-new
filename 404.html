@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="theme-color" content="#1e1e2e" />
+  <meta name="robots" content="noindex, follow" />
+
+  <title>404 – Page Not Found | Zia Muhammad</title>
+  <meta name="description" content="The page you are looking for doesn't exist. Return to Zia Muhammad's portfolio." />
+
+  <link rel="canonical" href="https://ziamuhammad.com/404.html" />
+  <link rel="shortcut icon" href="./assets/images/Profile-W.png" type="image/x-icon" />
+  <link rel="apple-touch-icon" href="./assets/images/Profile-W.png" />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="./assets/css/style.css" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    .error-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 40px 20px;
+      background: var(--eerie-black-2, #1e1e2e);
+      color: var(--white-2, #e4e4e4);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .error-code {
+      font-size: clamp(80px, 20vw, 160px);
+      font-weight: 600;
+      line-height: 1;
+      background: linear-gradient(135deg, #ffd700, #ff8c00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+
+    .error-title {
+      font-size: clamp(20px, 4vw, 32px);
+      font-weight: 500;
+      margin-bottom: 12px;
+      color: #e4e4e4;
+    }
+
+    .error-message {
+      font-size: 15px;
+      color: #999;
+      max-width: 480px;
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    .error-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .error-nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.25s ease;
+    }
+
+    .error-nav a.primary {
+      background: linear-gradient(135deg, #ffd700, #ff8c00);
+      color: #1e1e2e;
+    }
+
+    .error-nav a.secondary {
+      border: 1px solid #444;
+      color: #ccc;
+    }
+
+    .error-nav a:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .error-divider {
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(135deg, #ffd700, #ff8c00);
+      border-radius: 2px;
+      margin: 0 auto 28px;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="error-page" id="main-content">
+    <div class="error-code" aria-label="Error 404">404</div>
+    <div class="error-divider"></div>
+    <h1 class="error-title">Page Not Found</h1>
+    <p class="error-message">
+      Oops! The page you're looking for doesn't exist or has been moved.
+      Let me help you find what you need.
+    </p>
+    <nav class="error-nav" aria-label="Return navigation">
+      <a href="/" class="primary" id="btn-home">🏠 Back to Home</a>
+      <a href="/resume.html" class="secondary" id="btn-resume">Resume</a>
+      <a href="/portfolio.html" class="secondary" id="btn-portfolio">Portfolio</a>
+      <a href="/contact.html" class="secondary" id="btn-contact">Contact Me</a>
+    </nav>
+  </main>
+</body>
+</html>

@@ -1,8 +1,11 @@
 User-agent: *
 Allow: /
-Disallow: /admin/
-Disallow: /login/
-Disallow: /cart/
-Disallow: /checkout/
-Disallow: /*?ref=*
+Disallow: /assets/resume/
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
 Sitemap: https://ziamuhammad.com/sitemap.xml

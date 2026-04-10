@@ -1,27 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+>
   <url>
     <loc>https://ziamuhammad.com/</loc>
-    <lastmod>2023-11-01</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-04-09</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://ziamuhammad.com/assets/images/Profile-W.png</image:loc>
+      <image:title>Zia Muhammad – Full Stack Software Engineer in Doha, Qatar</image:title>
+      <image:caption>Profile photo of Zia Muhammad, Full Stack Software Engineer</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://ziamuhammad.com/resume.html</loc>
-    <lastmod>2023-11-01</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-04-09</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ziamuhammad.com/portfolio.html</loc>
-    <lastmod>2023-11-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-04-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://ziamuhammad.com/assets/images/al-sharq.png</image:loc>
+      <image:title>Al Sharq News – Leading Arabic daily in Qatar with 85M+ views</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://ziamuhammad.com/assets/images/peninsula.png</image:loc>
+      <image:title>The Peninsula Qatar – English news site with 65M+ views</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://ziamuhammad.com/assets/images/alarab.png</image:loc>
+      <image:title>Alarab News – Global Middle East news hub built on Laravel and React</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://ziamuhammad.com/assets/images/lusail.png</image:loc>
+      <image:title>Lusail News – Mobile news API and backend development</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://ziamuhammad.com/assets/images/qatarpressc.png</image:loc>
+      <image:title>Qatar Press Centre – Journalist and influencer media hub</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://ziamuhammad.com/assets/images/daralsharq.png</image:loc>
+      <image:title>Dar Al Sharq Group – Centralized publishing systems</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://ziamuhammad.com/assets/images/thakiratalsharq.png</image:loc>
+      <image:title>Thakira Al Sharq – Newspaper archival and analytics platform</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://ziamuhammad.com/assets/images/kidsexpo.png</image:loc>
+      <image:title>Kids Expo – Event platform for education, health, and government</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://ziamuhammad.com/contact.html</loc>
-    <lastmod>2023-11-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-04-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>
