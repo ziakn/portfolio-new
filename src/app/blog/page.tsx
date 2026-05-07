@@ -6,6 +6,7 @@ import { posts } from '@/data/posts';
 export const metadata: Metadata = {
   title: 'Blog – Tech Insights & Software Engineering Articles',
   description: 'Read the latest articles on Laravel, Next.js, AI integrations, and software engineering by Zia Muhammad.',
+  alternates: { canonical: 'https://ziamuhammad.com/blog' },
 };
 
 export default function BlogPage() {

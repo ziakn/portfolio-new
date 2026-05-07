@@ -44,8 +44,22 @@ export const metadata: Metadata = {
     icon: '/images/logo.ico',
     apple: '/images/logo.svg',
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   verification: {
-    google: undefined,
+    google: 'G-PKC08M31Q4', // Note: Using the GA ID as placeholder if GSC code is unknown, but GSC usually has its own code.
+  },
+  alternates: {
+    canonical: 'https://ziamuhammad.com',
   },
   other: {
     'google-adsense-account': 'ca-pub-9790243158087298',
@@ -104,7 +118,7 @@ export default function RootLayout({
         />
 
         {/* JSON-LD Structured Data */}
-        <Script id="json-ld" type="application/ld+json" strategy="afterInteractive">
+        <Script id="json-ld-person" type="application/ld+json" strategy="afterInteractive">
           {`
             {
               "@context": "https://schema.org",
@@ -126,6 +140,21 @@ export default function RootLayout({
                 "@type": "PostalAddress",
                 "addressLocality": "Doha",
                 "addressCountry": "Qatar"
+              }
+            }
+          `}
+        </Script>
+        <Script id="json-ld-website" type="application/ld+json" strategy="afterInteractive">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "Zia Muhammad Portfolio",
+              "url": "https://ziamuhammad.com",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://ziamuhammad.com/blog?q={search_term_string}",
+                "query-input": "required name=search_term_string"
               }
             }
           `}

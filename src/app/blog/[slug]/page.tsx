@@ -2,6 +2,7 @@ import { posts } from '@/data/posts';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import Script from 'next/script';
 import type { Metadata } from 'next';
 
 type Props = {
@@ -17,9 +18,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${post.title} | Blog`,
     description: post.excerpt,
+    alternates: {
+      canonical: `https://ziamuhammad.com/blog/${slug}`,
+    },
     openGraph: {
       title: post.title,
       description: post.excerpt,
+      url: `https://ziamuhammad.com/blog/${slug}`,
       images: [{ url: post.img }],
     },
   };
@@ -59,7 +64,37 @@ export default async function BlogPostPage({ params }: Props) {
         />
       </figure>
 
-      <section className="about-text" dangerouslySetInnerHTML={{ __html: post.content }} />
+      <section className="about-text">
+        <Script id="breadcrumb-json-ld" type="application/ld+json" strategy="afterInteractive">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://ziamuhammad.com"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Blog",
+                  "item": "https://ziamuhammad.com/blog"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": "${post.title}",
+                  "item": "https://ziamuhammad.com/blog/${post.slug}"
+                }
+              ]
+            }
+          `}
+        </Script>
+        <div dangerouslySetInnerHTML={{ __html: post.content }} />
+      </section>
 
       <footer style={{ marginTop: '50px', borderTop: '1px solid var(--jet)', paddingTop: '20px' }}>
         <Link href="/blog" style={{ color: 'var(--orange-yellow-crayola)', display: 'flex', alignItems: 'center', gap: '5px' }}>

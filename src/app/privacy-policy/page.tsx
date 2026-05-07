@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description: 'Privacy Policy for Zia Muhammad Portfolio.',
+  alternates: { canonical: 'https://ziamuhammad.com/privacy-policy' },
 };
 
 export default function PrivacyPolicy() {

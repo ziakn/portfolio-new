@@ -4,12 +4,12 @@ export const metadata: Metadata = {
   title: 'Resume – Zia Muhammad | Full Stack Software Engineer | 7+ Years in Qatar',
   description:
     "Zia Muhammad's CV and resume. Full Stack Software Engineer with 7+ years in Doha, Qatar. Expert in Laravel, React.js, Next.js, LLM/AI integrations.",
-  alternates: { canonical: '/resume' },
+  alternates: { canonical: 'https://ziamuhammad.com/resume' },
   openGraph: {
     title: 'Resume – Zia Muhammad | Full Stack Software Engineer in Doha, Qatar',
     description:
       '7+ years of full-stack engineering experience in Qatar. Expert in Laravel, React.js, Next.js, AI/LLM integrations.',
-    url: '/resume',
+    url: 'https://ziamuhammad.com/resume',
     type: 'profile',
   },
 };

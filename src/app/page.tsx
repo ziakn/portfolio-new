@@ -1,16 +1,17 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'Zia Muhammad | Full Stack Software Engineer in Doha, Qatar',
   description:
     'Zia Muhammad – Full Stack Software Engineer in Doha, Qatar with 7+ years of experience. Expert in Laravel, React.js, Next.js, REST APIs, and LLM Integrations.',
-  alternates: { canonical: '/' },
+  alternates: { canonical: 'https://ziamuhammad.com' },
   openGraph: {
     title: 'Zia Muhammad | Full Stack Software Engineer in Doha, Qatar',
     description:
       'Full Stack Software Engineer with 7+ years of experience scaling high-traffic platforms in Qatar.',
-    url: '/',
+    url: 'https://ziamuhammad.com',
   },
 };
 
@@ -58,6 +59,33 @@ const certifications = [
 export default function AboutPage() {
   return (
     <article className="about active" data-page="about">
+      <Script id="local-business-json-ld" type="application/ld+json" strategy="afterInteractive">
+        {`
+          {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "name": "Zia Muhammad | Software Engineer Qatar",
+            "image": "https://ziamuhammad.com/images/Profile-W.png",
+            "url": "https://ziamuhammad.com",
+            "telephone": "",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Doha",
+              "addressCountry": "Qatar"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": 25.2854,
+              "longitude": 51.5310
+            },
+            "sameAs": [
+              "https://www.linkedin.com/in/zia-software/",
+              "https://github.com/ziakn"
+            ],
+            "priceRange": "$$"
+          }
+        `}
+      </Script>
       <header>
         <h1 className="h1 article-title">About Me</h1>
       </header>
