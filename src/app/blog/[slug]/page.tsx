@@ -42,6 +42,9 @@ export default async function BlogPostPage({ params }: Props) {
 
   if (!post) notFound();
 
+  // Get related posts (exclude current)
+  const relatedPosts = posts.filter((p) => p.slug !== slug).slice(0, 2);
+
   return (
     <article className="blog-post active">
       <header>
@@ -101,6 +104,45 @@ export default async function BlogPostPage({ params }: Props) {
           <ion-icon name="arrow-back-outline"></ion-icon>
           <span>Back to Blog</span>
         </Link>
+
+        {relatedPosts.length > 0 && (
+          <div style={{ marginTop: '40px' }}>
+            <h3 className="h3" style={{ marginBottom: '20px' }}>Related Articles</h3>
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              {relatedPosts.map((related) => (
+                <li key={related.slug}>
+                  <Link 
+                    href={`/blog/${related.slug}`}
+                    style={{ 
+                      display: 'flex', 
+                      gap: '15px', 
+                      alignItems: 'center', 
+                      padding: '15px', 
+                      background: 'var(--border-gradient-onyx)',
+                      borderRadius: '12px',
+                      textDecoration: 'none',
+                      color: 'var(--white-2)',
+                    }}
+                  >
+                    <Image 
+                      src={related.img} 
+                      alt={related.title} 
+                      width={120} 
+                      height={80} 
+                      style={{ borderRadius: '8px', objectFit: 'cover' }} 
+                    />
+                    <div>
+                      <h4 style={{ fontSize: 'var(--fs-5)', marginBottom: '5px', color: 'var(--orange-yellow-crayola)' }}>
+                        {related.title}
+                      </h4>
+                      <time style={{ fontSize: 'var(--fs-7)', color: 'var(--light-gray-70)' }}>{related.date}</time>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </footer>
     </article>
   );

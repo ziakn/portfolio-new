@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
+import Script from 'next/script';
 
 export default function ContactPage() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
@@ -30,6 +31,28 @@ export default function ContactPage() {
 
   return (
     <article className="contact active" data-page="contact">
+      <Script id="breadcrumb-json-ld" type="application/ld+json" strategy="afterInteractive">
+        {`
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://ziamuhammad.com"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Contact",
+                "item": "https://ziamuhammad.com/contact"
+              }
+            ]
+          }
+        `}
+      </Script>
       <header>
         <h1 className="h1 article-title">Contact</h1>
       </header>
@@ -48,7 +71,7 @@ export default function ContactPage() {
       </section>
 
       <section className="contact-form">
-        <h3 className="h3 form-title">Contact Form</h3>
+        <h2 className="h2 form-title">Contact Form</h2>
         <form
           action="https://formsubmit.co/ajax/ziakn03@gmail.com"
           method="POST"

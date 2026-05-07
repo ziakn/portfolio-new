@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import Script from 'next/script';
 
 const projects = [
   { 
@@ -219,6 +220,28 @@ export default function PortfolioPage() {
 
   return (
     <article className="portfolio active" data-page="portfolio">
+      <Script id="breadcrumb-json-ld" type="application/ld+json" strategy="afterInteractive">
+        {`
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://ziamuhammad.com"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Portfolio",
+                "item": "https://ziamuhammad.com/portfolio"
+              }
+            ]
+          }
+        `}
+      </Script>
       <header>
         <h1 className="h1 article-title">Portfolio</h1>
       </header>
@@ -277,7 +300,7 @@ export default function PortfolioPage() {
                   </div>
                   <Image
                     src={p.img}
-                    alt={p.title}
+                    alt={`Screenshot of ${p.title} project: ${p.desc.substring(0, 100)}`}
                     width={600}
                     height={400}
                     loading="lazy"

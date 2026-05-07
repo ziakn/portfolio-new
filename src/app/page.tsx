@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Script from 'next/script';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Zia Muhammad | Full Stack Software Engineer in Doha, Qatar',
@@ -59,30 +60,19 @@ const certifications = [
 export default function AboutPage() {
   return (
     <article className="about active" data-page="about">
-      <Script id="local-business-json-ld" type="application/ld+json" strategy="afterInteractive">
+      <Script id="breadcrumb-json-ld" type="application/ld+json" strategy="afterInteractive">
         {`
           {
             "@context": "https://schema.org",
-            "@type": "ProfessionalService",
-            "name": "Zia Muhammad | Software Engineer Qatar",
-            "image": "https://ziamuhammad.com/images/Profile-W.webp",
-            "url": "https://ziamuhammad.com",
-            "telephone": "",
-            "address": {
-              "@type": "PostalAddress",
-              "addressLocality": "Doha",
-              "addressCountry": "Qatar"
-            },
-            "geo": {
-              "@type": "GeoCoordinates",
-              "latitude": 25.2854,
-              "longitude": 51.5310
-            },
-            "sameAs": [
-              "https://www.linkedin.com/in/zia-software/",
-              "https://github.com/ziakn"
-            ],
-            "priceRange": "$$"
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://ziamuhammad.com"
+              }
+            ]
           }
         `}
       </Script>
@@ -107,12 +97,13 @@ export default function AboutPage() {
           If you are looking to <strong>hire a software engineer in Doha</strong> or need a 
           consultant for <strong>zero-downtime database migrations</strong> and <strong>API architecture</strong>, 
           let&apos;s connect. I help businesses in Qatar and globally transform their digital presence 
-          with state-of-the-art technology.
+          with state-of-the-art technology. Check out my <Link href="/portfolio" style={{color: 'var(--orange-yellow-crayola)', textDecoration: 'underline'}}>portfolio projects</Link> and 
+          <Link href="/blog" style={{color: 'var(--orange-yellow-crayola)', textDecoration: 'underline', marginLeft: '8px'}}>recent articles</Link>.
         </p>
       </section>
 
       <section className="service">
-        <h3 className="h3 service-title">What I&apos;m Doing</h3>
+        <h2 className="h2 service-title">What I&apos;m Doing</h2>
         <ul className="service-list">
           {services.map((s) => (
             <li className="service-item" key={s.title}>
@@ -129,7 +120,7 @@ export default function AboutPage() {
       </section>
 
       <section className="certifications-section">
-        <h3 className="h3 certifications-title">Certifications</h3>
+        <h2 className="h2 certifications-title">Certifications</h2>
         <ul className="certifications-list">
           {certifications.map((c) => (
             <li className="cert-card" key={c.title}>

@@ -165,6 +165,48 @@ export default function RootLayout({
             }
           `}
         </Script>
+        <Script id="json-ld-organization" type="application/ld+json" strategy="afterInteractive">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "Dar Al-Sharq Group",
+              "url": "https://daralsharq.net/",
+              "logo": "https://daralsharq.net/logo.png",
+              "sameAs": [
+                "https://twitter.com/daralsharq",
+                "https://www.linkedin.com/company/dar-al-sharq-group"
+              ],
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Doha",
+                "addressCountry": "Qatar"
+              }
+            }
+          `}
+        </Script>
+        <Script id="json-ld-webpage" type="application/ld+json" strategy="afterInteractive">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "WebPage",
+              "name": "Zia Muhammad | Full Stack Software Engineer",
+              "url": "https://ziamuhammad.com",
+              "description": "Full Stack Software Engineer with 7+ years of experience scaling high-traffic platforms in Qatar.",
+              "isPartOf": {
+                "@type": "WebSite",
+                "name": "Zia Muhammad Portfolio",
+                "url": "https://ziamuhammad.com"
+              },
+              "significantLinks": [
+                "https://ziamuhammad.com/resume",
+                "https://ziamuhammad.com/portfolio",
+                "https://ziamuhammad.com/blog",
+                "https://ziamuhammad.com/contact"
+              ]
+            }
+          `}
+        </Script>
 
         {/* Ionicons */}
         <Script

@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'Resume – Zia Muhammad | Full Stack Software Engineer | 7+ Years in Qatar',
@@ -35,6 +37,28 @@ const skillDetails = [
 export default function ResumePage() {
   return (
     <article className="resume active" data-page="resume">
+      <Script id="breadcrumb-json-ld" type="application/ld+json" strategy="afterInteractive">
+        {`
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://ziamuhammad.com"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Resume",
+                "item": "https://ziamuhammad.com/resume"
+              }
+            ]
+          }
+        `}
+      </Script>
       <header>
         <h1 className="h1 article-title">Resume</h1>
       </header>
@@ -45,7 +69,7 @@ export default function ResumePage() {
           <div className="icon-box">
             <ion-icon name="book-outline"></ion-icon>
           </div>
-          <h3 className="h3">Education</h3>
+          <h2 className="h2">Education</h2>
         </div>
         <ol className="timeline-list">
           <li className="timeline-item">
@@ -64,7 +88,7 @@ export default function ResumePage() {
           <div className="icon-box">
             <ion-icon name="book-outline"></ion-icon>
           </div>
-          <h3 className="h3">Experience</h3>
+          <h2 className="h2">Experience</h2>
           <div className="resume-buttons">
             <a href="/resume/CV - Zia Muhammad.pdf" target="_blank" className="btn-plain">
               View Resume
@@ -85,6 +109,7 @@ export default function ResumePage() {
               <li>Shipped 30+ RESTful APIs across mobile and web apps in 5 industries.</li>
               <li>Integrated payment gateways (CyberSource, Stripe, Qpay, Sadad) and SMS providers.</li>
               <li>Delivered React Native apps for news, e-commerce, and food delivery.</li>
+              <li><Link href="/portfolio" style={{color: 'var(--orange-yellow-crayola)', textDecoration: 'underline'}}>View all projects →</Link></li>
             </ul>
           </li>
 
@@ -119,7 +144,7 @@ export default function ResumePage() {
 
       {/* Skills */}
       <section className="skill">
-        <h3 className="h3 skills-title">My Skills</h3>
+        <h2 className="h2 skills-title">My Skills</h2>
         <ul className="skills-list content-card">
           {skills.map((s) => (
             <li className="skills-item" key={s.name}>
