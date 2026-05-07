@@ -2,7 +2,15 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import Sidebar from '@/components/Sidebar';
 import Navbar from '@/components/Navbar';
+import { Poppins } from 'next/font/google';
 import './globals.css';
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  display: 'swap',
+  variable: '--font-poppins',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://ziamuhammad.com'),
@@ -28,7 +36,7 @@ export const metadata: Metadata = {
     locale: 'en_US',
     images: [
       {
-        url: '/images/Profile-W.png',
+        url: '/images/Profile-W.webp',
         width: 800,
         height: 800,
         alt: 'Zia Muhammad – Full Stack Software Engineer',
@@ -56,7 +64,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: 'G-PKC08M31Q4', // Note: Using the GA ID as placeholder if GSC code is unknown, but GSC usually has its own code.
+    google: 'G-PKC08M31Q4',
   },
   alternates: {
     canonical: 'https://ziamuhammad.com',
@@ -72,21 +80,19 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  'viewport-fit': 'cover',
+};
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="en" className={poppins.variable}>
       <body>
         <main>
           <Sidebar />
@@ -125,7 +131,7 @@ export default function RootLayout({
               "@type": "Person",
               "name": "Zia Muhammad",
               "url": "https://ziamuhammad.com",
-              "image": "https://ziamuhammad.com/images/Profile-W.png",
+               "image": "https://ziamuhammad.com/images/Profile-W.webp",
               "sameAs": [
                 "https://twitter.com/ziamuhmmad2",
                 "https://www.linkedin.com/in/zia-software/",

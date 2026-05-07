@@ -65,7 +65,7 @@ export default function AboutPage() {
             "@context": "https://schema.org",
             "@type": "ProfessionalService",
             "name": "Zia Muhammad | Software Engineer Qatar",
-            "image": "https://ziamuhammad.com/images/Profile-W.png",
+            "image": "https://ziamuhammad.com/images/Profile-W.webp",
             "url": "https://ziamuhammad.com",
             "telephone": "",
             "address": {

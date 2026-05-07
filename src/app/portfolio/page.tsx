@@ -8,203 +8,203 @@ const projects = [
     title: 'Al Sharq News', 
     category: 'web development', 
     href: 'https://al-sharq.com/', 
-    img: '/images/al-sharq.png', 
+    img: '/images/al-sharq.webp', 
     desc: 'Leading Arabic daily in Qatar with 85M+ views. Scaled using Laravel and React with optimized real-time content delivery.' 
   },
   { 
     title: 'The Peninsula Qatar', 
     category: 'web development', 
     href: 'https://thepeninsulaqatar.com/', 
-    img: '/images/peninsula.png', 
+    img: '/images/peninsula.webp', 
     desc: 'English news site with 65M+ views. Engineered zero-downtime migration and high-performance frontend architecture.' 
   },
   { 
     title: 'Alarab News', 
     category: 'web design', 
     href: 'https://alarab.qa/', 
-    img: '/images/alarab.png', 
+    img: '/images/alarab.webp', 
     desc: 'Global Middle East news hub. Focused on RTL layout optimization and high-fidelity responsive design.' 
   },
   { 
     title: 'Lusail News', 
     category: 'applications', 
     href: 'https://lusailnews.net/', 
-    img: '/images/lusail.png', 
+    img: '/images/lusail.webp', 
     desc: 'Robust APIs & backend for mobile news applications, ensuring seamless data integration and high availability.' 
   },
   { 
     title: 'Qatar Press Centre', 
     category: 'web design', 
     href: 'https://qatarpressc.qa/', 
-    img: '/images/qatarpressc.png', 
+    img: '/images/qatarpressc.webp', 
     desc: 'Journalist & influencer media hub with advanced content management and influencer tracking tools.' 
   },
   { 
     title: 'Tasklink', 
     category: 'web development', 
     href: 'https://tasklink.qa', 
-    img: '/images/project-1.jpg', 
+    img: '/images/project-1.webp', 
     desc: 'Remote and Freelancer website/application with real-time job bidding and secure payment systems.' 
   },
   { 
     title: 'Foras', 
     category: 'web development', 
     href: 'https://foras.qa', 
-    img: '/images/project-2.png', 
+    img: '/images/project-2.webp', 
     desc: 'Ecommerce website/application featuring multi-vendor support and automated inventory management.' 
   },
   { 
     title: 'Thakira Al Sharq', 
     category: 'web development', 
     href: 'https://thakiratalsharq.com/', 
-    img: '/images/thakiratalsharq.png', 
+    img: '/images/thakiratalsharq.webp', 
     desc: 'Newspaper archival & analytics platform. Solved data search latency for millions of historical records.' 
   },
   { 
     title: 'Kids Expo', 
     category: 'applications', 
     href: 'https://www.kidsexpo.qa/en', 
-    img: '/images/kidsexpo.png', 
+    img: '/images/kidsexpo.webp', 
     desc: 'Event platform for education, health, and government events. Managed high-concurrency registration.' 
   },
   { 
     title: 'Dar Al Sharq Group', 
     category: 'web development', 
     href: 'https://daralsharq.net/', 
-    img: '/images/daralsharq.png', 
+    img: '/images/daralsharq.webp', 
     desc: 'Centralized publishing systems for Qatar\'s leading media group, unifying multiple publication workflows.' 
   },
   { 
     title: 'Alsharq Technology', 
     category: 'web development', 
     href: 'https://alsharqtech.com/', 
-    img: '/images/alsharqtech.png', 
+    img: '/images/alsharqtech.webp', 
     desc: 'Corporate Website and portfolio for a leading technology solutions provider in Doha, Qatar.' 
   },
   { 
     title: 'Top Solution Qatar', 
     category: 'applications', 
     href: 'https://topsolutionsqatar.com/', 
-    img: '/images/topsolutionsqatar.png', 
+    img: '/images/topsolutionsqatar.webp', 
     desc: 'Turnkey exhibition services platform managing event logistics, services, and digital interactions.' 
   },
   { 
     title: 'Alwaraq Printing Press', 
     category: 'applications', 
     href: 'https://alwaraq.qa/', 
-    img: '/images/alwaraq.png', 
+    img: '/images/alwaraq.webp', 
     desc: 'Printing ERP & workflow system managing production lifecycle, inventory, and customer orders.' 
   },
   { 
     title: 'Bon and Bean', 
     category: 'web development', 
     href: 'https://bonandbean.com/', 
-    img: '/images/bonandbean.png', 
+    img: '/images/bonandbean.webp', 
     desc: 'Specialty coffee e-commerce platform with a premium shopping experience and subscription models.' 
   },
   { 
     title: 'Al Mahbara', 
     category: 'web development', 
     href: 'https://almahbrah.com/', 
-    img: '/images/almahbrah.png', 
+    img: '/images/almahbrah.webp', 
     desc: 'Custom gift design & printing platform for personalized corporate and individual gifting solutions.' 
   },
   { 
     title: 'Alwaseet Qatar’s', 
     category: 'web development', 
     href: 'https://alwaseetqatar.com/', 
-    img: '/images/alwaseetqatar.png', 
+    img: '/images/alwaseetqatar.webp', 
     desc: 'Classified ads platform for selling and renting properties, vehicles, and services across Qatar.' 
   },
   { 
     title: 'Little Sailor', 
     category: 'mobile development', 
     href: 'https://www.littlesailor.com.qa/', 
-    img: '/images/littlesailor.png', 
+    img: '/images/littlesailor.webp', 
     desc: 'Restaurant dine-in & takeaway application with real-time order tracking and loyalty integration.' 
   },
   { 
     title: 'Almass Water', 
     category: 'applications', 
     href: 'https://almaswater.com/', 
-    img: '/images/almaswater.png', 
+    img: '/images/almaswater.webp', 
     desc: 'Bottle distribution & delivery portal managing high-volume water supply and logistics.' 
   },
   { 
     title: 'KPK Arms License', 
     category: 'applications', 
     href: 'https://armslicensekpk.com/', 
-    img: '/images/arms-license.png', 
+    img: '/images/arms-license.webp', 
     desc: 'Digital licensing system for 22 districts in Pakistan, automating verification and issuance.' 
   },
   { 
     title: 'UET Peshawar', 
     category: 'applications', 
     href: 'https://uetpeshawar.edu.pk/', 
-    img: '/images/uet-peshawar.png', 
+    img: '/images/uet-peshawar.webp', 
     desc: 'Academic system lifecycle participation, improving student portals and faculty management systems.' 
   },
   { 
     title: 'SoloStore', 
     category: 'web development', 
     href: '#', 
-    img: '/images/solostore.png', 
+    img: '/images/solostore.webp', 
     desc: 'Single vendor shopping platform optimized for performance, conversion, and seamless UX.' 
   },
   { 
     title: 'Maroon Mall', 
     category: 'web development', 
     href: '#', 
-    img: '/images/project-3.jpg', 
+    img: '/images/project-3.webp', 
     desc: 'Mall aggregator e-commerce platform connecting multiple retailers in a unified shopping portal.' 
   },
   { 
     title: 'Tiollo SaaS', 
     category: 'mobile development', 
     href: '#', 
-    img: '/images/tiollo.png', 
+    img: '/images/tiollo.webp', 
     desc: 'Multi-vendor food delivery & hotel booking SaaS with advanced dispatching and booking engines.' 
   },
   { 
     title: 'SimplistQ CRM', 
     category: 'applications', 
     href: '#', 
-    img: '/images/project-4.png', 
+    img: '/images/project-4.webp', 
     desc: 'Enterprise CRM for invoicing, support, and payment integration (Twyla/Sadad) for corporate clients.' 
   },
   { 
     title: 'SimplistQ Sales', 
     category: 'applications', 
     href: '#', 
-    img: '/images/project-5.png', 
+    img: '/images/project-5.webp', 
     desc: 'Internal telesales & staff communications tool for lead management and performance tracking.' 
   },
   { 
     title: 'SSR Qatar', 
     category: 'web development', 
     href: '#', 
-    img: '/images/project-6.png', 
+    img: '/images/project-6.webp', 
     desc: 'HR & staffing portal for companies and job seekers with automated matching and profile management.' 
   },
   { 
     title: 'AJT Properties', 
     category: 'web development', 
     href: '#', 
-    img: '/images/project-7.png', 
+    img: '/images/project-7.webp', 
     desc: 'Real estate sales & rental platforms with interactive property listings and lead generation.' 
   },
   { 
     title: 'Hamilton Qatar', 
     category: 'applications', 
     href: '#', 
-    img: '/images/project-8.jpg', 
+    img: '/images/project-8.webp', 
     desc: 'Enterprise project management tool for Qatar Civil Defence (QCDD) compliance and monitoring.' 
   },
   { 
     title: 'Eaqaqa', 
     category: 'applications', 
     href: '#', 
-    img: '/images/project-9.png', 
+    img: '/images/project-9.webp', 
     desc: 'Academic research publishing system for Qatar University, managing peer reviews and digital archives.' 
   },
 ];

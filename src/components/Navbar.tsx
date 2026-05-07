@@ -19,13 +19,14 @@ export default function Navbar() {
       <ul className="navbar-list">
         {navItems.map(({ href, label }) => (
           <li className="navbar-item" key={href}>
-            <Link
-              href={href}
-              className={`navbar-link${pathname === href ? ' active' : ''}`}
-            >
-              {label}
-            </Link>
-          </li>
+             <Link
+               href={href}
+               className={`navbar-link${pathname === href ? ' active' : ''}`}
+               aria-current={pathname === href ? 'page' : undefined}
+             >
+               {label}
+             </Link>
+           </li>
         ))}
       </ul>
     </nav>

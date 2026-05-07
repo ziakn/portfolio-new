@@ -15,7 +15,7 @@ export const posts: BlogPost[] = [
     date: 'April 20, 2026',
     category: 'AI & Backend',
     excerpt: 'Learn how to leverage OpenAI and Gemini APIs within your Laravel applications to build intelligent features like automated tagging and RAG pipelines.',
-    img: '/images/blog-1.jpg',
+     img: '/images/blog-1.webp',
     content: `
       <p>Integrating Large Language Models (LLMs) into production Laravel applications is becoming a standard requirement for modern web platforms. Whether you are building automated content tagging, intelligent search via RAG (Retrieval-Augmented Generation), or article summarization, Laravel provides an excellent ecosystem to manage these integrations.</p>
       
@@ -35,7 +35,7 @@ export const posts: BlogPost[] = [
     date: 'March 15, 2026',
     category: 'Frontend',
     excerpt: 'Best practices for optimizing Next.js performance, handling 85M+ yearly views, and implementing zero-downtime migrations.',
-    img: '/images/blog-2.jpg',
+     img: '/images/blog-2.webp',
     content: `
       <p>Scaling a Next.js application to handle millions of monthly users requires a deep understanding of rendering strategies and caching mechanisms.</p>
 
@@ -55,7 +55,7 @@ export const posts: BlogPost[] = [
     date: 'February 10, 2026',
     category: 'Tech Trends',
     excerpt: 'Exploring the digital transformation in Doha and how local businesses are adopting modern tech stacks like React and Headless CMS.',
-    img: '/images/blog-3.jpg',
+     img: '/images/blog-3.webp',
     content: `
       <p>Qatar is undergoing a rapid digital transformation. With the growth of Qatar Vision 2030, businesses are moving away from legacy systems to more agile, high-performance tech stacks.</p>
 
