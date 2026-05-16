@@ -1,15 +1,24 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { posts } from '@/data/posts';
+import { formatPostDate, getPosts } from '@/data/posts';
 
 export const metadata: Metadata = {
-  title: 'Blog – Tech Insights & Software Engineering Articles',
-  description: 'Read the latest articles on Laravel, Next.js, AI integrations, and software engineering by Zia Muhammad.',
+  title: 'Qatar Software Engineering Blog',
+  description:
+    'Read practical articles on Laravel, Next.js, SEO, AI integrations, APIs, and digital platforms for Qatar businesses by Zia Muhammad.',
   alternates: { canonical: 'https://ziamuhammad.com/blog' },
+  openGraph: {
+    title: 'Qatar Software Engineering Blog | Zia Muhammad',
+    description:
+      'Technical guides for Qatar businesses covering software engineering, SEO, Laravel, Next.js, AI, and web performance.',
+    url: 'https://ziamuhammad.com/blog',
+  },
 };
 
 export default function BlogPage() {
+  const posts = getPosts();
+
   return (
     <article className="blog active">
       <header>
@@ -28,7 +37,7 @@ export default function BlogPage() {
                   <div className="blog-meta">
                     <p className="blog-category">{post.category}</p>
                     <span className="dot"></span>
-                    <time dateTime="2026-04-20">{post.date}</time>
+                    <time dateTime={post.date}>{formatPostDate(post.date)}</time>
                   </div>
                   <h3 className="h3 blog-item-title">{post.title}</h3>
                   <p className="blog-text">{post.excerpt}</p>

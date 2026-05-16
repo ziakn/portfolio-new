@@ -22,9 +22,16 @@ export const metadata: Metadata = {
     'Zia Muhammad – Full Stack Software Engineer in Doha, Qatar with 7+ years of experience. Expert in Laravel, React.js, Next.js, REST APIs, and LLM Integrations (OpenAI, Gemini). Scaled Al Sharq News to 85M+ yearly views.',
   keywords: [
     'Full Stack Developer Qatar',
+    'Software Engineer Qatar',
     'Laravel Developer Doha',
+    'Laravel Developer Qatar',
     'React.js Engineer',
+    'React Developer Qatar',
     'Next.js Developer',
+    'Next.js Developer Qatar',
+    'Technical SEO Qatar',
+    'Web Development Qatar',
+    'Doha Software Consultant',
     'LLM Integration',
     'Software Engineer Doha',
   ],
@@ -161,6 +168,45 @@ export default function RootLayout({
                 "@type": "SearchAction",
                 "target": "https://ziamuhammad.com/blog?q={search_term_string}",
                 "query-input": "required name=search_term_string"
+              }
+            }
+          `}
+        </Script>
+        <Script id="json-ld-local-business" type="application/ld+json" strategy="afterInteractive">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "ProfessionalService",
+              "name": "Zia Muhammad Software Engineering",
+              "url": "https://ziamuhammad.com",
+              "image": "https://ziamuhammad.com/images/Profile-W.webp",
+              "description": "Full Stack Software Engineer in Doha, Qatar offering Laravel, React, Next.js, API, AI integration, hosting, and technical SEO services.",
+              "areaServed": {
+                "@type": "Country",
+                "name": "Qatar"
+              },
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Doha",
+                "addressCountry": "Qatar"
+              },
+              "telephone": "+97450684583",
+              "email": "mailto:ziakn03@gmail.com",
+              "priceRange": "$$",
+              "sameAs": [
+                "https://twitter.com/ziamuhmmad2",
+                "https://www.linkedin.com/in/zia-software/",
+                "https://github.com/ziakn"
+              ],
+              "hasOfferCatalog": {
+                "@type": "OfferCatalog",
+                "name": "Software engineering services in Qatar",
+                "itemListElement": [
+                  { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Laravel Development" } },
+                  { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Next.js Development" } },
+                  { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Technical SEO" } },
+                  { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "AI Integration" } }
+                ]
               }
             }
           `}

@@ -1,4 +1,4 @@
-import { posts } from '@/data/posts';
+import { formatPostDate, getPost, getPosts, getRelatedPosts } from '@/data/posts';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -11,13 +11,21 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = posts.find((p) => p.slug === slug);
+  const post = getPost(slug);
 
   if (!post) return { title: 'Post Not Found' };
 
   return {
     title: `${post.title} | Blog`,
     description: post.excerpt,
+    keywords: [
+      post.title,
+      `${post.category} Qatar`,
+      'Software Engineer Qatar',
+      'Laravel Developer Qatar',
+      'Next.js Developer Doha',
+      'Technical SEO Qatar',
+    ],
     alternates: {
       canonical: `https://ziamuhammad.com/blog/${slug}`,
     },
@@ -31,6 +39,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
+  const posts = getPosts();
+
   return posts.map((post) => ({
     slug: post.slug,
   }));
@@ -38,12 +48,59 @@ export async function generateStaticParams() {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = posts.find((p) => p.slug === slug);
+  const post = getPost(slug);
 
   if (!post) notFound();
 
-  // Get related posts (exclude current)
-  const relatedPosts = posts.filter((p) => p.slug !== slug).slice(0, 2);
+  const relatedPosts = getRelatedPosts(slug);
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.excerpt,
+    image: `https://ziamuhammad.com${post.img}`,
+    datePublished: post.date,
+    dateModified: post.date,
+    author: {
+      '@type': 'Person',
+      name: 'Zia Muhammad',
+      url: 'https://ziamuhammad.com',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Doha',
+        addressCountry: 'Qatar',
+      },
+    },
+    publisher: {
+      '@type': 'Person',
+      name: 'Zia Muhammad',
+    },
+    mainEntityOfPage: `https://ziamuhammad.com/blog/${post.slug}`,
+  };
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://ziamuhammad.com',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Blog',
+        item: 'https://ziamuhammad.com/blog',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: post.title,
+        item: `https://ziamuhammad.com/blog/${post.slug}`,
+      },
+    ],
+  };
 
   return (
     <article className="blog-post active">
@@ -52,7 +109,7 @@ export default async function BlogPostPage({ params }: Props) {
         <div className="blog-meta" style={{ marginBottom: '20px' }}>
           <p className="blog-category">{post.category}</p>
           <span className="dot"></span>
-          <time dateTime={post.date}>{post.date}</time>
+          <time dateTime={post.date}>{formatPostDate(post.date)}</time>
         </div>
       </header>
 
@@ -68,34 +125,16 @@ export default async function BlogPostPage({ params }: Props) {
       </figure>
 
       <section className="about-text">
-        <Script id="breadcrumb-json-ld" type="application/ld+json" strategy="afterInteractive">
-          {`
-            {
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              "itemListElement": [
-                {
-                  "@type": "ListItem",
-                  "position": 1,
-                  "name": "Home",
-                  "item": "https://ziamuhammad.com"
-                },
-                {
-                  "@type": "ListItem",
-                  "position": 2,
-                  "name": "Blog",
-                  "item": "https://ziamuhammad.com/blog"
-                },
-                {
-                  "@type": "ListItem",
-                  "position": 3,
-                  "name": "${post.title}",
-                  "item": "https://ziamuhammad.com/blog/${post.slug}"
-                }
-              ]
-            }
-          `}
-        </Script>
+        <Script
+          id="breadcrumb-json-ld"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c') }}
+        />
+        <Script
+          id="article-json-ld"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd).replace(/</g, '\\u003c') }}
+        />
         <div dangerouslySetInnerHTML={{ __html: post.content }} />
       </section>
 
@@ -135,7 +174,12 @@ export default async function BlogPostPage({ params }: Props) {
                       <h4 style={{ fontSize: 'var(--fs-5)', marginBottom: '5px', color: 'var(--orange-yellow-crayola)' }}>
                         {related.title}
                       </h4>
-                      <time style={{ fontSize: 'var(--fs-7)', color: 'var(--light-gray-70)' }}>{related.date}</time>
+                      <time
+                        dateTime={related.date}
+                        style={{ fontSize: 'var(--fs-7)', color: 'var(--light-gray-70)' }}
+                      >
+                        {formatPostDate(related.date)}
+                      </time>
                     </div>
                   </Link>
                 </li>

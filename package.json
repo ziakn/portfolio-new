@@ -6,19 +6,22 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:blogs": "node scripts/seed-blog-db.js"
   },
   "dependencies": {
-    "next": "16.2.4",
+    "better-sqlite3": "^12.10.0",
+    "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^8.57.1",
-    "eslint-config-next": "16.2.4",
+    "eslint-config-next": "16.2.6",
     "typescript": "^5"
   }
 }

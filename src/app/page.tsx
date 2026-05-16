@@ -4,14 +4,23 @@ import Script from 'next/script';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Zia Muhammad | Full Stack Software Engineer in Doha, Qatar',
+  title: 'Software Engineer in Doha, Qatar | Laravel, React, Next.js',
   description:
-    'Zia Muhammad – Full Stack Software Engineer in Doha, Qatar with 7+ years of experience. Expert in Laravel, React.js, Next.js, REST APIs, and LLM Integrations.',
+    'Zia Muhammad is a Full Stack Software Engineer in Doha, Qatar offering Laravel, React, Next.js, APIs, AI integrations, hosting, and technical SEO for Qatar businesses.',
+  keywords: [
+    'Software Engineer in Doha',
+    'Software Engineer Qatar',
+    'Laravel Developer Qatar',
+    'React Developer Qatar',
+    'Next.js Developer Qatar',
+    'Web Development Qatar',
+    'Technical SEO Qatar',
+  ],
   alternates: { canonical: 'https://ziamuhammad.com' },
   openGraph: {
-    title: 'Zia Muhammad | Full Stack Software Engineer in Doha, Qatar',
+    title: 'Software Engineer in Doha, Qatar | Zia Muhammad',
     description:
-      'Full Stack Software Engineer with 7+ years of experience scaling high-traffic platforms in Qatar.',
+      'Laravel, React, Next.js, API, AI integration, hosting, and technical SEO services for Qatar businesses.',
     url: 'https://ziamuhammad.com',
   },
 };

@@ -1,7 +1,9 @@
 import { MetadataRoute } from 'next';
+import { getPosts } from '@/data/posts';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://ziamuhammad.com';
+  const posts = getPosts();
 
   return [
     {
@@ -52,24 +54,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.3,
     },
-    // Blog posts
-    {
-      url: `${baseUrl}/blog/integrating-llms-laravel`,
-      lastModified: new Date('2026-04-20'),
-      changeFrequency: 'monthly',
+    ...posts.map((post) => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: new Date(`${post.date}T00:00:00.000Z`),
+      changeFrequency: 'monthly' as const,
       priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/blog/scaling-nextjs-high-traffic`,
-      lastModified: new Date('2026-03-15'),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/blog/future-web-dev-qatar`,
-      lastModified: new Date('2026-02-10'),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
+    })),
   ];
 }
