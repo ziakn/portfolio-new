@@ -69,7 +69,7 @@ const topics = [
   ['software-engineer-doha-services', 'Software Engineer in Doha: Services Businesses Usually Need', 'Consulting', 'A service overview for Qatar companies that need websites, APIs, dashboards, mobile apps, AI integrations, and technical SEO.'],
 ];
 
-const makeContent = ([slug, title, category]) => `
+const makeContent = ([, title]) => `
   <p>${title} is a practical topic for organizations in Qatar that want reliable software, stronger search visibility, and better digital customer experiences. The best results usually come from combining clean engineering with a clear understanding of local search intent, bilingual content needs, and the way teams in Doha actually operate.</p>
   <h3>What to prioritize</h3>
   <p>Start with the fundamentals: fast pages, clear information architecture, secure forms, useful metadata, and content that answers real business questions. For Qatar-focused projects, service pages should mention the location naturally, show relevant proof, and connect technical details to business outcomes.</p>
