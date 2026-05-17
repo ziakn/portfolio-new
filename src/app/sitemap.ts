@@ -1,64 +1,88 @@
-import { MetadataRoute } from 'next';
+import type { MetadataRoute } from 'next';
 import { getPosts } from '@/data/posts';
 
+const baseUrl = 'https://ziamuhammad.com';
+const siteLastModified = new Date('2026-05-17T00:00:00.000Z');
+
+const portfolioImages = [
+  '/images/al-sharq.webp',
+  '/images/peninsula.webp',
+  '/images/alarab.webp',
+  '/images/lusail.webp',
+  '/images/qatarpressc.webp',
+  '/images/daralsharq.webp',
+  '/images/alsharqtech.webp',
+  '/images/topsolutionsqatar.webp',
+  '/images/solostore.webp',
+  '/images/tiollo.webp',
+];
+
+function absoluteUrl(path: string) {
+  return new URL(path, baseUrl).toString();
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://ziamuhammad.com';
   const posts = getPosts();
 
   return [
     {
       url: baseUrl,
-      lastModified: new Date(),
+      lastModified: siteLastModified,
       changeFrequency: 'daily',
       priority: 1,
+      images: [absoluteUrl('/images/Profile-W.webp')],
     },
     {
-      url: `${baseUrl}/resume`,
-      lastModified: new Date(),
+      url: absoluteUrl('/resume'),
+      lastModified: siteLastModified,
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/portfolio`,
-      lastModified: new Date(),
+      url: absoluteUrl('/portfolio'),
+      lastModified: siteLastModified,
       changeFrequency: 'weekly',
       priority: 0.9,
+      images: portfolioImages.map(absoluteUrl),
     },
     {
-      url: `${baseUrl}/blog`,
-      lastModified: new Date(),
+      url: absoluteUrl('/blog'),
+      lastModified: posts[0]?.date
+        ? new Date(`${posts[0].date}T00:00:00.000Z`)
+        : siteLastModified,
       changeFrequency: 'daily',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/contact`,
-      lastModified: new Date(),
+      url: absoluteUrl('/contact'),
+      lastModified: siteLastModified,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/privacy-policy`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.3,
+      url: absoluteUrl('/privacy-policy'),
+      lastModified: siteLastModified,
+      changeFrequency: 'yearly',
+      priority: 0.2,
     },
     {
-      url: `${baseUrl}/terms-and-conditions`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.3,
+      url: absoluteUrl('/terms-and-conditions'),
+      lastModified: siteLastModified,
+      changeFrequency: 'yearly',
+      priority: 0.2,
     },
     {
-      url: `${baseUrl}/disclaimer`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.3,
+      url: absoluteUrl('/disclaimer'),
+      lastModified: siteLastModified,
+      changeFrequency: 'yearly',
+      priority: 0.2,
     },
     ...posts.map((post) => ({
-      url: `${baseUrl}/blog/${post.slug}`,
+      url: absoluteUrl(`/blog/${post.slug}`),
       lastModified: new Date(`${post.date}T00:00:00.000Z`),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
+      changeFrequency: 'weekly' as const,
+      priority: 0.75,
+      images: [absoluteUrl(post.img)],
     })),
   ];
 }
