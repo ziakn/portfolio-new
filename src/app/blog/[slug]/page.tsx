@@ -5,6 +5,8 @@ import Link from 'next/link';
 import Script from 'next/script';
 import type { Metadata } from 'next';
 
+export const revalidate = 3600;
+
 type Props = {
   params: Promise<{ slug: string }>;
 };
@@ -30,10 +32,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       canonical: `https://ziamuhammad.com/blog/${slug}`,
     },
     openGraph: {
+      type: 'article',
       title: post.title,
       description: post.excerpt,
       url: `https://ziamuhammad.com/blog/${slug}`,
       images: [{ url: post.img }],
+      publishedTime: post.date,
+      modifiedTime: post.date,
+      authors: ['Zia Muhammad'],
+      tags: [post.category, 'Qatar software engineering', 'Next.js', 'Laravel'],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
+      images: [post.img],
     },
   };
 }
@@ -53,6 +66,7 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound();
 
   const relatedPosts = getRelatedPosts(slug);
+  const plainContent = post.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -61,6 +75,9 @@ export default async function BlogPostPage({ params }: Props) {
     image: `https://ziamuhammad.com${post.img}`,
     datePublished: post.date,
     dateModified: post.date,
+    articleSection: post.category,
+    keywords: [post.category, 'Qatar software engineering', 'Laravel', 'Next.js', 'technical SEO'],
+    wordCount: plainContent ? plainContent.split(' ').length : undefined,
     author: {
       '@type': 'Person',
       name: 'Zia Muhammad',

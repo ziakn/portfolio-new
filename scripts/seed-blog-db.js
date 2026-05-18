@@ -69,6 +69,118 @@ const topics = [
   ['software-engineer-doha-services', 'Software Engineer in Doha: Services Businesses Usually Need', 'Consulting', 'A service overview for Qatar companies that need websites, APIs, dashboards, mobile apps, AI integrations, and technical SEO.'],
 ];
 
+const targetPostCount = 1000;
+const scheduledStartDate = new Date('2026-05-19T00:00:00.000Z');
+const serviceAreas = [
+  'Laravel development',
+  'Next.js SEO',
+  'React frontends',
+  'API architecture',
+  'mobile app backends',
+  'AI search',
+  'RAG pipelines',
+  'technical SEO',
+  'ecommerce platforms',
+  'payment integrations',
+  'cloud hosting',
+  'database optimization',
+  'CMS workflows',
+  'bilingual websites',
+  'Core Web Vitals',
+  'SaaS dashboards',
+  'real-time notifications',
+  'Google Maps integrations',
+  'CRM automation',
+  'legacy modernization',
+];
+const audiences = [
+  'Qatar startups',
+  'Doha businesses',
+  'Qatar ecommerce teams',
+  'media companies in Qatar',
+  'real estate companies in Doha',
+  'hospitality brands in Qatar',
+  'public-sector teams',
+  'service companies in Doha',
+  'retailers in Qatar',
+  'enterprise teams in Qatar',
+];
+const angles = [
+  'planning checklist',
+  'implementation guide',
+  'SEO strategy',
+  'technical blueprint',
+  'performance audit',
+  'security checklist',
+  'migration plan',
+  'content strategy',
+  'integration guide',
+  'maintenance roadmap',
+];
+const categoryByService = {
+  'Laravel development': 'Laravel Qatar',
+  'Next.js SEO': 'Next.js SEO',
+  'React frontends': 'Frontend',
+  'API architecture': 'API Development',
+  'mobile app backends': 'Mobile Apps',
+  'AI search': 'AI & Backend',
+  'RAG pipelines': 'AI & Backend',
+  'technical SEO': 'SEO',
+  'ecommerce platforms': 'Ecommerce',
+  'payment integrations': 'API Development',
+  'cloud hosting': 'Hosting',
+  'database optimization': 'Backend',
+  'CMS workflows': 'Content Management',
+  'bilingual websites': 'Localization',
+  'Core Web Vitals': 'Performance',
+  'SaaS dashboards': 'SaaS',
+  'real-time notifications': 'Realtime Apps',
+  'Google Maps integrations': 'API Development',
+  'CRM automation': 'Business Apps',
+  'legacy modernization': 'Digital Transformation',
+};
+
+function slugify(value) {
+  return value
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function titleCase(value) {
+  return value.replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function buildScheduledTopics() {
+  const generated = [];
+
+  for (const service of serviceAreas) {
+    for (const audience of audiences) {
+      for (const angle of angles) {
+        if (topics.length + generated.length >= targetPostCount) return [...topics, ...generated];
+
+        const title = `${titleCase(service)} for ${titleCase(audience)}: ${titleCase(angle)}`;
+        const slug = slugify(title);
+        const category = categoryByService[service] || 'Software Engineering';
+        const excerpt = `A practical ${angle} for ${audience} working on ${service}, with guidance on architecture, search visibility, performance, and long-term maintainability.`;
+        const date = new Date(scheduledStartDate);
+        date.setUTCDate(scheduledStartDate.getUTCDate() + generated.length);
+
+        generated.push([
+          slug,
+          title,
+          category,
+          excerpt,
+          date.toISOString().slice(0, 10),
+        ]);
+      }
+    }
+  }
+
+  return [...topics, ...generated];
+}
+
 const makeContent = ([, title]) => `
   <p>${title} is a practical topic for organizations in Qatar that want reliable software, stronger search visibility, and better digital customer experiences. The best results usually come from combining clean engineering with a clear understanding of local search intent, bilingual content needs, and the way teams in Doha actually operate.</p>
   <h3>What to prioritize</h3>
@@ -79,6 +191,10 @@ const makeContent = ([, title]) => `
   <p>Search engines need consistent signals: canonical URLs, descriptive titles, useful headings, schema markup, internal links, and current content. Visitors need trust signals too, including case studies, measurable outcomes, contact details, and a clear explanation of how the work is delivered.</p>
   <h3>Qatar market fit</h3>
   <p>For Qatar businesses, digital products often need bilingual support, mobile-first UX, local payment and messaging integrations, and performance that works well for both local and international audiences. Planning these needs early reduces rework and makes the product easier to scale.</p>
+  <h3>SEO implementation checklist</h3>
+  <p>For search visibility, every article or service page should use a focused title, a descriptive meta description, one clear H1, helpful subheadings, internal links to related services, original examples, and schema where it genuinely describes the page. Thin pages with repeated wording should be expanded before they are submitted for indexing.</p>
+  <h3>Operational next steps</h3>
+  <p>The safest approach is to publish consistently, review performance in Search Console, improve pages that earn impressions but low clicks, and keep the content aligned with real services and project experience. This creates a stronger signal than publishing many shallow pages at once.</p>
 `;
 
 const db = new Database(dbPath);
@@ -111,12 +227,16 @@ const insert = db.prepare(`
 `);
 
 const seedDate = new Date('2026-05-15T00:00:00.000Z');
+const allTopics = buildScheduledTopics();
 
 db.transaction(() => {
-  topics.forEach((topic, index) => {
-    const [slug, title, category, excerpt] = topic;
-    const date = new Date(seedDate);
-    date.setUTCDate(seedDate.getUTCDate() - index * 3);
+  allTopics.forEach((topic, index) => {
+    const [slug, title, category, excerpt, scheduledDate] = topic;
+    const date = scheduledDate ? new Date(`${scheduledDate}T00:00:00.000Z`) : new Date(seedDate);
+
+    if (!scheduledDate) {
+      date.setUTCDate(seedDate.getUTCDate() - index * 3);
+    }
 
     insert.run({
       slug,
@@ -132,4 +252,4 @@ db.transaction(() => {
 
 db.close();
 
-console.log(`Seeded ${topics.length} blog posts into ${path.relative(process.cwd(), dbPath)}`);
+console.log(`Seeded ${allTopics.length} blog posts into ${path.relative(process.cwd(), dbPath)}`);

@@ -12,6 +12,20 @@ export interface BlogPost {
 }
 
 const dbPath = path.join(process.cwd(), 'data', 'blog.sqlite');
+const siteTimeZone = 'Asia/Qatar';
+
+function getCurrentPublishDate(): string {
+  const parts = new Intl.DateTimeFormat('en', {
+    timeZone: siteTimeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date());
+
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+
+  return `${values.year}-${values.month}-${values.day}`;
+}
 
 function getDb() {
   return new Database(dbPath, { readonly: true, fileMustExist: true });
@@ -23,9 +37,9 @@ export function getPosts(): BlogPost[] {
   try {
     return db
       .prepare(
-        'SELECT slug, title, date, category, excerpt, content, img FROM posts ORDER BY date DESC, id DESC',
+        'SELECT slug, title, date, category, excerpt, content, img FROM posts WHERE date <= ? ORDER BY date DESC, id DESC',
       )
-      .all() as BlogPost[];
+      .all(getCurrentPublishDate()) as BlogPost[];
   } finally {
     db.close();
   }
@@ -36,8 +50,8 @@ export function getPost(slug: string): BlogPost | undefined {
 
   try {
     return db
-      .prepare('SELECT slug, title, date, category, excerpt, content, img FROM posts WHERE slug = ?')
-      .get(slug) as BlogPost | undefined;
+      .prepare('SELECT slug, title, date, category, excerpt, content, img FROM posts WHERE slug = ? AND date <= ?')
+      .get(slug, getCurrentPublishDate()) as BlogPost | undefined;
   } finally {
     db.close();
   }
@@ -49,9 +63,9 @@ export function getRelatedPosts(slug: string, limit = 2): BlogPost[] {
   try {
     return db
       .prepare(
-        'SELECT slug, title, date, category, excerpt, content, img FROM posts WHERE slug != ? ORDER BY date DESC, id DESC LIMIT ?',
+        'SELECT slug, title, date, category, excerpt, content, img FROM posts WHERE slug != ? AND date <= ? ORDER BY date DESC, id DESC LIMIT ?',
       )
-      .all(slug, limit) as BlogPost[];
+      .all(slug, getCurrentPublishDate(), limit) as BlogPost[];
   } finally {
     db.close();
   }
