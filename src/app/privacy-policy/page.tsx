@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
-  description: 'Privacy Policy for Zia Muhammad Portfolio.',
+  description: 'Privacy Policy for Zia Muhammad Portfolio and ziamuhammad.com.',
   alternates: { canonical: 'https://ziamuhammad.com/privacy-policy' },
 };
 
@@ -27,11 +27,11 @@ export default function PrivacyPolicy() {
         </p>
         <h3 className="h3">Google DoubleClick DART Cookie</h3>
         <p>
-          Google is one of a third-party vendor on our site. It also uses cookies, known as DART cookies, to serve ads to our site visitors based upon their visit to www.website.com and other sites on the internet. However, visitors may choose to decline the use of DART cookies by visiting the Google ad and content network Privacy Policy at the following URL – <a href="https://policies.google.com/technologies/ads" style={{color: 'var(--orange-yellow-crayola)'}}>https://policies.google.com/technologies/ads</a>
+          Google may use cookies, including advertising cookies, to serve ads to visitors based on their visits to ziamuhammad.com and other sites on the internet. However, visitors may choose to decline the use of DART cookies by visiting the Google ad and content network Privacy Policy at the following URL – <a href="https://policies.google.com/technologies/ads" style={{color: 'var(--orange-yellow-crayola)'}}>https://policies.google.com/technologies/ads</a>
         </p>
         <h3 className="h3">Our Advertising Partners</h3>
         <p>
-          Some of advertisers on our site may use cookies and web beacons. Our advertising partners include:
+          Third-party advertising partners on this site may use cookies and web beacons. Our advertising partners include:
         </p>
         <ul>
           <li style={{color: 'var(--light-gray)', marginBottom: '10px'}}>• Google</li>

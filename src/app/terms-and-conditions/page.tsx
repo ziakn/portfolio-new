@@ -24,9 +24,9 @@ export default function TermsAndConditions() {
         <p>
           Unless otherwise stated, Zia Muhammad Portfolio and/or its licensors own the intellectual property rights for all material on Zia Muhammad Portfolio. All intellectual property rights are reserved. You may access this from Zia Muhammad Portfolio for your own personal use subjected to restrictions set in these terms and conditions.
         </p>
-        <h3 className="h3">User Comments</h3>
+        <h3 className="h3">Professional Content</h3>
         <p>
-          Parts of this website offer an opportunity for users to post and exchange opinions and information in certain areas of the website. Zia Muhammad Portfolio does not filter, edit, publish or review Comments prior to their presence on the website. Comments do not reflect the views and opinions of Zia Muhammad Portfolio, its agents and/or affiliates.
+          This website publishes portfolio information, contact details, and software engineering articles written for informational and professional purposes. Visitors may contact Zia Muhammad through the contact form or listed email address, but the site does not provide public user comments or community posting features.
         </p>
       </section>
     </article>

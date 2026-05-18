@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import Sidebar from '@/components/Sidebar';
 import Navbar from '@/components/Navbar';
+import SiteFooter from '@/components/SiteFooter';
 import { Poppins } from 'next/font/google';
 import './globals.css';
 
@@ -106,6 +107,7 @@ export default function RootLayout({
           <div className="main-content">
             <Navbar />
             {children}
+            <SiteFooter />
           </div>
         </main>
 

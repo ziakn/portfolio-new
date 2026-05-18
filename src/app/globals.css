@@ -507,6 +507,39 @@ main {
 }
 
 /*-----------------------------------*\
+  #SITE FOOTER
+\*-----------------------------------*/
+
+.site-footer {
+  margin: 28px 0 86px;
+  padding: 18px 20px;
+  border-top: 1px solid var(--jet);
+  color: var(--light-gray-70);
+  font-size: var(--fs-7);
+  line-height: 1.6;
+}
+
+.site-footer p {
+  margin-bottom: 12px;
+}
+
+.site-footer ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+}
+
+.site-footer a {
+  color: var(--light-gray);
+  transition: color var(--transition-1);
+}
+
+.site-footer a:hover,
+.site-footer a:focus {
+  color: var(--orange-yellow-crayola);
+}
+
+/*-----------------------------------*\
   #ABOUT
 \*-----------------------------------*/
 
@@ -1844,6 +1877,10 @@ textarea.form-input::-webkit-resizer {
 
   .navbar-link {
     font-weight: var(--fw-500);
+  }
+
+  .site-footer {
+    margin-bottom: 0;
   }
 
   /**
