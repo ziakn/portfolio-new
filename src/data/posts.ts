@@ -1,5 +1,4 @@
-import Database from 'better-sqlite3';
-import path from 'path';
+import posts from '../../data/blog-posts.json';
 
 export interface BlogPost {
   slug: string;
@@ -11,8 +10,8 @@ export interface BlogPost {
   img: string;
 }
 
-const dbPath = path.join(process.cwd(), 'data', 'blog.sqlite');
 const siteTimeZone = 'Asia/Qatar';
+const allPosts = posts as BlogPost[];
 
 function getCurrentPublishDate(): string {
   const parts = new Intl.DateTimeFormat('en', {
@@ -27,48 +26,22 @@ function getCurrentPublishDate(): string {
   return `${values.year}-${values.month}-${values.day}`;
 }
 
-function getDb() {
-  return new Database(dbPath, { readonly: true, fileMustExist: true });
-}
-
 export function getPosts(): BlogPost[] {
-  const db = getDb();
+  const publishDate = getCurrentPublishDate();
 
-  try {
-    return db
-      .prepare(
-        'SELECT slug, title, date, category, excerpt, content, img FROM posts WHERE date <= ? ORDER BY date DESC, id DESC',
-      )
-      .all(getCurrentPublishDate()) as BlogPost[];
-  } finally {
-    db.close();
-  }
+  return allPosts.filter((post) => post.date <= publishDate);
 }
 
 export function getPost(slug: string): BlogPost | undefined {
-  const db = getDb();
+  const publishDate = getCurrentPublishDate();
 
-  try {
-    return db
-      .prepare('SELECT slug, title, date, category, excerpt, content, img FROM posts WHERE slug = ? AND date <= ?')
-      .get(slug, getCurrentPublishDate()) as BlogPost | undefined;
-  } finally {
-    db.close();
-  }
+  return allPosts.find((post) => post.slug === slug && post.date <= publishDate);
 }
 
 export function getRelatedPosts(slug: string, limit = 2): BlogPost[] {
-  const db = getDb();
+  const publishDate = getCurrentPublishDate();
 
-  try {
-    return db
-      .prepare(
-        'SELECT slug, title, date, category, excerpt, content, img FROM posts WHERE slug != ? AND date <= ? ORDER BY date DESC, id DESC LIMIT ?',
-      )
-      .all(slug, getCurrentPublishDate(), limit) as BlogPost[];
-  } finally {
-    db.close();
-  }
+  return allPosts.filter((post) => post.slug !== slug && post.date <= publishDate).slice(0, limit);
 }
 
 export function formatPostDate(date: string): string {

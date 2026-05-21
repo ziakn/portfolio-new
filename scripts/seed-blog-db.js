@@ -887,6 +887,7 @@ const insert = db.prepare(`
 
 const seedDate = new Date('2026-05-15T00:00:00.000Z');
 const allTopics = buildScheduledTopics();
+const seededPosts = [];
 
 db.transaction(() => {
   db.prepare('DELETE FROM posts').run();
@@ -899,7 +900,7 @@ db.transaction(() => {
       date.setUTCDate(seedDate.getUTCDate() - index * 3);
     }
 
-    insert.run({
+    const post = {
       slug,
       title,
       date: date.toISOString().slice(0, 10),
@@ -907,10 +908,29 @@ db.transaction(() => {
       excerpt,
       content: makeContent(topic, index),
       img: images[index % images.length],
-    });
+    };
+
+    insert.run(post);
+    seededPosts.push({ id: index + 1, ...post });
   });
 })();
 
 db.close();
 
+const jsonPath = path.join(dbDir, 'blog-posts.json');
+const jsonPosts = seededPosts
+  .sort((first, second) => second.date.localeCompare(first.date) || second.id - first.id)
+  .map((post) => ({
+    slug: post.slug,
+    title: post.title,
+    date: post.date,
+    category: post.category,
+    excerpt: post.excerpt,
+    content: post.content,
+    img: post.img,
+  }));
+
+fs.writeFileSync(jsonPath, `${JSON.stringify(jsonPosts, null, 2)}\n`);
+
 console.log(`Seeded ${allTopics.length} blog posts into ${path.relative(process.cwd(), dbPath)}`);
+console.log(`Wrote ${jsonPosts.length} blog posts into ${path.relative(process.cwd(), jsonPath)}`);
