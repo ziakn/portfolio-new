@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Script from 'next/script';
 import type { Metadata } from 'next';
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 type Props = {
   params: Promise<{ slug: string }>;

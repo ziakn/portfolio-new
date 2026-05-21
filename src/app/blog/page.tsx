@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { formatPostDate, getPosts } from '@/data/posts';
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: 'Qatar Software Engineering Blog',

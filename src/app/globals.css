@@ -1141,6 +1141,10 @@ main {
   margin-bottom: 10px;
 }
 
+.blog-post>header {
+  margin-top: 35px;
+}
+
 .blog-posts-list {
   display: grid;
   grid-template-columns: 1fr;

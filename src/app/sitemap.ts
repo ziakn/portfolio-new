@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { getPosts } from '@/data/posts';
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 const baseUrl = 'https://ziamuhammad.com';
 const siteLastModified = new Date('2026-05-17T00:00:00.000Z');

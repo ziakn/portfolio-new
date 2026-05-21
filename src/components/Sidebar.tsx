@@ -10,7 +10,15 @@ export default function Sidebar() {
     <aside className={`sidebar${active ? ' active' : ''}`} data-sidebar>
       <div className="sidebar-info">
         <figure className="avatar-box">
-          <Image src="/images/Profile-W.webp" alt="Zia Muhammad" width={80} height={80} priority />
+          <Image
+            src="/images/Profile-W.webp"
+            alt="Zia Muhammad"
+            width={388}
+            height={500}
+            sizes="(min-width: 1250px) 150px, (min-width: 580px) 120px, 80px"
+            quality={100}
+            priority
+          />
         </figure>
 
         <div className="info-content">
