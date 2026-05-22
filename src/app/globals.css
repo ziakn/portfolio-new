@@ -1043,7 +1043,7 @@ main {
 
 .project-list {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 30px;
   margin-bottom: 10px;
 }
@@ -1069,6 +1069,7 @@ main {
 
 .project-item>a {
   width: 100%;
+  min-width: 0;
 }
 
 .project-img {
@@ -1961,7 +1962,7 @@ textarea.form-input::-webkit-resizer {
 
   .project-list,
   .blog-posts-list {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   /**
@@ -2017,7 +2018,7 @@ textarea.form-input::-webkit-resizer {
 
   .main-content {
     position: relative;
-    width: max-content;
+    width: min(100%, 950px);
     margin: auto;
   }
 
@@ -2078,7 +2079,7 @@ textarea.form-input::-webkit-resizer {
    */
 
   .project-list {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   /**
@@ -2150,8 +2151,9 @@ textarea.form-input::-webkit-resizer {
   }
 
   .main-content {
-    min-width: 75%;
-    width: 75%;
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
     margin: 0;
   }
 
