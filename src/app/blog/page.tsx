@@ -27,6 +27,14 @@ export default function BlogPage() {
         <h1 className="h1 article-title">Blog</h1>
       </header>
 
+      <section className="about-text blog-intro">
+        <p>
+          Original notes from my work on Laravel, Next.js, APIs, AI workflows, payment integrations,
+          and high-traffic publishing platforms in Qatar. I keep this section focused on practical
+          engineering lessons instead of daily keyword posts.
+        </p>
+      </section>
+
       <section className="blog-posts">
         <ul className="blog-posts-list">
           {posts.map((post) => (

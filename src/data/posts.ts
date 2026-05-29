@@ -1,4 +1,4 @@
-import posts from '../../data/blog-posts.json';
+import posts from './curated-posts';
 
 export interface BlogPost {
   slug: string;

@@ -28,6 +28,17 @@ export default function TermsAndConditions() {
         <p>
           This website publishes portfolio information, contact details, and software engineering articles written for informational and professional purposes. Visitors may contact Zia Muhammad through the contact form or listed email address, but the site does not provide public user comments or community posting features.
         </p>
+        <h3 className="h3">Original Articles and Portfolio Notes</h3>
+        <p>
+          Articles and case-study notes on this site are written from professional software engineering
+          experience, including Laravel, Next.js, APIs, technical SEO, AI workflows, and publishing
+          platforms. Content may be updated when projects, tools, or policies change.
+        </p>
+        <h3 className="h3">External Links</h3>
+        <p>
+          Portfolio items and social profiles may link to third-party websites. Those websites are
+          responsible for their own content, availability, privacy practices, and terms.
+        </p>
       </section>
     </article>
   );
