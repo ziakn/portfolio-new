@@ -79,6 +79,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'yearly',
       priority: 0.2,
     },
+    {
+      url: absoluteUrl('/tasbih-privacy-policy'),
+      lastModified: siteLastModified,
+      changeFrequency: 'yearly',
+      priority: 0.2,
+    },
     ...posts.map((post) => ({
       url: absoluteUrl(`/blog/${post.slug}`),
       lastModified: new Date(`${post.date}T00:00:00.000Z`),
