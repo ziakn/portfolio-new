@@ -1,4 +1,12 @@
-import { formatPostDate, getPost, getPosts, getRelatedPosts } from '@/data/posts';
+import {
+  formatPostDate,
+  getPost,
+  getPosts,
+  getRelatedPosts,
+  getPostKeywords,
+  getWordCount,
+  getReadingTimeMinutes,
+} from '@/data/posts';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -20,14 +28,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${post.title} | Blog`,
     description: post.excerpt,
-    keywords: [
-      post.title,
-      `${post.category} Qatar`,
-      'Software Engineer Qatar',
-      'Laravel Developer Qatar',
-      'Next.js Developer Doha',
-      'Technical SEO Qatar',
-    ],
+    keywords: [post.title, ...getPostKeywords(post)],
+    authors: [{ name: 'Zia Muhammad', url: 'https://ziamuhammad.com' }],
+    category: post.category,
     alternates: {
       canonical: `https://ziamuhammad.com/blog/${slug}`,
     },
@@ -66,18 +69,24 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound();
 
   const relatedPosts = getRelatedPosts(slug);
-  const plainContent = post.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const wordCount = getWordCount(post.content);
+  const readingTime = getReadingTimeMinutes(post.content);
+  const postUrl = `https://ziamuhammad.com/blog/${post.slug}`;
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.excerpt,
     image: `https://ziamuhammad.com${post.img}`,
+    url: postUrl,
     datePublished: post.date,
     dateModified: post.date,
+    inLanguage: 'en',
+    isAccessibleForFree: true,
     articleSection: post.category,
-    keywords: [post.category, 'Qatar software engineering', 'Laravel', 'Next.js', 'technical SEO'],
-    wordCount: plainContent ? plainContent.split(' ').length : undefined,
+    keywords: getPostKeywords(post).join(', '),
+    wordCount: wordCount || undefined,
+    timeRequired: `PT${readingTime}M`,
     author: {
       '@type': 'Person',
       name: 'Zia Muhammad',
@@ -91,8 +100,16 @@ export default async function BlogPostPage({ params }: Props) {
     publisher: {
       '@type': 'Person',
       name: 'Zia Muhammad',
+      url: 'https://ziamuhammad.com',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://ziamuhammad.com/images/Profile-W.webp',
+      },
     },
-    mainEntityOfPage: `https://ziamuhammad.com/blog/${post.slug}`,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': postUrl,
+    },
   };
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
@@ -127,6 +144,8 @@ export default async function BlogPostPage({ params }: Props) {
           <p className="blog-category">{post.category}</p>
           <span className="dot"></span>
           <time dateTime={post.date}>{formatPostDate(post.date)}</time>
+          <span className="dot"></span>
+          <span>{readingTime} min read</span>
         </div>
       </header>
 

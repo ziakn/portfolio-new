@@ -4,605 +4,526 @@ const path = require('path');
 
 const dbDir = path.join(process.cwd(), 'data');
 const dbPath = path.join(dbDir, 'blog.sqlite');
+const jsonPath = path.join(dbDir, 'blog-posts.json');
 
 fs.mkdirSync(dbDir, { recursive: true });
 
-const images = [
-  '/images/blog-1.webp',
-  '/images/blog-2.webp',
-  '/images/blog-3.webp',
-  '/images/blog-4.webp',
-  '/images/blog-5.webp',
-  '/images/blog-6.webp',
-];
+const TARGET_TOTAL = 1000;
+// Generated posts are scheduled one per day starting here, so exactly one new
+// post becomes live each day (the app shows posts whose date <= today).
+const GENERATED_START = new Date('2026-06-22T00:00:00.000Z');
 
-const topics = [
-  ['laravel-developer-qatar-guide', 'How to Choose a Laravel Developer in Qatar', 'Laravel Qatar', 'A practical guide for Qatar companies evaluating Laravel developers, project fit, delivery process, and long-term maintainability.'],
-  ['nextjs-seo-doha-businesses', 'Next.js SEO for Doha Businesses', 'Next.js SEO', 'How Doha businesses can use Next.js metadata, performance, structured data, and content strategy to rank for local search terms.'],
-  ['qatar-website-performance-checklist', 'Website Performance Checklist for Qatar Companies', 'Performance', 'A focused checklist for improving Core Web Vitals, hosting choices, images, caching, and frontend delivery for Qatar audiences.'],
-  ['arabic-english-website-qatar', 'Building Arabic and English Websites for Qatar', 'Localization', 'Key engineering decisions behind bilingual websites, RTL layouts, content modeling, and SEO for Qatar-based brands.'],
-  ['doha-real-estate-web-platforms', 'Web Platforms for Doha Real Estate Companies', 'Real Estate Tech', 'What real estate teams in Qatar need from listing portals, CRM integrations, lead routing, and search-friendly property pages.'],
-  ['restaurant-ordering-apps-qatar', 'Restaurant Ordering Apps in Qatar: Technical Blueprint', 'Mobile Apps', 'A blueprint for restaurant ordering, delivery, loyalty, and payment workflows built for Qatar customer expectations.'],
-  ['qatar-news-portal-architecture', 'Architecture Lessons from High-Traffic Qatar News Portals', 'Media Engineering', 'Engineering patterns for caching, publishing workflows, migrations, and performance on high-traffic Qatar media websites.'],
-  ['ai-content-workflows-newsrooms-qatar', 'AI Content Workflows for Qatar Newsrooms', 'AI & Backend', 'How AI can support tagging, summarization, search, moderation, and editorial productivity without replacing editorial judgment.'],
-  ['ecommerce-development-qatar', 'Ecommerce Development in Qatar: What Matters Most', 'Ecommerce', 'The technical priorities behind fast, secure, and conversion-friendly ecommerce platforms for Qatar retailers.'],
-  ['payment-gateway-integration-qatar', 'Payment Gateway Integration for Qatar Web Apps', 'API Development', 'How to plan payment gateway integrations for Qatar web apps with reliability, clear error handling, and secure checkout flows.'],
-  ['seo-consultant-doha-technical-audit', 'What a Technical SEO Audit in Doha Should Cover', 'SEO', 'A technical SEO audit checklist covering crawlability, metadata, schema, content structure, speed, and local relevance.'],
-  ['wordpress-vs-laravel-qatar-business', 'WordPress vs Laravel for Qatar Business Websites', 'Strategy', 'A clear comparison of WordPress and Laravel for Qatar businesses that need speed, custom workflows, and room to grow.'],
-  ['react-developer-doha-hiring-guide', 'Hiring a React Developer in Doha: A Business Guide', 'Frontend', 'What to look for when hiring React talent in Doha, from component quality to performance, accessibility, and project delivery.'],
-  ['qatar-startup-mvp-tech-stack', 'Best Tech Stack for Qatar Startup MVPs', 'Startups', 'How Qatar startups can choose a practical MVP stack that balances speed, cost, future scale, and developer availability.'],
-  ['laravel-api-design-mobile-apps-qatar', 'Laravel API Design for Qatar Mobile Apps', 'API Development', 'Design principles for Laravel APIs powering mobile apps, including authentication, versioning, pagination, and observability.'],
-  ['cloud-hosting-qatar-websites', 'Cloud Hosting Choices for Qatar Websites', 'Hosting', 'How to choose hosting for Qatar websites based on latency, reliability, deployment workflow, backups, and operational control.'],
-  ['local-seo-software-engineer-qatar', 'Local SEO for Software Services in Qatar', 'SEO', 'How software consultants and agencies can build local Qatar visibility with service pages, case studies, schema, and useful content.'],
-  ['qatar-event-registration-platforms', 'Event Registration Platforms in Qatar', 'Event Tech', 'Technical features that matter for Qatar events, including high-concurrency registration, ticketing, QR check-in, and reporting.'],
-  ['crm-development-qatar-companies', 'CRM Development for Qatar Companies', 'Business Apps', 'How custom CRM platforms support Qatar sales, service, billing, lead follow-up, and management reporting.'],
-  ['database-migration-zero-downtime', 'Zero-Downtime Database Migration for Production Apps', 'Backend', 'A practical migration approach for production platforms where downtime, data loss, and user disruption are not acceptable.'],
-  ['nextjs-image-optimization-qatar', 'Next.js Image Optimization for Qatar Portfolios and Brands', 'Next.js SEO', 'How image sizing, formats, priority loading, and alt text affect SEO and conversion on Qatar-focused websites.'],
-  ['schema-markup-qatar-businesses', 'Schema Markup for Qatar Businesses', 'SEO', 'How structured data helps search engines understand Qatar businesses, services, people, articles, breadcrumbs, and locations.'],
-  ['rag-pipelines-laravel-qatar', 'RAG Pipelines with Laravel for Qatar Organizations', 'AI & Backend', 'How retrieval-augmented generation can power internal search, knowledge assistants, and customer support tools in Qatar.'],
-  ['doha-portfolio-website-seo', 'Portfolio Website SEO for Doha Professionals', 'SEO', 'How professionals in Doha can improve portfolio visibility with project proof, service language, metadata, and content depth.'],
-  ['bilingual-seo-qatar-websites', 'Bilingual SEO for Qatar Websites', 'Localization', 'How to structure English and Arabic content for search visibility, hreflang planning, URL strategy, and localized metadata.'],
-  ['laravel-queues-high-traffic-qatar', 'Using Laravel Queues for High-Traffic Qatar Platforms', 'Backend', 'How queues improve performance and reliability for imports, notifications, AI jobs, publishing tasks, and third-party APIs.'],
-  ['real-time-notifications-qatar-apps', 'Real-Time Notifications for Qatar Web and Mobile Apps', 'Realtime Apps', 'Architecture options for real-time updates using WebSockets, Pusher-style services, queues, and clear notification rules.'],
-  ['qatar-ecommerce-seo-product-pages', 'SEO-Friendly Product Pages for Qatar Ecommerce', 'Ecommerce', 'How Qatar retailers can improve product pages with structured data, images, internal links, content, and performance.'],
-  ['technical-content-strategy-qatar-it', 'Technical Content Strategy for Qatar IT Services', 'Content Strategy', 'How IT service providers in Qatar can build search demand through useful guides, case studies, and local landing pages.'],
-  ['web-accessibility-qatar-government', 'Accessibility Basics for Qatar Government and Public Websites', 'Accessibility', 'Practical accessibility improvements for public-sector websites, forms, navigation, colors, keyboard support, and content clarity.'],
-  ['newsroom-cms-workflows-qatar', 'CMS Workflows for Qatar Media Teams', 'Media Engineering', 'How editorial CMS workflows can support approvals, scheduling, multimedia content, analytics, and multi-publication publishing.'],
-  ['server-side-rendering-seo-qatar', 'Server-Side Rendering and SEO for Qatar Websites', 'Next.js SEO', 'When SSR helps search visibility, freshness, personalization, and performance for Qatar service and content websites.'],
-  ['landing-pages-qatar-services', 'High-Converting Service Pages for Qatar Businesses', 'SEO', 'How to structure service pages around search intent, proof, process, calls to action, and local Qatar relevance.'],
-  ['map-integrations-qatar-apps', 'Google Maps Integration for Qatar Web Apps', 'API Development', 'What to consider when adding maps, location search, directions, geocoding, and branch finders to Qatar applications.'],
-  ['sms-whatsapp-integrations-qatar', 'SMS and WhatsApp Integrations for Qatar Applications', 'API Development', 'How Qatar businesses can use transactional messaging for OTPs, delivery updates, booking confirmations, and customer service.'],
-  ['qatar-saas-architecture', 'SaaS Architecture for Qatar Service Companies', 'SaaS', 'Foundational architecture choices for multi-tenant dashboards, roles, billing, reporting, onboarding, and secure data separation.'],
-  ['portfolio-case-studies-seo', 'Turning Portfolio Projects into SEO Case Studies', 'Content Strategy', 'How software professionals can convert project work into credible case studies that attract local Qatar search traffic.'],
-  ['core-web-vitals-doha-websites', 'Core Web Vitals for Doha Websites', 'Performance', 'How local businesses can improve loading, interactivity, visual stability, images, scripts, and hosting decisions.'],
-  ['secure-laravel-apps-qatar', 'Security Checklist for Laravel Apps in Qatar', 'Security', 'A practical checklist for authentication, authorization, validation, file uploads, secrets, logging, and production hardening.'],
-  ['headless-cms-qatar-brands', 'Headless CMS for Qatar Brands', 'Content Management', 'When a headless CMS helps Qatar brands publish faster across websites, mobile apps, campaigns, and multilingual channels.'],
-  ['mobile-first-design-qatar', 'Mobile-First Design for Qatar Audiences', 'Frontend', 'Why mobile-first delivery matters in Qatar and how to design forms, navigation, content, and performance for smaller screens.'],
-  ['api-observability-qatar-platforms', 'API Observability for Qatar Digital Platforms', 'Backend', 'How logging, metrics, tracing, alerts, and dashboards help teams operate production APIs with confidence.'],
-  ['qatar-hospitality-websites', 'Website Features for Qatar Hospitality Businesses', 'Hospitality Tech', 'What restaurants, cafes, and hospitality brands need from booking, menus, ordering, location pages, and SEO.'],
-  ['automated-content-tagging-ai', 'Automated Content Tagging with AI', 'AI & Backend', 'How AI tagging can improve search, recommendations, editorial workflows, and archives for large content platforms.'],
-  ['nextjs-sitemap-robots-qatar', 'Sitemaps and Robots.txt for Qatar Websites', 'SEO', 'How to configure sitemaps, robots directives, canonical URLs, and crawl priorities for a growing Qatar website.'],
-  ['doha-freelance-software-engineer', 'Working with a Freelance Software Engineer in Doha', 'Consulting', 'How to scope, manage, and evaluate freelance software engineering work for Qatar businesses and startups.'],
-  ['legacy-system-modernization-qatar', 'Modernizing Legacy Systems for Qatar Companies', 'Digital Transformation', 'How to plan modernization without interrupting operations, including audits, data migration, APIs, and phased releases.'],
-  ['frontend-performance-react-qatar', 'React Frontend Performance for Qatar Platforms', 'Frontend', 'How to reduce bundle weight, avoid unnecessary rendering, optimize images, and keep React interfaces responsive.'],
-  ['ai-search-business-websites-qatar', 'AI Search for Qatar Business Websites', 'AI & Backend', 'How semantic search and AI assistants can help visitors find services, documents, FAQs, and product information faster.'],
-  ['software-engineer-doha-services', 'Software Engineer in Doha: Services Businesses Usually Need', 'Consulting', 'A service overview for Qatar companies that need websites, APIs, dashboards, mobile apps, AI integrations, and technical SEO.'],
-];
-
-const targetPostCount = 1000;
-const scheduledStartDate = new Date('2026-05-18T00:00:00.000Z');
-const serviceAreas = [
-  'Laravel development',
-  'Next.js SEO',
-  'React frontends',
-  'API architecture',
-  'mobile app backends',
-  'AI search',
-  'RAG pipelines',
-  'technical SEO',
-  'ecommerce platforms',
-  'payment integrations',
-  'cloud hosting',
-  'database optimization',
-  'CMS workflows',
-  'bilingual websites',
-  'Core Web Vitals',
-  'SaaS dashboards',
-  'real-time notifications',
-  'Google Maps integrations',
-  'CRM automation',
-  'legacy modernization',
-];
-const audiences = [
-  'Qatar startups',
-  'Doha businesses',
-  'Qatar ecommerce teams',
-  'media companies in Qatar',
-  'real estate companies in Doha',
-  'hospitality brands in Qatar',
-  'public-sector teams',
-  'service companies in Doha',
-  'retailers in Qatar',
-  'enterprise teams in Qatar',
-];
-const angles = [
-  'planning checklist',
-  'implementation guide',
-  'SEO strategy',
-  'technical blueprint',
-  'performance audit',
-  'security checklist',
-  'migration plan',
-  'content strategy',
-  'integration guide',
-  'maintenance roadmap',
-];
-const categoryByService = {
-  'Laravel development': 'Laravel Qatar',
-  'Next.js SEO': 'Next.js SEO',
-  'React frontends': 'Frontend',
-  'API architecture': 'API Development',
-  'mobile app backends': 'Mobile Apps',
-  'AI search': 'AI & Backend',
-  'RAG pipelines': 'AI & Backend',
-  'technical SEO': 'SEO',
-  'ecommerce platforms': 'Ecommerce',
-  'payment integrations': 'API Development',
-  'cloud hosting': 'Hosting',
-  'database optimization': 'Backend',
-  'CMS workflows': 'Content Management',
-  'bilingual websites': 'Localization',
-  'Core Web Vitals': 'Performance',
-  'SaaS dashboards': 'SaaS',
-  'real-time notifications': 'Realtime Apps',
-  'Google Maps integrations': 'API Development',
-  'CRM automation': 'Business Apps',
-  'legacy modernization': 'Digital Transformation',
-};
-
-const futureSignals = [
+/* ============================================================================
+ * 1) EVERGREEN LIBRARY — genuinely hand-written, already live (past dates).
+ *    These are the strongest, original articles and lead the blog.
+ * ========================================================================== */
+const evergreenPosts = [
   {
-    service: 'agentic AI workflows',
-    category: 'AI & Backend',
-    keyword: 'AI agents Qatar',
-    discussion: 'agentic AI, approval flows, prompt governance, and measurable task automation',
-    prediction: 'businesses will ask less about simple chatbots and more about supervised agents that can search, draft, route, and update records safely',
+    slug: 'how-to-choose-a-laravel-developer-in-qatar',
+    title: 'How to Choose a Laravel Developer in Qatar',
+    date: '2026-06-12',
+    category: 'Laravel',
+    excerpt:
+      'A practical, vendor-neutral guide for Qatar businesses evaluating a Laravel developer: how to judge fit, process, code quality, and long-term maintainability.',
+    img: '/images/al-sharq.webp',
+    content: `
+      <p>Hiring a Laravel developer in Qatar is rarely about finding someone who can write PHP. Most developers can build a feature that works in a demo. The real question is whether the person can build software that stays maintainable, performs under real traffic, and can be handed to another engineer two years from now without a rewrite.</p>
+      <p>This guide is written for business owners and project managers who are not developers themselves but still have to make a confident decision.</p>
+      <h3>Start with the problem, not the technology</h3>
+      <p>Before comparing developers, write down what the project must achieve in plain language: the users, the core workflow, the integrations, and what success looks like in six months. A strong Laravel developer will ask about these things before talking about frameworks. If the first conversation is only about tools and price, that is a warning sign.</p>
+      <h3>What to look for in their work</h3>
+      <ul>
+        <li><strong>Readable code over clever code.</strong> Ask to see a real repository or a sample. Clear naming, small functions, and tests matter more than impressive one-liners.</li>
+        <li><strong>Database discipline.</strong> Good Laravel work shows thoughtful migrations, indexes, and relationships — not everything crammed into one table.</li>
+        <li><strong>Validation and error handling.</strong> Production apps live or die on the unhappy path. Ask how they handle failed payments, bad input, and third-party outages.</li>
+        <li><strong>Deployment story.</strong> Can they describe how code goes from their machine to production safely, with backups and a rollback plan?</li>
+      </ul>
+      <h3>Questions that reveal experience</h3>
+      <p>Useful interview questions are specific: "How would you keep the site fast if traffic suddenly doubled?", "How do you handle a database change without downtime?", "What do you do when a payment callback arrives late?" The answers show whether the developer has shipped real systems or only tutorials.</p>
+      <h3>Local context matters</h3>
+      <p>In Qatar, projects often need bilingual Arabic and English content, local payment gateways such as Qpay or Sadad, and hosting choices that respect latency for regional users. A developer who has worked on these specifics will save you weeks of discovery.</p>
+      <h3>Protect yourself with ownership</h3>
+      <p>Agree in writing that you own the code, the repository, the domains, and the hosting accounts. Ask for documentation and a short handover. The goal is never to be locked to one person. A confident developer is comfortable making themselves replaceable.</p>
+      <p>The best hire is usually the one who explains tradeoffs honestly, scopes the work realistically, and talks about maintenance — not the one who promises everything quickly and cheaply.</p>
+    `,
   },
   {
-    service: 'AI search optimization',
-    category: 'AI & Backend',
-    keyword: 'AI search SEO Qatar',
-    discussion: 'AI Overviews, answer engines, entity-rich pages, source citations, and structured content',
-    prediction: 'search conversations will move from ranking only on blue links to being selected as a trusted source inside AI-generated answers',
+    slug: 'nextjs-seo-fundamentals-metadata-sitemaps-structured-data',
+    title: 'Next.js SEO Fundamentals: Metadata, Sitemaps, and Structured Data',
+    date: '2026-06-05',
+    category: 'Next.js SEO',
+    excerpt:
+      'A developer-focused walkthrough of the SEO building blocks the App Router gives you — and the mistakes that quietly keep good pages from ranking.',
+    img: '/images/blog-1.webp',
+    content: `
+      <p>Next.js gives you everything you need for strong technical SEO, but the pieces only help if they agree with each other. A page can have a perfect title and still be invisible if its canonical URL, sitemap entry, and robots rules contradict it. This article walks through the fundamentals in the order I actually check them.</p>
+      <h3>1. Unique, specific metadata per page</h3>
+      <p>Every important route should export its own <code>metadata</code> with a unique title and description that match what is on the page. The most common mistake is letting a generic site-wide description leak onto article and service pages. A title that describes the page beats a title stuffed with keywords every time.</p>
+      <h3>2. One honest canonical URL</h3>
+      <p>Each page should declare a single canonical URL, and that URL must be the same one you put in the sitemap. Conflicting canonicals are one of the quietest causes of "Google found it but didn't index it." Pick the real address and use it everywhere consistently.</p>
+      <h3>3. A sitemap that reflects reality</h3>
+      <p>Generate your sitemap from the same data that renders your pages, so it never drifts out of date. Just as important: only include pages that deserve to be indexed. If you have hundreds of thin or unfinished pages, leaving them out of the sitemap is a feature, not a limitation.</p>
+      <h3>4. Structured data that is true</h3>
+      <p>JSON-LD for articles, breadcrumbs, and your organization helps search engines understand the page. The rule is simple: only describe what is actually visible. Marking up a rating or author that does not appear on the page is the kind of mismatch that erodes trust.</p>
+      <h3>5. Render the content on the server</h3>
+      <p>Keep content pages as server components so the text exists in the initial HTML. If the main content only appears after client-side JavaScript runs, crawlers may see far less than your visitors do. Reserve client components for genuinely interactive controls.</p>
+      <blockquote>The fastest SEO win on most Next.js sites is not a new tool — it is making the title, canonical, sitemap, and on-page content tell the same story.</blockquote>
+      <p>Get these five fundamentals aligned before reaching for anything more advanced. They cover the majority of real-world ranking problems on content and service sites.</p>
+    `,
   },
   {
-    service: 'sovereign cloud planning',
-    category: 'Hosting',
-    keyword: 'sovereign cloud Qatar',
-    discussion: 'data residency, hybrid cloud, backup location, latency, and vendor risk',
-    prediction: 'more Qatar organizations will compare cloud providers by governance, residency, and operational control rather than price alone',
-  },
-  {
-    service: 'AI security controls',
-    category: 'Security',
-    keyword: 'AI security Qatar',
-    discussion: 'shadow AI, prompt injection, sensitive data leaks, access policy, and audit trails',
-    prediction: 'security reviews will include AI usage inventories, model access rules, and testing for unsafe automated decisions',
-  },
-  {
-    service: 'Digital Agenda 2030 platforms',
-    category: 'Digital Transformation',
-    keyword: 'Qatar Digital Agenda 2030',
-    discussion: 'public services, digital identity, cloud foundations, skills, and citizen-facing platforms',
-    prediction: 'Digital Agenda 2030 will create demand for practical web platforms that connect policy goals to everyday user journeys',
-  },
-  {
-    service: 'bilingual answer-engine content',
-    category: 'Localization',
-    keyword: 'Arabic English AI search Qatar',
-    discussion: 'Arabic queries, English service pages, hreflang, entity consistency, and local intent',
-    prediction: 'Qatar brands will need content that performs in classic search, AI answers, Arabic discovery, and English comparison queries',
-  },
-  {
-    service: 'privacy-first analytics',
-    category: 'Analytics',
-    keyword: 'privacy analytics Qatar',
-    discussion: 'server-side events, consent, first-party data, lead quality, and attribution gaps',
-    prediction: 'marketing teams will ask for cleaner analytics pipelines as browser tracking weakens and paid acquisition gets more expensive',
-  },
-  {
-    service: 'cyber-resilient Laravel apps',
-    category: 'Laravel Qatar',
-    keyword: 'Laravel security Qatar',
-    discussion: 'authorization, audit logs, dependency hygiene, incident recovery, and secure admin panels',
-    prediction: 'custom Laravel applications will be judged by recovery planning and operational visibility, not only feature delivery',
-  },
-  {
-    service: 'voice and WhatsApp journeys',
-    category: 'Conversational UX',
-    keyword: 'WhatsApp automation Qatar',
-    discussion: 'Arabic voice search, WhatsApp support, booking flows, lead capture, and CRM handoff',
-    prediction: 'customers will expect service discovery to continue naturally from Google to WhatsApp, voice, forms, and human follow-up',
-  },
-  {
-    service: 'AI-ready CMS architecture',
-    category: 'Content Management',
-    keyword: 'AI CMS Qatar',
-    discussion: 'content models, editorial metadata, tagging, summaries, translation, and permissions',
-    prediction: 'CMS work will shift toward reusable content blocks that feed websites, apps, newsletters, and AI assistants',
-  },
-  {
-    service: 'edge performance for Qatar users',
+    slug: 'core-web-vitals-guide-content-sites',
+    title: 'A Practical Core Web Vitals Guide for Content-Heavy Sites',
+    date: '2026-05-28',
     category: 'Performance',
-    keyword: 'website performance Qatar',
-    discussion: 'edge caching, image delivery, server components, Core Web Vitals, and mobile speed',
-    prediction: 'performance conversations will become more local, with teams asking how fast pages feel for Doha users on real devices',
+    excerpt:
+      'What LCP, INP, and CLS actually measure, where content sites usually lose points, and the fixes that move the numbers most.',
+    img: '/images/blog-3.webp',
+    content: `
+      <p>Core Web Vitals can feel abstract until you connect each metric to something a reader feels. Once you do, the fixes become obvious. This guide focuses on content-heavy sites — blogs, news, and portfolios — where images, fonts, and third-party scripts are usually the culprits.</p>
+      <h3>Largest Contentful Paint (LCP) — how fast the main thing appears</h3>
+      <p>On an article page, the largest element is usually the hero image or the headline. To improve LCP, give the hero image an explicit size, mark it as priority so it loads early, and serve it in a modern format like WebP. Slow server response and render-blocking fonts also hurt LCP, so keep the critical path lean.</p>
+      <h3>Interaction to Next Paint (INP) — how responsive the page feels</h3>
+      <p>INP measures how quickly the page reacts when someone taps or clicks. The biggest enemy is too much JavaScript running on the main thread. On content pages, the cure is usually to ship less client-side code: keep reading pages as server components and load non-essential scripts after the page is interactive.</p>
+      <h3>Cumulative Layout Shift (CLS) — how stable the page is</h3>
+      <p>Nothing frustrates a reader more than text jumping as an ad or image loads. CLS is almost always fixable by reserving space: set width and height on every image, give ad slots a fixed container, and avoid injecting banners above existing content.</p>
+      <h3>A simple working order</h3>
+      <ol>
+        <li>Measure real pages, not the homepage only — article pages behave differently.</li>
+        <li>Fix the hero image first (size, format, priority). This often moves LCP the most.</li>
+        <li>Audit third-party scripts; defer or remove anything not needed on first paint.</li>
+        <li>Reserve space for every image and embed to kill layout shift.</li>
+        <li>Re-measure on a mid-range phone with a throttled connection, not your laptop.</li>
+      </ol>
+      <p>Performance work rewards honesty about what real users experience. A site that feels fast on a developer's machine can still feel slow on a phone in a moving car — and that is the experience Google is measuring.</p>
+    `,
   },
   {
-    service: 'open banking and payment workflows',
+    slug: 'designing-rest-apis-frontend-mobile-teams-enjoy',
+    title: 'Designing REST APIs Frontend and Mobile Teams Actually Enjoy',
+    date: '2026-05-20',
     category: 'API Development',
-    keyword: 'payment integration Qatar',
-    discussion: 'wallets, reconciliation, webhooks, refunds, fraud checks, and finance dashboards',
-    prediction: 'checkout projects will expand into finance operations, real-time reconciliation, and safer recurring payment flows',
+    excerpt:
+      'Consistency, predictable errors, sensible pagination, and clear contracts — the design choices that make an API pleasant instead of painful.',
+    img: '/images/blog-5.webp',
+    content: `
+      <p>A good API is one that another team can use without messaging you. Most API frustration does not come from missing features — it comes from inconsistency, surprising errors, and contracts that change without warning. Here is how I keep server APIs pleasant for the people consuming them.</p>
+      <h3>Be relentlessly consistent</h3>
+      <p>Pick conventions and apply them everywhere: the same casing for fields, the same date format, the same shape for lists, the same envelope for errors. A consumer should be able to guess the shape of an endpoint they have never called because every other endpoint taught them the pattern.</p>
+      <h3>Design errors as carefully as success</h3>
+      <p>Every error should return a correct HTTP status, a stable machine-readable code, and a human-readable message. Validation failures should say which field failed and why. Frontend and mobile teams build real user experiences on top of these errors, so a vague "something went wrong" forces them to guess.</p>
+      <h3>Paginate predictably</h3>
+      <p>Decide on one pagination style and document it: page-based for simple lists, cursor-based for large or fast-changing data. Always return enough metadata for the client to know whether more results exist. Inconsistent pagination across endpoints is a common source of subtle bugs.</p>
+      <h3>Separate the API shape from the database</h3>
+      <p>Use a transformer or resource layer so your API responses are not a direct mirror of your tables. This lets you rename columns, add relationships, or optimize storage without breaking clients. The API is a contract; the database is an implementation detail.</p>
+      <h3>Version only when behavior breaks</h3>
+      <p>Adding an optional field is safe and needs no new version. Removing a field, renaming it, or changing what a value means does. Reserve version bumps for genuine breaking changes, and log which clients still use old versions so you know when it is safe to retire them — this matters especially for mobile apps that update slowly.</p>
+      <h3>Document in the same change</h3>
+      <p>The best moment to update the docs is in the same pull request that changes the API. Sample request, sample response, error formats, and auth rules belong together. Documentation written "later" is documentation that is wrong.</p>
+      <p>None of this is glamorous, and that is the point. The APIs people love are the ones that are boring, predictable, and never surprise them.</p>
+    `,
   },
   {
-    service: 'real estate AI discovery',
-    category: 'Real Estate Tech',
-    keyword: 'real estate website Qatar',
-    discussion: 'semantic property search, maps, lead scoring, listing freshness, and neighborhood content',
-    prediction: 'property portals will compete on search quality and trusted inventory freshness more than on listing volume alone',
-  },
-  {
-    service: 'smart hospitality platforms',
-    category: 'Hospitality Tech',
-    keyword: 'restaurant app Qatar',
-    discussion: 'ordering, loyalty, reservations, delivery integrations, menu SEO, and operational reporting',
-    prediction: 'restaurants and cafes will want owned ordering and loyalty flows to reduce dependence on third-party platforms',
-  },
-  {
-    service: 'media archive intelligence',
-    category: 'Media Engineering',
-    keyword: 'news CMS Qatar',
-    discussion: 'archive search, AI tagging, related stories, paywalls, newsletters, and editorial analytics',
-    prediction: 'newsrooms will turn old archives into searchable, reusable knowledge assets instead of treating them as static history',
-  },
-  {
-    service: 'low-code versus custom software',
+    slug: 'wordpress-vs-laravel-business-website',
+    title: 'WordPress vs Laravel: Choosing the Right Stack for a Business Website',
+    date: '2026-05-14',
     category: 'Strategy',
-    keyword: 'custom software Qatar',
-    discussion: 'automation tools, ownership, integrations, data models, and long-term maintenance',
-    prediction: 'buyers will ask when low-code is enough and when custom Laravel, Next.js, or API work protects the business better',
+    excerpt:
+      'A balanced comparison for business owners deciding between a CMS and a custom framework — based on workflow, budget, and how custom the product really is.',
+    img: '/images/blog-4.webp',
+    content: `
+      <p>"Should we build it in WordPress or Laravel?" is one of the most common questions I hear from businesses in Qatar. The honest answer is that they solve different problems, and the right choice depends on how custom your product actually is — not on which technology is more fashionable.</p>
+      <h3>When WordPress is the right call</h3>
+      <p>WordPress is excellent when the site is mostly content: a company website, a blog, a brochure site, or a simple catalog. Editors can publish without a developer, there is a huge ecosystem of themes and plugins, and the cost to launch is low. If your main need is pages, posts, and a contact form, a custom framework is usually overkill.</p>
+      <h3>When Laravel earns its cost</h3>
+      <p>Laravel shines when the product has real business logic: custom workflows, dashboards, role-based permissions, payment reconciliation, mobile APIs, or integrations that do not fit a plugin. You pay more upfront, but you get a codebase shaped exactly around your operations, without the plugin sprawl that makes some WordPress sites fragile over time.</p>
+      <h3>A simple way to decide</h3>
+      <ul>
+        <li>Mostly publishing content and marketing pages? <strong>WordPress.</strong></li>
+        <li>An application with custom rules, accounts, and integrations? <strong>Laravel.</strong></li>
+        <li>A content site today, but a custom platform within a year? Consider Laravel with a headless CMS, or start lean and plan the migration.</li>
+      </ul>
+      <h3>The hidden costs people forget</h3>
+      <p>WordPress is cheap to start but needs ongoing care: plugin updates, security hardening, and performance tuning as plugins accumulate. Laravel costs more to build but tends to be cheaper to reason about as it grows, because the logic is yours and explicit. Neither is "low maintenance" — they just move the maintenance to different places.</p>
+      <h3>It is not always either/or</h3>
+      <p>Many businesses run both: a WordPress site for marketing content and a Laravel application for the actual product or portal. Letting each tool do what it is best at is often smarter than forcing everything into one stack.</p>
+      <p>Choose based on how much of your product is genuinely custom. That single question answers the WordPress-versus-Laravel debate more reliably than any feature checklist.</p>
+    `,
   },
   {
-    service: 'MCP and AI tool integration',
-    category: 'AI & Backend',
-    keyword: 'MCP integration Qatar',
-    discussion: 'model context protocols, tool permissions, API boundaries, logs, and human approval',
-    prediction: 'AI assistants will become useful when they can safely connect to company tools without exposing every system by default',
+    slug: 'bilingual-arabic-english-websites-engineering-seo',
+    title: 'Building Bilingual Arabic and English Websites: Engineering and SEO',
+    date: '2026-05-06',
+    category: 'Localization',
+    excerpt:
+      'The engineering and SEO decisions behind bilingual sites for Qatar — RTL layout, URL strategy, hreflang, and content models that do not make translation an afterthought.',
+    img: '/images/alarab.webp',
+    content: `
+      <p>Bilingual Arabic and English websites are normal in Qatar, but they are often treated as a translation task bolted on at the end. The result is broken layouts, duplicate content problems, and URLs that confuse search engines. Done properly, bilingual support is an architecture decision made at the start.</p>
+      <h3>Right-to-left is more than text direction</h3>
+      <p>Arabic is read right-to-left, and that affects far more than paragraph alignment. Navigation, icons, form layouts, progress steps, and spacing all need to mirror. Building with logical CSS properties (start/end instead of left/right) lets one stylesheet serve both directions instead of maintaining two fragile layouts.</p>
+      <h3>Give each language a real URL</h3>
+      <p>Each language version should live at its own crawlable URL — typically a path prefix like <code>/en</code> and <code>/ar</code>. Avoid switching languages only with cookies or JavaScript, because search engines then see one ambiguous page instead of two indexable ones.</p>
+      <h3>Tell search engines about the pair</h3>
+      <p>Use hreflang tags so Google knows the English and Arabic pages are alternates of each other, not duplicates. This helps the right version appear for the right audience and prevents the two from competing. Each page should also carry its own canonical pointing to itself.</p>
+      <h3>Model content for two languages from the start</h3>
+      <p>The database should treat translations as first-class data, not as copied rows that drift apart. Store a shared identity for a piece of content with per-language fields for title, slug, body, and metadata. This keeps the two versions linked, makes it obvious what still needs translating, and lets editors manage both without duplicating the entire workflow.</p>
+      <h3>Localize the details, not just the body</h3>
+      <p>Real localization includes dates, numbers, currency, form validation messages, and metadata. A page that translates the article but leaves the buttons and error messages in English feels unfinished — to readers and to search engines judging quality.</p>
+      <p>Plan bilingual support as a foundation and it becomes invisible: both audiences get a site that feels native, and search engines understand exactly what each page is for.</p>
+    `,
   },
   {
-    service: 'green and efficient hosting',
-    category: 'Hosting',
-    keyword: 'efficient cloud hosting Qatar',
-    discussion: 'right-sized servers, caching, image weight, database efficiency, and energy-aware infrastructure',
-    prediction: 'technical SEO and hosting decisions will increasingly include efficiency, waste reduction, and simpler operations',
+    slug: 'caching-strategies-high-traffic-laravel',
+    title: 'Caching Strategies for High-Traffic Laravel Applications',
+    date: '2026-04-28',
+    category: 'Laravel',
+    excerpt:
+      'A layered look at caching in Laravel — from query and response caching to invalidation discipline — for apps that need to stay fast under load.',
+    img: '/images/alsharqtech.webp',
+    content: `
+      <p>Caching is the difference between a Laravel app that calmly handles a traffic spike and one that falls over the moment it gets attention. But caching is also where subtle bugs live, because a cache that is never invalidated correctly will happily serve wrong data to everyone. The goal is to cache aggressively and invalidate precisely.</p>
+      <h3>Think in layers</h3>
+      <p>There is no single cache. A high-traffic app usually has several working together:</p>
+      <ul>
+        <li><strong>Application config and routes.</strong> Cached at deploy time so the framework boots fast.</li>
+        <li><strong>Database query results.</strong> Expensive or frequently repeated queries cached for seconds or minutes.</li>
+        <li><strong>Rendered fragments or full responses.</strong> Pages or components that rarely change, cached close to the user.</li>
+        <li><strong>External API responses.</strong> Third-party data cached to protect against rate limits and outages.</li>
+      </ul>
+      <h3>Cache the expensive, not the trivial</h3>
+      <p>Measure before caching. The right targets are queries and computations that are both slow and frequent. Caching a query that already runs in a millisecond adds complexity for no benefit, and every cache you add is something you must remember to invalidate.</p>
+      <h3>Invalidation is the hard part</h3>
+      <p>The famous joke that cache invalidation is one of the two hard problems in computing is true. Tie cache keys to the data they represent and clear them when that data changes — for example, clearing an article's cache when an editor updates it. Tag-based invalidation helps when many cached items depend on the same record. Avoid blanket "clear everything" calls, which throw away good cache and cause stampedes.</p>
+      <h3>Guard against stampedes</h3>
+      <p>When a popular cached item expires, hundreds of requests can try to regenerate it at once and overload the database. Techniques like locking during regeneration, or serving slightly stale data while one process refreshes, keep the system stable during these moments.</p>
+      <h3>Make cache state visible</h3>
+      <p>In production, you want to know your hit rate, what is cached, and how to safely clear a single key. A cache you cannot inspect is a cache you cannot trust when something looks wrong. A small admin view or a few good log lines pay for themselves the first time data looks stale.</p>
+      <p>Done with discipline, caching is invisible to users and to the database alike. It is one of the highest-leverage tools for keeping a Laravel platform fast as it grows.</p>
+    `,
   },
   {
-    service: 'enterprise knowledge assistants',
-    category: 'AI & Backend',
-    keyword: 'enterprise RAG Qatar',
-    discussion: 'RAG pipelines, permissions, citations, document freshness, and evaluation sets',
-    prediction: 'internal search will become a board-level productivity topic as teams try to unlock documents, policies, and project history',
+    slug: 'mvp-tech-stack-for-startups',
+    title: 'From Idea to MVP: A Pragmatic Tech Stack for New Products',
+    date: '2026-04-21',
+    category: 'Startups',
+    excerpt:
+      'How to choose a stack for a first version that ships fast, stays cheap, and does not trap you when the product finds traction.',
+    img: '/images/blog-6.webp',
+    content: `
+      <p>Choosing a tech stack for an MVP is a balancing act. Pick something too trendy and you spend your runway fighting tooling. Pick something too rigid and you cannot pivot when you learn what users actually want. The right MVP stack is boring, well-documented, and fast to change.</p>
+      <h3>Optimize for speed of learning</h3>
+      <p>The point of an MVP is to learn whether anyone wants the product. Every technical choice should serve that goal. That usually means a single, well-understood framework, a managed database, and a hosting platform that deploys with one command. Save the microservices and exotic infrastructure for when you have users to justify them.</p>
+      <h3>A stack that rarely lets you down</h3>
+      <p>For most products, a proven full-stack framework (Laravel or Next.js, depending on whether the heart of the product is backend logic or a rich interface), a relational database like PostgreSQL or MySQL, and a managed host will take you a long way. These are tools with huge communities, so when you hit a problem at 2am, the answer already exists.</p>
+      <h3>Build only the core loop</h3>
+      <p>Identify the one workflow that delivers your product's value and build only that, end to end. Resist the urge to add settings pages, admin dashboards, and edge cases before a single user has tried the core loop. Most of those features will change once real people use the product.</p>
+      <h3>Choices that buy you flexibility</h3>
+      <ul>
+        <li>Keep business logic out of the UI so you can change the interface without rewriting the rules.</li>
+        <li>Use a relational database — it is far easier to grow into than to migrate away from later.</li>
+        <li>Put third-party services (email, payments, SMS) behind a thin layer so you can swap providers.</li>
+        <li>Write down decisions, not just code, so the next developer understands the why.</li>
+      </ul>
+      <h3>Avoid premature scaling</h3>
+      <p>The most common MVP mistake is building for a million users you do not have yet. A single well-configured server handles more traffic than most early startups will ever see. Scale when the metrics demand it, and let real usage tell you where the bottleneck actually is — it is rarely where you guessed.</p>
+      <p>A good MVP stack is one you stop thinking about, so you can spend your attention on customers instead of infrastructure.</p>
+    `,
   },
   {
-    service: 'customer data platforms for SMEs',
-    category: 'Business Apps',
-    keyword: 'CRM automation Qatar',
-    discussion: 'lead sources, customer profiles, WhatsApp history, consent, segmentation, and reporting',
-    prediction: 'smaller businesses will want practical customer data systems without the cost and complexity of enterprise suites',
-  },
-  {
-    service: 'AI ecommerce merchandising',
-    category: 'Ecommerce',
-    keyword: 'ecommerce SEO Qatar',
-    discussion: 'product feeds, recommendations, visual search, Arabic product data, and stock-aware SEO',
-    prediction: 'retailers will expect ecommerce sites to explain, recommend, and personalize products using cleaner product data',
-  },
-  {
-    service: 'accessibility for public services',
-    category: 'Accessibility',
-    keyword: 'accessible websites Qatar',
-    discussion: 'keyboard access, readable forms, bilingual labels, error states, and mobile public-service journeys',
-    prediction: 'accessibility will become part of quality, procurement, and public trust rather than a final visual polish step',
-  },
-  {
-    service: 'API observability and reliability',
+    slug: 'database-indexing-basics-backend-developers',
+    title: 'Database Indexing Basics Every Backend Developer Should Know',
+    date: '2026-04-14',
     category: 'Backend',
-    keyword: 'API monitoring Qatar',
-    discussion: 'logs, traces, uptime checks, queue health, webhook retries, and support diagnostics',
-    prediction: 'teams will ask developers to prove how systems behave after launch, especially when APIs connect payments, apps, and CRM tools',
+    excerpt:
+      'A plain-language explanation of how indexes work, when they help, when they hurt, and how to find the queries that need them.',
+    img: '/images/blog-2.webp',
+    content: `
+      <p>Indexing is one of those topics that separates an application that stays fast from one that mysteriously slows down as data grows. The good news is that the core idea is simple, and a handful of habits prevent most performance problems.</p>
+      <h3>What an index actually is</h3>
+      <p>An index is like the index at the back of a book. Without it, the database reads every row to find what you asked for — fine with a thousand rows, painful with a million. With an index, the database jumps almost directly to the matching rows. That is the entire benefit: avoiding full scans of large tables.</p>
+      <h3>What to index</h3>
+      <p>Index the columns you filter, join, and sort on frequently. Foreign keys are almost always worth indexing because they are used in joins constantly. A column in a <code>WHERE</code> clause on a large, busy table is a strong candidate. The columns in your <code>ORDER BY</code> can benefit too.</p>
+      <h3>Why not index everything</h3>
+      <p>Indexes are not free. Every index must be updated on every insert, update, and delete, so too many indexes slow down writes and consume storage. The skill is choosing the few indexes that serve your real query patterns rather than blanketing every column.</p>
+      <h3>Composite indexes and order</h3>
+      <p>When you filter on several columns together, a single composite index covering those columns can beat several separate ones. Order matters: put the most selective or most-frequently-filtered column first. A composite index on (status, created_at) helps a query that filters by status and then sorts by date — but the column order has to match how you query.</p>
+      <h3>Find the queries that need help</h3>
+      <p>Do not guess. Use your database's slow query log and the <code>EXPLAIN</code> command, which shows whether a query uses an index or scans the whole table. The phrase you are looking to eliminate is the full table scan on a large table. Fix those, and most performance complaints disappear.</p>
+      <blockquote>Add indexes in response to real slow queries, not in anticipation of imaginary ones. Measure, then index.</blockquote>
+      <p>Indexing well is mostly about knowing your queries. Once you can read an <code>EXPLAIN</code> output, the right indexes usually become obvious.</p>
+    `,
   },
   {
-    service: 'local-first service SEO',
-    category: 'SEO',
-    keyword: 'local SEO Doha',
-    discussion: 'entity pages, case studies, service-area proof, reviews, schema, and content refreshes',
-    prediction: 'thin service pages will lose ground to pages with original proof, local context, and answers to specific buyer questions',
+    slug: 'securing-laravel-application-checklist',
+    title: 'Securing a Laravel Application: A Practical Checklist',
+    date: '2026-04-07',
+    category: 'Security',
+    excerpt:
+      'A grounded security checklist for real Laravel apps — authentication, authorization, input handling, secrets, and the operational basics that prevent most incidents.',
+    img: '/images/blog-1.webp',
+    content: `
+      <p>Most security incidents are not exotic. They come from missed basics: an unprotected route, a leaked key, an unvalidated upload, or a dependency that was never updated. This checklist focuses on the practical controls that prevent the majority of real problems in a Laravel application.</p>
+      <h3>Authentication and sessions</h3>
+      <p>Use the framework's built-in authentication rather than rolling your own. Enforce reasonable password rules, hash passwords with the framework defaults, and consider two-factor authentication for admin accounts. Make sure sessions expire sensibly and that logging out truly invalidates the session.</p>
+      <h3>Authorization on every action</h3>
+      <p>Authentication confirms who someone is; authorization controls what they can do. Every sensitive action should check permission with policies or gates — not just hide a button in the UI. The most common real-world vulnerability is an endpoint that trusts the request without verifying the user is allowed to touch that specific record.</p>
+      <h3>Validate and escape everything from users</h3>
+      <ul>
+        <li>Validate all input with form requests; never trust data because the frontend "already checked it."</li>
+        <li>Use the query builder or Eloquent so queries are parameterized, which prevents SQL injection.</li>
+        <li>Let Blade escape output by default; be extremely careful with any raw, unescaped rendering.</li>
+        <li>Restrict file uploads by type and size, store them outside the web root, and never trust the original filename.</li>
+      </ul>
+      <h3>Protect secrets</h3>
+      <p>Keep credentials in environment variables, never in the repository. Make sure debug mode is off in production so stack traces never leak configuration. Rotate keys if they were ever exposed, and limit who can read production environment files.</p>
+      <h3>Keep dependencies current</h3>
+      <p>Outdated packages are a leading cause of breaches. Update regularly, watch for security advisories, and remove dependencies you no longer use. A smaller dependency tree is a smaller attack surface.</p>
+      <h3>Operational basics</h3>
+      <p>Enforce HTTPS everywhere, set security headers, rate-limit authentication and API endpoints, and keep audit logs for sensitive actions. Test your backups by restoring them. Security is not a one-time task — it is a habit of small, consistent precautions that make an attacker's job not worth the effort.</p>
+    `,
+  },
+  {
+    slug: 'zero-downtime-news-migration-laravel-qatar',
+    title: 'How I Plan Zero-Downtime Laravel Migrations for High-Traffic News Sites',
+    date: '2026-03-26',
+    category: 'Laravel',
+    excerpt:
+      'A practical field note from migrating large Qatar news platforms: how to protect data integrity, keep editors publishing, and avoid launch-day surprises.',
+    img: '/images/al-sharq.webp',
+    content: `
+      <p>Large publishing migrations are rarely blocked by one difficult SQL query. They fail when editorial work, cache invalidation, media paths, redirects, and rollback planning are treated as separate concerns. On Qatar news platforms where traffic can spike around breaking stories, the migration plan has to protect both readers and the newsroom.</p>
+      <p>My starting point is always an inventory of what must keep working during the move. For a Laravel news platform that usually includes articles, authors, sections, tags, media galleries, SEO metadata, legacy URLs, push notification hooks, RSS feeds, sitemaps, and analytics tags. If any of those pieces are moved without a verification path, the migration may look successful in the database while the public site quietly loses value.</p>
+      <h3>Map the data before writing import code</h3>
+      <p>I prefer to write a source-to-target mapping document before building the importer. It lists each table, the destination model, field transformations, nullable rules, indexes, and the validation query that proves the record landed correctly. This sounds slow, but it prevents the most expensive kind of rework: discovering after launch that a legacy content type was interpreted incorrectly.</p>
+      <p>For example, news articles often have multiple date fields. There may be a created date, a first published date, a last edited date, and a scheduled publish date. Search engines, RSS readers, and newsroom dashboards each care about a different one. The migration needs to preserve that meaning rather than simply moving the newest timestamp into every field.</p>
+      <h3>Run dual reads and compare results</h3>
+      <p>When possible, I run the new Laravel application beside the old system and compare record counts, URL responses, and rendered metadata before switching traffic. A simple dashboard can show how many articles, images, authors, categories, and redirects have passed validation. The goal is not to create a perfect migration tool; it is to make uncertainty visible early enough to act on it.</p>
+      <p>For very large tables, batches should be idempotent. Every import step needs to be safe to retry, and every retry needs to avoid duplicate rows. I usually store source IDs in dedicated columns or mapping tables so the importer can resume from a failed batch without guessing.</p>
+      <h3>Keep editors publishing</h3>
+      <p>The hardest part of a publishing migration is not the archive. It is the content created while the team is testing the new system. For that reason, I separate historical migration from the final sync. The archive can be moved and tested ahead of time, then the launch window only has to handle recent changes, media uploads, and URL verification.</p>
+      <p>Before launch, I also prepare redirects for legacy article paths and category pages. This matters for readers, but it also matters for AdSense and search quality because a site with broken internal paths can look unfinished even when the homepage is polished.</p>
+      <h3>What I check before the switch</h3>
+      <p>My final checklist includes database counts, sample article rendering, canonical URLs, Open Graph images, image alt text, sitemap output, RSS feed validity, robots.txt, 404 handling, cache purge behavior, and mobile layout. I also check backups, access logs, error logs, and a rollback command that has already been tested.</p>
+      <p>A good migration is not dramatic. Readers keep reading, editors keep publishing, and the new stack quietly takes over with better performance and cleaner maintainability. That is the standard I aim for on high-traffic Laravel and Next.js projects.</p>
+    `,
+  },
+  {
+    slug: 'technical-seo-checklist-nextjs-portfolio-adsense',
+    title: 'Technical SEO Checklist I Use Before Requesting an AdSense Review',
+    date: '2026-03-18',
+    category: 'Technical SEO',
+    excerpt:
+      'A developer-focused checklist for making a portfolio or service site easier for Google to crawl, understand, and trust before an AdSense review.',
+    img: '/images/blog-1.webp',
+    content: `
+      <p>AdSense review is not only a question of placing an ads.txt file and waiting. Google needs to understand that the site has real publisher content, clear ownership, useful navigation, and pages that are not created only to target keywords. For a small portfolio site, those signals have to be especially clear because there are fewer pages for Google to evaluate.</p>
+      <p>When I review a Next.js site before an AdSense submission, I start with the pages a crawler will see first: homepage, blog index, article pages, privacy policy, contact page, sitemap, robots.txt, and ads.txt. Each page needs a job. If a page exists only because a template generated it, it should be improved, noindexed, or removed.</p>
+      <h3>Content quality comes first</h3>
+      <p>The most important check is whether the site contains original content that could help a specific visitor. A portfolio page should explain the problem solved, the technology used, and the result. A blog article should include experience, tradeoffs, or a practical process. Thin daily posts with similar structures can hurt trust because they look scaled rather than written.</p>
+      <p>I would rather publish six strong articles than sixty generic ones. Strong articles usually include a concrete scenario, a decision process, limitations, and a result. They also avoid inflated claims and repeated keyword phrases. If the same paragraph can fit ten different titles, it is probably too generic for a publisher review.</p>
+      <h3>Crawlable structure</h3>
+      <p>Next.js makes it easy to generate metadata, sitemaps, and canonical URLs, but those pieces still need to agree with each other. The canonical URL in metadata should match the sitemap URL. The robots file should allow important pages. The blog index should link to every public article. Article pages should return a proper 404 when the slug does not exist.</p>
+      <p>I also check that images are real assets, not broken placeholders, and that the article has visible text in the HTML. If content depends entirely on client-side rendering or a third-party widget, a crawler may see less value than a human visitor sees.</p>
+      <h3>Trust pages</h3>
+      <p>AdSense reviewers expect basic publisher trust signals. A privacy policy should mention cookies, analytics, advertising partners, and how visitors can opt out of personalized ads. Contact information should be easy to find. Terms and disclaimer pages do not need to be legal essays, but they should describe what the site publishes and who is responsible for it.</p>
+      <p>For service businesses, I also add local context where it is true: city, country, professional role, and links to credible profiles such as LinkedIn or GitHub. This helps separate a real professional site from a low-effort content farm.</p>
+      <h3>Final review routine</h3>
+      <p>Before clicking request review, I run a production build, open the generated sitemap, verify ads.txt, check several article pages on mobile, and scan for duplicate titles or placeholder copy. The goal is simple: every indexed page should be useful, navigable, and clearly owned.</p>
+    `,
+  },
+  {
+    slug: 'building-rag-workflows-for-newsrooms',
+    title: 'Building RAG Workflows for Newsrooms Without Breaking Editorial Control',
+    date: '2026-03-10',
+    category: 'AI Engineering',
+    excerpt:
+      'How I think about retrieval, review, source boundaries, and human approval when adding LLM workflows to newsroom systems.',
+    img: '/images/blog-2.webp',
+    content: `
+      <p>Newsrooms are a demanding place to introduce AI. The workflow is fast, the cost of mistakes is high, and editors need control over what gets published. A retrieval-augmented generation system can help with research, summaries, tagging, and archive discovery, but only if it is designed as an editorial assistant rather than an automatic publisher.</p>
+      <p>My preferred architecture starts with clear source boundaries. The system should know which content it is allowed to retrieve from: published articles, internal notes, wire copy, PDFs, or a curated knowledge base. Each source should have metadata such as publication date, section, language, author, and permission level. Without that structure, retrieval becomes noisy and the model may blend contexts that should remain separate.</p>
+      <h3>Retrieval before generation</h3>
+      <p>For newsroom work, I treat retrieval quality as the main product. If the retrieved passages are weak, the generated answer will be weak even with a strong model. Chunk size, metadata filters, language handling, and freshness rules matter more than prompt decoration. For Arabic and English archives, I also test query behavior in both languages because names, places, and transliterations can vary.</p>
+      <p>A useful RAG workflow should show its sources. Editors need to see which articles or documents informed the response, when they were published, and whether the answer depends on old information. This is especially important for topics that change quickly.</p>
+      <h3>Human approval is a feature</h3>
+      <p>I do not design newsroom AI tools to bypass editors. I design them to reduce repetitive work while keeping approval in human hands. A good example is suggested tagging. The model can propose section tags, related topics, and SEO metadata, but the editor should be able to accept, edit, or reject them before publishing.</p>
+      <p>The same principle applies to summaries. A model-generated summary can be a draft, but the interface should make it obvious that it is not final. I prefer to store the generated draft, the prompt version, the model used, and the editor who approved the final text. That audit trail helps debugging and accountability.</p>
+      <h3>Operational checks</h3>
+      <p>RAG systems need monitoring just like APIs. I track failed retrievals, empty results, slow queries, rejected suggestions, and user feedback. If editors keep rewriting a certain type of output, that is a product signal. The fix might be better metadata, a narrower prompt, a smaller source set, or a workflow change.</p>
+      <p>The best newsroom AI systems feel practical. They help an editor find archive context, prepare a cleaner first draft, or classify content faster. They do not ask the newsroom to trust a black box with publication authority.</p>
+    `,
+  },
+  {
+    slug: 'api-design-lessons-payment-gateways-qatar',
+    title: 'API Design Lessons From Payment Gateway Integrations in Qatar',
+    date: '2026-03-02',
+    category: 'API Development',
+    excerpt:
+      'What payment integrations taught me about idempotency, reconciliation, failure states, and customer support workflows.',
+    img: '/images/blog-3.webp',
+    content: `
+      <p>Payment gateway work looks simple from the outside: send an amount, redirect the customer, receive a callback. In production, the hard part is not the happy path. The hard part is every state between paid and failed, especially when the customer closes a browser tab, the callback arrives late, or the gateway status does not match the local order.</p>
+      <p>Across integrations with providers such as Stripe, CyberSource, Qpay, and Sadad, I learned to design payment APIs around reconciliation first. The local application should never depend only on a frontend success screen. It needs server-side callbacks, status polling where available, signed payload verification, and a way for support staff to inspect what happened.</p>
+      <h3>Idempotency protects customers</h3>
+      <p>Every payment initiation should have an internal reference that can be safely retried. If a user taps the payment button twice or a mobile app retries after a timeout, the system should not create duplicate orders or charge attempts without intention. Idempotency keys and unique transaction references make the flow predictable.</p>
+      <p>I also separate the business order from the payment attempt. An order may have multiple attempts: failed card, expired session, successful retry, refund, or manual correction. Keeping those as separate records makes reporting and support much easier.</p>
+      <h3>Callbacks are not enough</h3>
+      <p>Gateway callbacks can be delayed or blocked by networking issues. For important orders, I add a reconciliation task that checks pending payments after a short interval. This task asks the gateway for the authoritative status and updates the local record only after verifying signatures and expected amounts.</p>
+      <p>Amounts deserve special care. Currency, decimal precision, service fees, and refunds should be represented consistently. A mismatch of one minor unit can create hours of support work if the logs do not show how the final amount was calculated.</p>
+      <h3>Design for support teams</h3>
+      <p>A payment integration is not finished until a non-developer can answer basic questions: did the customer reach the gateway, did the bank approve the payment, did our callback succeed, was the order fulfilled, and what should happen next? I like to expose a compact transaction timeline in the admin panel for exactly this reason.</p>
+      <p>Good payment API design is mostly about boring reliability. The smoother the edge cases are, the less visible the integration becomes to customers.</p>
+    `,
+  },
+  {
+    slug: 'nextjs-performance-notes-for-media-sites',
+    title: 'Next.js Performance Notes for Media and Portfolio Sites',
+    date: '2026-02-22',
+    category: 'Next.js',
+    excerpt:
+      'A practical look at images, metadata, routing, and rendering choices that affect real users on content-heavy Next.js sites.',
+    img: '/images/blog-4.webp',
+    content: `
+      <p>Performance work on a Next.js site should begin with the page people actually visit, not a synthetic ideal. For a media or portfolio site, that usually means the homepage, article pages, portfolio grid, and contact page. Each has a different bottleneck: images, scripts, font loading, third-party embeds, or too much client-side JavaScript.</p>
+      <p>I prefer to keep content pages as server components whenever possible. Static text, article metadata, and image paths do not need client state. Client components are useful for filters, forms, and interactive controls, but using them for an entire content page increases JavaScript without improving the reading experience.</p>
+      <h3>Images are usually the first win</h3>
+      <p>Large portfolio screenshots and profile photos can make a good site feel slow if they are not sized correctly. I use Next.js Image for local assets, set meaningful width and height values, and avoid loading every image with priority. The first visible image may deserve priority; the rest should usually lazy load.</p>
+      <p>Alt text should describe the image in a useful way. It is not a place to repeat keywords. For portfolio screenshots, a good alt text can mention the project name and what the screenshot shows. This helps accessibility and gives search engines cleaner context.</p>
+      <h3>Metadata should be specific</h3>
+      <p>Every important page needs a unique title, description, canonical URL, and Open Graph data. Article pages should use the article title and excerpt rather than a generic site description. Portfolio and service pages should explain the actual offer or evidence on the page.</p>
+      <p>I also keep sitemap output aligned with real content. If a site has hundreds of generated posts that are not ready for readers, those pages should not appear in the sitemap. Search quality starts with choosing what deserves to be indexed.</p>
+      <h3>Third-party scripts</h3>
+      <p>Analytics, maps, icon libraries, and ads can all affect page speed. Some are necessary, but they should be loaded intentionally. If a script is not needed on the first paint, I load it after the page becomes interactive or replace it with a lighter local alternative.</p>
+      <p>The best performance improvements are usually straightforward: fewer unnecessary client components, correctly sized images, clean metadata, and a content set that is worth crawling.</p>
+    `,
+  },
+  {
+    slug: 'portfolio-case-study-al-sharq-peninsula-platforms',
+    title: 'Portfolio Notes: Scaling News Platforms for Al Sharq and The Peninsula Qatar',
+    date: '2026-02-12',
+    category: 'Case Study',
+    excerpt:
+      'A concise portfolio note on the engineering concerns behind high-traffic publishing platforms in Qatar.',
+    img: '/images/peninsula.webp',
+    content: `
+      <p>Working on major Qatar publishing platforms taught me that news engineering is a mix of speed, discipline, and empathy for editorial teams. A reader sees headlines, images, and article pages. Behind that, the platform has to support breaking news, search visibility, media uploads, mobile apps, APIs, caching, and fast recovery when something fails.</p>
+      <p>For platforms such as Al Sharq News and The Peninsula Qatar, the engineering challenge is not only building features. It is keeping the site stable when attention suddenly arrives. Traffic can rise around public events, sports stories, weather, policy announcements, or regional news. The stack needs to absorb those spikes without making editors wait.</p>
+      <h3>Backend priorities</h3>
+      <p>On the backend, I focus on query performance, clean content models, safe publishing workflows, and predictable API responses. Indexing decisions matter because article pages, category pages, search pages, and mobile feeds all query the same content in different ways. A small inefficient query can become expensive when it runs across many high-traffic pages.</p>
+      <p>APIs also need clear contracts. Mobile apps, web frontends, and internal tools should not each invent a different shape for the same article. Consistent API responses make caching easier and reduce bugs when the newsroom changes a content field.</p>
+      <h3>Frontend priorities</h3>
+      <p>On the frontend, readers need fast page loads and stable layouts. News pages often include images, embeds, related articles, tags, ads, and analytics. If those pieces are not managed carefully, the page shifts while the reader is trying to read. Good layout structure and image dimensions help avoid that.</p>
+      <p>SEO metadata is also part of the product. Article titles, canonical URLs, structured data, Open Graph images, and sitemap freshness all help the content travel correctly across search and social platforms.</p>
+      <h3>What success looks like</h3>
+      <p>Success is a platform that feels calm under pressure. Editors can publish quickly, readers can open pages on mobile connections, and the technical team can measure what is happening. That is the kind of work I want my portfolio to show: not only visual screenshots, but the engineering judgment behind them.</p>
+    `,
+  },
+  {
+    slug: 'laravel-api-versioning-for-mobile-apps',
+    title: 'Laravel API Versioning Notes for Mobile Apps That Cannot Update Immediately',
+    date: '2026-02-02',
+    category: 'Laravel',
+    excerpt:
+      'How I keep Laravel APIs stable for mobile apps while still shipping backend improvements and schema changes.',
+    img: '/images/blog-5.webp',
+    content: `
+      <p>Mobile API work has a constraint that web teams sometimes forget: users do not all update at the same time. A Laravel backend can be deployed in minutes, but an iOS or Android app version may stay in the market for months. That means API changes need a compatibility plan before they reach production.</p>
+      <p>I usually start by defining which fields are part of the public contract and which are internal implementation details. Public fields should not disappear without a version change. New optional fields are easier to ship, but renamed fields, changed enum values, and different pagination structures need more care.</p>
+      <h3>Version routes around behavior</h3>
+      <p>I do not create a new API version for every small response addition. I reserve version changes for behavior that an older client cannot safely understand. In Laravel, that might mean separate route groups such as /api/v1 and /api/v2, separate resource transformers, and tests that pin the exact response shape expected by each client.</p>
+      <p>Transformers are especially useful because they keep database changes away from the API surface. The backend can normalize a table, add relationships, or rename internal columns while the mobile response remains stable.</p>
+      <h3>Deprecation needs visibility</h3>
+      <p>A versioning strategy only works if the team can see which clients are still using older endpoints. I like to log app version, platform, endpoint, and response status for critical API traffic. That data helps decide when an old version can be retired and which users may need an app update reminder.</p>
+      <p>For high-risk changes, I also add temporary compatibility code instead of forcing a hard break. It is less elegant in the short term, but it protects customers and support teams.</p>
+      <h3>Documentation is part of the API</h3>
+      <p>Good API documentation should include sample requests, sample responses, error formats, authentication rules, pagination, and version notes. The best time to update it is in the same pull request as the API change. If documentation is treated as a later task, it usually becomes inaccurate.</p>
+      <p>Stable APIs are not frozen APIs. They are APIs that change with a clear contract, measured adoption, and respect for the clients already in the field.</p>
+    `,
+  },
+  {
+    slug: 'technical-seo-for-portfolio-project-pages',
+    title: 'Technical SEO for Portfolio Project Pages: What I Include Beyond Screenshots',
+    date: '2026-01-22',
+    category: 'Technical SEO',
+    excerpt:
+      'A practical structure for portfolio pages that show evidence, context, and implementation detail instead of only thumbnails.',
+    img: '/images/qatarpressc.webp',
+    content: `
+      <p>A portfolio grid can prove that work exists, but it rarely proves how the work was done. For search engines and potential clients, project pages need more context than a title, screenshot, and external link. They should explain the problem, the audience, the technical contribution, and the result.</p>
+      <p>When I improve portfolio content, I look for missing evidence. Did the project involve Laravel, React, Next.js, mobile APIs, hosting, or technical SEO? Was the work a migration, redesign, integration, performance improvement, or internal system? Each answer gives the page a clearer purpose.</p>
+      <h3>Use specific project descriptions</h3>
+      <p>Generic phrases such as "modern website" or "custom solution" do not help readers understand the work. A better description explains what changed: a publishing workflow became faster, an API supported mobile apps, a payment flow became easier to reconcile, or a site structure became easier to crawl.</p>
+      <p>I also avoid exaggerating metrics. If a number is public or confidently attributable, I use it. If not, I describe the engineering outcome without pretending to own every business result.</p>
+      <h3>Connect screenshots to decisions</h3>
+      <p>Screenshots are useful, but captions and alt text should connect them to the implementation. A news homepage screenshot might represent caching, editorial layout, category navigation, and image optimization. An admin dashboard screenshot might represent workflow design, permissions, and reporting.</p>
+      <p>That context helps human visitors and gives crawlers more meaningful content around visual assets.</p>
+      <h3>Make trust easy to verify</h3>
+      <p>External links, clear contact details, an about page, and social profiles all help visitors verify who is behind the work. For AdSense review, those trust signals matter because the site needs to look like a real publisher, not a thin collection of pages made only for ads.</p>
+    `,
+  },
+  {
+    slug: 'hosting-checklist-for-laravel-nextjs-sites',
+    title: 'Hosting Checklist for Laravel and Next.js Sites Before Launch',
+    date: '2026-01-12',
+    category: 'Hosting',
+    excerpt:
+      'The deployment checks I use for SSL, caching, backups, environment variables, logs, and rollback readiness.',
+    img: '/images/blog-6.webp',
+    content: `
+      <p>A launch checklist is useful because production issues are often simple things missed under pressure. For Laravel and Next.js projects, I check the application, server, DNS, cache, storage, and monitoring layers before moving traffic.</p>
+      <p>The first step is environment separation. Production credentials, API keys, database connections, mail settings, payment secrets, and analytics IDs should not be copied from local development without review. I also confirm that debug mode is disabled and error pages are user-friendly.</p>
+      <h3>Server and SSL checks</h3>
+      <p>SSL should be active before launch, with HTTP redirecting to HTTPS. The server should have the correct PHP or Node version, process manager, file permissions, queue workers, scheduler, and storage links. For Laravel, I verify config cache, route cache, migrations, queues, and log permissions. For Next.js, I verify build output, image handling, environment variables, and the start command.</p>
+      <p>DNS changes should be planned with TTL in mind. Lowering TTL ahead of migration can make a launch smoother if a rollback is needed.</p>
+      <h3>Backups and rollback</h3>
+      <p>I do not consider a site ready until backups have been tested. A backup that cannot be restored is only a hopeful file. Before launch, I confirm database backups, uploaded media backups, and a rollback path for the deployed code.</p>
+      <p>For content sites, I also verify robots.txt, sitemap.xml, canonical URLs, redirects, and 404 behavior. These are easy to miss because they are not always visible in the main UI.</p>
+      <h3>After launch</h3>
+      <p>Immediately after launch, I watch logs, analytics, uptime checks, form submissions, and key pages on mobile. The goal is to catch small issues before users report them. Calm launches come from boring preparation.</p>
+    `,
+  },
+  {
+    slug: 'ai-feature-readiness-checklist-for-business-apps',
+    title: 'AI Feature Readiness Checklist for Business Apps',
+    date: '2026-01-02',
+    category: 'AI Engineering',
+    excerpt:
+      'Questions I ask before adding LLM features to production business software, from data boundaries to review workflows.',
+    img: '/images/blog-2.webp',
+    content: `
+      <p>Adding an AI feature to a business app should start with a workflow question, not a model question. The team needs to know what decision or task the feature improves, who reviews the output, and what happens when the model is uncertain.</p>
+      <p>My first check is data boundaries. Which records can the model access? Are there private customer notes, payment details, health information, or internal documents that should never be sent to an external API? If the answer is unclear, the project needs data classification before implementation.</p>
+      <h3>Define acceptable output</h3>
+      <p>Every AI feature needs a definition of acceptable output. For a summary tool, that may mean no invented facts, source references, and a maximum length. For a support assistant, it may mean only answering from approved documentation. For an internal classifier, it may mean confidence thresholds and manual review for low-confidence cases.</p>
+      <p>These rules should be visible in tests and product behavior, not only in a prompt.</p>
+      <h3>Design the human review path</h3>
+      <p>In production software, the review path is as important as the generated text. Users need to edit, accept, reject, or regenerate. The system should store enough context to troubleshoot poor results: model name, prompt version, retrieval sources, user action, and timestamp.</p>
+      <p>This does not make the system heavy. It makes it maintainable after real users begin finding edge cases.</p>
+      <h3>Measure usefulness</h3>
+      <p>I track whether users accept suggestions, how often they edit them, and which tasks still require manual work. If the AI feature creates more review work than it saves, the solution may need a narrower scope, better retrieval, or a simpler automation rule.</p>
+      <p>The best AI features feel like reliable workflow improvements. They are clear about boundaries, honest about uncertainty, and easy for humans to supervise.</p>
+    `,
   },
 ];
 
-const futureOutcomes = [
-  'reduce manual follow-up',
-  'earn trust in AI answers',
-  'prepare for 2030 demand',
-  'protect customer data',
-  'improve mobile conversion',
-  'make operations measurable',
-  'connect content to revenue',
-  'shorten support response time',
-  'keep systems maintainable',
-  'turn search demand into qualified enquiries',
-];
+/* ============================================================================
+ * 2) GENERATION ENGINE — assembles articles from per-topic pools of distinct,
+ *    hand-written paragraphs. Each post draws a different intro, a different
+ *    set of body sections, an optional list block, and a different close, so
+ *    structure and wording vary meaningfully between posts.
+ * ========================================================================== */
 
-const titlePatterns = [
-  ({ signal, audience, outcome }) => `${titleCase(signal.service)} for ${titleCase(audience)}: How to ${titleCase(outcome)}`,
-  ({ signal, audience, year }) => `${titleCase(signal.keyword)} in ${year}: What ${titleCase(audience)} Should Prepare For`,
-  ({ signal, audience, angle }) => `${titleCase(angle)} for ${titleCase(signal.service)} in ${titleCase(audience)}`,
-  ({ signal, audience }) => `Why ${titleCase(audience)} Will Talk About ${titleCase(signal.keyword)} Next`,
-  ({ signal, outcome }) => `${titleCase(signal.service)} Roadmap to ${titleCase(outcome)} in Qatar`,
-];
-
-const excerptPatterns = [
-  ({ signal, audience, angle }) => `A future-facing ${angle} for ${audience} covering ${signal.discussion}, with practical steps for Qatar teams planning the next wave of digital work.`,
-  ({ signal, audience, outcome }) => `${titleCase(audience)} are likely to discuss ${signal.keyword} as they try to ${outcome}. This guide turns that trend into a realistic website, API, and content plan.`,
-  ({ signal, year }) => `A ${year} planning note on ${signal.keyword}, including the questions buyers may search, the risks teams should avoid, and the content signals worth building early.`,
-  ({ signal, audience }) => `How ${audience} can prepare for rising interest in ${signal.keyword}, from SEO language and structured data to backend architecture and operational readiness.`,
-];
-
-const trendLenses = [
-  'enterprise adoption',
-  'developer productivity',
-  'security governance',
-  'architecture planning',
-  'business process automation',
-  'infrastructure budgeting',
-  'risk management',
-  'product strategy',
-  'technical SEO positioning',
-  'Qatar market readiness',
-  'startup planning',
-  'public-sector transformation',
-  'customer experience',
-  'procurement decisions',
-  'operations monitoring',
-];
-
-const forecastAngles = [
-  'adoption roadmap',
-  'risk checklist',
-  'buyer education',
-  'architecture review',
-  'operations model',
-  'cost control',
-  'team workflow',
-  'governance playbook',
-  'integration plan',
-  'market positioning',
-  'content strategy',
-  'security audit',
-  'infrastructure plan',
-  'product roadmap',
-  'implementation brief',
-  'readiness scorecard',
-  'lead generation',
-  'vendor selection',
-  'data strategy',
-  'automation design',
-  'compliance planning',
-  'performance review',
-  'support workflow',
-  'executive briefing',
-  'technical comparison',
-  'migration roadmap',
-  'search demand plan',
-  'customer journey',
-  'quality assurance',
-  'budget forecast',
-  'platform strategy',
-  'innovation planning',
-  'workflow redesign',
-  'deployment model',
-  'procurement guide',
-  'measurement plan',
-  'future skills',
-];
-
-futureSignals.splice(
-  0,
-  futureSignals.length,
-  {
-    service: 'agentic AI software',
-    category: 'AI & Autonomous Agents',
-    keyword: 'agentic AI enterprise software',
-    discussion: 'enterprise software agents, supervised autonomy, approval flows, tool permissions, and measurable business decisions',
-    prediction: 'enterprise buyers will move from single chatbots to networks of specialized agents that plan, check, and complete work with human oversight',
-  },
-  {
-    service: 'multi-agent system design',
-    category: 'AI & Autonomous Agents',
-    keyword: 'multi-agent AI systems',
-    discussion: 'narrowly specialized agents, orchestration layers, handoff rules, memory, testing, and failure recovery',
-    prediction: 'teams will ask how to divide work across smaller agents instead of trusting one general model with every workflow',
-  },
-  {
-    service: 'AI coding orchestration',
-    category: 'Software Development Evolution',
-    keyword: 'AI tools for software engineers',
-    discussion: 'AI coding assistants, debugging, code review, promptable workflows, developer supervision, and quality gates',
-    prediction: 'software engineering work will shift toward describing intent, reviewing generated changes, and orchestrating AI-assisted delivery',
-  },
-  {
-    service: 'low-code application delivery',
-    category: 'Software Development Evolution',
-    keyword: 'low-code no-code applications',
-    discussion: 'citizen developers, governance, integration limits, data ownership, shadow IT, and custom software boundaries',
-    prediction: 'more applications will be started by non-developers, while professional developers will be needed for architecture, integration, and security',
-  },
-  {
-    service: 'domain-specific generative AI',
-    category: 'AI & Backend',
-    keyword: 'domain-specific AI models',
-    discussion: 'industry-tuned models, private knowledge, evaluation sets, retrieval, permissions, and model selection',
-    prediction: 'companies will prefer smaller specialized AI systems that understand their field, data, and risk profile',
-  },
-  {
-    service: 'hybrid computing architecture',
-    category: 'Infrastructure & Compute',
-    keyword: 'hybrid computing workflows',
-    discussion: 'cloud, edge, GPU acceleration, local inference, data movement, cost control, and resilience',
-    prediction: 'leading enterprises will mix cloud, edge, on-premise, and accelerated compute instead of choosing one fixed platform',
-  },
-  {
-    service: 'preemptive cybersecurity',
-    category: 'Cybersecurity Transformation',
-    keyword: 'preventive cybersecurity AI',
-    discussion: 'AI threat prediction, behavior monitoring, attack simulation, identity risk, and automated containment',
-    prediction: 'security teams will discuss prevention before incident response, using AI to detect intent before attacks reach critical systems',
-  },
-  {
-    service: 'post-quantum security planning',
-    category: 'Quantum Computing',
-    keyword: 'post-quantum cryptography readiness',
-    discussion: 'elliptic curve risk, crypto inventory, blockchain security, certificate rotation, and migration planning',
-    prediction: 'quantum risk will become a board-level security topic as teams audit systems that depend on vulnerable cryptography',
-  },
-  {
-    service: 'quantum computing strategy',
-    category: 'Quantum Computing',
-    keyword: 'quantum computing business impact',
-    discussion: 'quantum market growth, acquisition activity, simulation workloads, cryptography, and enterprise readiness',
-    prediction: 'business leaders will separate near-term quantum security risk from longer-term quantum computing opportunity',
-  },
-  {
-    service: 'brain-computer interface readiness',
-    category: 'Emerging Tech Frontiers',
-    keyword: 'brain-computer interfaces',
-    discussion: 'clinical trials, assistive technology, neural interfaces, privacy, accessibility, and long-term commercialization',
-    prediction: 'BCI discussions will shift from science fiction to clinical progress, ethics, and future interface design',
-  },
-  {
-    service: 'space technology platforms',
-    category: 'Emerging Tech Frontiers',
-    keyword: 'commercial lunar and space technology',
-    discussion: 'commercial lunar landers, microgravity experiments, resource prospecting, robotics, and data platforms',
-    prediction: 'space technology will become a practical infrastructure conversation as lunar missions and microgravity experiments mature',
-  },
-  {
-    service: 'AR and VR product strategy',
-    category: 'Emerging Tech Frontiers',
-    keyword: 'AR VR shipments 2028',
-    discussion: 'immersive interfaces, enterprise training, spatial commerce, device adoption, and neural interface overlap',
-    prediction: 'AR and VR will return to product roadmaps where training, design review, and immersive customer journeys have clear value',
-  },
-  {
-    service: 'AI infrastructure scaling',
-    category: 'Infrastructure & Compute',
-    keyword: 'AI infrastructure spending',
-    discussion: 'accelerated servers, GPUs, inference cost, data centers, networking, power, and workload scheduling',
-    prediction: 'AI infrastructure will dominate budgets as organizations move from pilots to production workloads',
-  },
-  {
-    service: 'semiconductor supply strategy',
-    category: 'Infrastructure & Compute',
-    keyword: 'semiconductor trillion dollar industry',
-    discussion: 'chip supply, accelerated compute, AI servers, procurement risk, and hardware-software planning',
-    prediction: 'software leaders will need to understand semiconductor capacity because compute availability will shape AI roadmaps',
-  },
-  {
-    service: 'AI governance for decisions',
-    category: 'AI & Autonomous Agents',
-    keyword: 'AI decision governance',
-    discussion: 'automated decisions, accountability, human review, audit logs, model confidence, and policy controls',
-    prediction: 'companies will need clear governance as AI agents influence more operational and strategic decisions',
-  },
-  {
-    service: 'specialized AI product design',
-    category: 'AI & Backend',
-    keyword: 'specialized AI products',
-    discussion: 'vertical AI, fine-tuned workflows, evaluation quality, private data, and product differentiation',
-    prediction: 'the strongest AI products will win by being specific, measurable, and deeply connected to one domain',
-  },
-  {
-    service: 'AI-native software architecture',
-    category: 'Software Development Evolution',
-    keyword: 'AI-native application architecture',
-    discussion: 'agent workflows, event streams, vector search, monitoring, permissions, and human checkpoints',
-    prediction: 'new applications will be designed around AI workflows from the beginning instead of adding AI as a sidebar feature',
-  },
-  {
-    service: 'AI quality assurance',
-    category: 'Software Development Evolution',
-    keyword: 'AI generated code review',
-    discussion: 'generated code testing, review checklists, regression risk, security scanning, and team standards',
-    prediction: 'quality assurance will become more important as AI increases development speed and the volume of proposed changes',
-  },
-  {
-    service: 'enterprise RAG systems',
-    category: 'AI & Backend',
-    keyword: 'enterprise generative AI models',
-    discussion: 'retrieval, domain-specific models, source citations, permissions, stale documents, and answer evaluation',
-    prediction: 'enterprise AI will rely on domain knowledge and retrieval quality more than on model size alone',
-  },
-  {
-    service: 'compute cost optimization',
-    category: 'Infrastructure & Compute',
-    keyword: 'AI inference cost optimization',
-    discussion: 'GPU utilization, caching, batch jobs, model routing, latency, and budget control',
-    prediction: 'AI success will depend on controlling inference cost as much as choosing the right model',
-  },
-  {
-    service: 'autonomous business process design',
-    category: 'AI & Autonomous Agents',
-    keyword: 'autonomous business process automation',
-    discussion: 'process mining, AI task routing, exception handling, approvals, dashboards, and ROI measurement',
-    prediction: 'automation projects will focus on complete business processes rather than isolated AI features',
-  },
-  {
-    service: 'AI security testing',
-    category: 'Cybersecurity Transformation',
-    keyword: 'AI red teaming and prompt injection',
-    discussion: 'prompt injection, data exfiltration, unsafe tool calls, red teaming, and model behavior testing',
-    prediction: 'AI applications will require security testing that covers prompts, tools, retrieval, and business logic together',
-  },
-  {
-    service: 'quantum-safe blockchain planning',
-    category: 'Quantum Computing',
-    keyword: 'quantum threat to blockchain security',
-    discussion: 'elliptic curve cryptography, wallet security, signing keys, migration windows, and protocol readiness',
-    prediction: 'blockchain and fintech teams will discuss quantum-safe migration before a practical break becomes urgent',
-  },
-  {
-    service: 'spatial AI interfaces',
-    category: 'Emerging Tech Frontiers',
-    keyword: 'spatial computing and AI interfaces',
-    discussion: 'AR overlays, voice, gesture, neural inputs, contextual assistants, and enterprise workflows',
-    prediction: 'the next interface conversation will combine AI assistants with spatial, wearable, and eventually neural inputs',
-  },
-);
-
-futureOutcomes.splice(
-  0,
-  futureOutcomes.length,
-  'automate decisions safely',
-  'orchestrate AI-assisted teams',
-  'prepare for low-code growth',
-  'choose specialized AI models',
-  'modernize hybrid compute',
-  'prevent cyberattacks earlier',
-  'prepare for quantum risk',
-  'plan emerging interface products',
-  'control AI infrastructure cost',
-  'align software with compute supply',
-);
-
-titlePatterns.splice(
-  0,
-  titlePatterns.length,
-  ({ signal, audience, outcome, lens, forecastAngle }) => `${titleCase(signal.service)} for ${titleCase(audience)}: ${titleCase(forecastAngle)} to ${titleCase(outcome)} Through ${titleCase(lens)}`,
-  ({ signal, audience, year, lens, forecastAngle }) => `${titleCase(signal.keyword)} in ${year}: ${titleCase(forecastAngle)} and ${titleCase(lens)} for ${titleCase(audience)}`,
-  ({ signal, audience, angle, lens, forecastAngle }) => `${titleCase(angle)} for ${titleCase(signal.service)}: ${titleCase(forecastAngle)} and ${titleCase(lens)} in ${titleCase(audience)}`,
-  ({ signal, audience, lens, forecastAngle }) => `Why ${titleCase(audience)} Will Discuss ${titleCase(signal.keyword)} for ${titleCase(forecastAngle)} and ${titleCase(lens)}`,
-  ({ signal, outcome, lens, forecastAngle }) => `${titleCase(signal.service)} ${titleCase(forecastAngle)} to ${titleCase(outcome)} with ${titleCase(lens)}`,
-);
-
-excerptPatterns.splice(
-  0,
-  excerptPatterns.length,
-  ({ signal, audience, angle, lens, forecastAngle }) => `A future-facing ${angle} for ${audience} covering ${signal.discussion}, with ${forecastAngle} and ${lens} questions technology buyers may ask through 2028.`,
-  ({ signal, audience, outcome, lens, forecastAngle }) => `${titleCase(audience)} are likely to discuss ${signal.keyword} as they try to ${outcome}. This article turns the trend into a ${forecastAngle} and ${lens} plan for websites, APIs, and operations.`,
-  ({ signal, year, lens, forecastAngle }) => `A ${year} planning note on ${signal.keyword}, including ${forecastAngle}, ${lens}, buyer questions, architecture risks, and content signals worth building early.`,
-  ({ signal, audience, lens, forecastAngle }) => `How ${audience} can prepare for rising interest in ${signal.keyword}, from ${forecastAngle} and ${lens} to backend architecture and operational readiness.`,
-);
+// Deterministic PRNG (mulberry32) so re-running the seeder is reproducible.
+function makeRng(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 function slugify(value) {
   return value
@@ -613,247 +534,498 @@ function slugify(value) {
 }
 
 function titleCase(value) {
-  return value.replace(/\b\w/g, (char) => char.toUpperCase());
+  return value.replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function buildScheduledTopics() {
-  const generated = [];
-  let signalIndex = 0;
+// Tokens that must keep their exact casing in a headline.
+const headlineKeep = new Map(
+  [
+    'SEO', 'API', 'APIs', 'AI', 'LLM', 'RAG', 'REST', 'URL', 'HTTP', 'HTTPS', 'SSL',
+    'CMS', 'MVP', 'SaaS', 'CDN', 'DNS', 'RTL', 'iOS', 'UX', 'UI', 'Next.js',
+  ].map((t) => [t.toLowerCase(), t]),
+);
+// Minor words stay lowercase unless they start the title.
+const headlineMinor = new Set([
+  'a', 'an', 'and', 'or', 'the', 'to', 'for', 'of', 'in', 'on', 'with', 'without', 'vs', 'at', 'by',
+]);
 
-  for (const audience of audiences) {
-    for (const angle of angles) {
-      for (const outcome of futureOutcomes) {
-        if (topics.length + generated.length >= targetPostCount) return [...topics, ...generated];
-
-        const signal = futureSignals[signalIndex % futureSignals.length];
-        const generatedIndex = generated.length;
-        const year = 2026 + Math.floor(generatedIndex / 220);
-        const lens = trendLenses[generatedIndex % trendLenses.length];
-        const forecastAngle = forecastAngles[generatedIndex % forecastAngles.length];
-        const title = titlePatterns[generatedIndex % titlePatterns.length]({
-          signal,
-          audience,
-          angle,
-          outcome,
-          year,
-          lens,
-          forecastAngle,
-        });
-        const slug = slugify(`${title}-${generatedIndex + 1}`);
-        const excerpt = excerptPatterns[generatedIndex % excerptPatterns.length]({
-          signal,
-          audience,
-          angle,
-          outcome,
-          year,
-          lens,
-          forecastAngle,
-        });
-        const date = new Date(scheduledStartDate);
-        date.setUTCDate(scheduledStartDate.getUTCDate() + generatedIndex);
-
-        generated.push([
-          slug,
-          title,
-          signal.category,
-          excerpt,
-          date.toISOString().slice(0, 10),
-          signal.service,
-          audience,
-          angle,
-          {
-            keyword: signal.keyword,
-            discussion: signal.discussion,
-            prediction: signal.prediction,
-            outcome,
-            year,
-            lens,
-            forecastAngle,
-          },
-        ]);
-
-        signalIndex += 1;
-      }
-    }
-  }
-
-  for (const service of serviceAreas) {
-    for (const audience of audiences) {
-      for (const angle of angles) {
-        if (topics.length + generated.length >= targetPostCount) return [...topics, ...generated];
-
-        const title = `${titleCase(service)} for ${titleCase(audience)}: ${titleCase(angle)}`;
-        const slug = slugify(title);
-        const category = categoryByService[service] || 'Software Engineering';
-        const excerpt = `A practical ${angle} for ${audience} working on ${service}, with guidance on architecture, search visibility, performance, and long-term maintainability.`;
-        const date = new Date(scheduledStartDate);
-        date.setUTCDate(scheduledStartDate.getUTCDate() + generated.length);
-
-        generated.push([
-          slug,
-          title,
-          category,
-          excerpt,
-          date.toISOString().slice(0, 10),
-          service,
-          audience,
-          angle,
-        ]);
-      }
-    }
-  }
-
-  return [...topics, ...generated];
+function headlineCase(title) {
+  const words = title.split(' ');
+  return words
+    .map((word, i) => {
+      if (!word) return word;
+      const bare = word.replace(/[^a-zA-Z0-9.+]/g, '');
+      const keep = headlineKeep.get(bare.toLowerCase());
+      if (keep) return word.replace(bare, keep);
+      const lower = word.toLowerCase();
+      const startsSegment = i === 0 || /[:—-]$/.test(words[i - 1]);
+      if (!startsSegment && headlineMinor.has(lower)) return lower;
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(' ');
 }
 
-const cvProofPoints = [
-  'In my work with Dar Al-Sharq Group in Doha, the same engineering choices had to support publishing teams, high traffic, mobile readers, and daily production deadlines.',
-  'Projects such as Al Sharq News and The Peninsula Qatar shaped the way I think about caching, editorial workflows, Core Web Vitals, and resilient Laravel or React architecture.',
-  'A zero-downtime migration of more than 12 million records taught me to plan database changes around rollback paths, validation reports, and calm release windows.',
-  'Building more than 30 REST APIs across web and mobile products made authentication, pagination, versioning, logging, and clear error states non-negotiable parts of delivery.',
-  'Payment integrations with Stripe, CyberSource, Qpay, and Sadad are a reminder that checkout work is never only frontend design; reconciliation and failure handling matter just as much.',
-  'AI integrations with OpenAI, Gemini, Ollama, RAG pipelines, and ChromaDB work best when they are connected to real content operations instead of treated as isolated demos.',
-  'Deploying Laravel, React, Vue, and Next.js products on Linux, Apache, Nginx, Docker, cPanel, and cloud hosting has made operational simplicity a practical SEO advantage.',
-  'Bilingual English and Arabic products in Qatar need RTL layout care, localized metadata, readable URLs, and content models that do not make translation a last-minute task.',
+function pickOne(rng, arr) {
+  return arr[Math.floor(rng() * arr.length)];
+}
+
+function pickDistinct(rng, arr, count) {
+  const pool = arr.slice();
+  const out = [];
+  const n = Math.min(count, pool.length);
+  for (let i = 0; i < n; i++) {
+    const idx = Math.floor(rng() * pool.length);
+    out.push(pool.splice(idx, 1)[0]);
+  }
+  return out;
+}
+
+const audiences = [
+  'Qatar businesses',
+  'Doha startups',
+  'growing product teams',
+  'small business owners',
+  'enterprise teams',
+  'agencies and freelancers',
+  'founders',
+  'in-house engineering teams',
 ];
 
-const serviceAdvice = {
-  'Laravel development': 'For Laravel work, I usually start with route structure, service boundaries, database indexes, queue usage, validation rules, and a deployment process that keeps production predictable.',
-  'Next.js SEO': 'For Next.js SEO, the strongest gains normally come from clean metadata, server-rendered content where it matters, image optimization, structured data, and fast routes that are easy for crawlers to understand.',
-  'React frontends': 'For React interfaces, the practical focus is component boundaries, accessible controls, bundle size, render performance, form behavior, and a design system that keeps future screens consistent.',
-  'API architecture': 'For API architecture, the foundations are versioning, authentication, pagination, rate limits, audit logs, observability, and documentation that mobile and frontend teams can actually use.',
-  'mobile app backends': 'For mobile backends, reliability depends on compact responses, token refresh flows, offline-friendly states, push notification rules, and APIs that handle slow networks gracefully.',
-  'AI search': 'For AI search, the important work is content preparation, embeddings, permissions, fallback behavior, answer citations, and analytics that show whether users found the right information.',
-  'RAG pipelines': 'For RAG pipelines, quality comes from chunking strategy, vector storage, source freshness, evaluation prompts, and clear boundaries between retrieved facts and generated wording.',
-  'technical SEO': 'For technical SEO, the work should connect crawlability, canonical URLs, schema, internal links, performance, and content depth instead of treating rankings as a metadata-only problem.',
-  'ecommerce platforms': 'For ecommerce platforms, conversion and SEO depend on product data quality, fast category pages, reliable checkout, inventory accuracy, payment handling, and search-friendly product URLs.',
-  'payment integrations': 'For payment integrations, teams need clear payment states, webhook verification, retry logic, reconciliation screens, and careful handling of failed, pending, cancelled, and refunded transactions.',
-  'cloud hosting': 'For cloud hosting, the decision should consider latency, backups, SSL, monitoring, deployment rollback, database access, CDN behavior, and who will maintain the server after launch.',
-  'database optimization': 'For database optimization, I look at slow queries, missing indexes, data growth, locking risk, reporting needs, backup strategy, and migration plans before changing application code.',
-  'CMS workflows': 'For CMS workflows, editors need scheduling, preview, approvals, media handling, role permissions, audit history, and publishing screens that reduce mistakes under deadline pressure.',
-  'bilingual websites': 'For bilingual websites, engineering choices should support Arabic and English URLs, RTL components, localized schema, hreflang planning, and content editing without duplicated manual work.',
-  'Core Web Vitals': 'For Core Web Vitals, the useful fixes are usually image sizing, script control, caching, route-level rendering decisions, stable layouts, and removal of unnecessary client-side work.',
-  'SaaS dashboards': 'For SaaS dashboards, architecture should cover tenant separation, roles, billing states, onboarding, reporting, support tools, and database queries that remain fast as accounts grow.',
-  'real-time notifications': 'For real-time notifications, teams need event rules, queue workers, delivery logs, user preferences, retry behavior, and a clear difference between urgent alerts and noisy updates.',
-  'Google Maps integrations': 'For Google Maps work, quality depends on location data, geocoding, branch search, distance sorting, rate limits, map loading performance, and mobile usability.',
-  'CRM automation': 'For CRM automation, value comes from lead routing, follow-up reminders, invoicing links, reporting, permissions, and integrations that reduce manual coordination for sales teams.',
-  'legacy modernization': 'For legacy modernization, the safest path is discovery, data mapping, API layers, phased releases, migration rehearsals, and monitoring before replacing core workflows.',
-};
+const titlePatterns = [
+  (s) => `A Practical Guide to ${s.subject}`,
+  (s) => `${s.subjectTitle}: What Actually Matters in Production`,
+  (s) => `How ${s.audienceTitle} Should Approach ${s.subject}`,
+  (s) => `${s.subjectTitle} for ${s.audienceTitle}`,
+  (s) => `Common Mistakes in ${s.subject} (and How to Avoid Them)`,
+  (s) => `${s.subjectTitle}: A Field Guide for ${s.year}`,
+  (s) => `Planning ${s.subject} Without the Usual Surprises`,
+  (s) => `${s.subjectTitle} — Lessons From Real Projects`,
+  (s) => `What I Check Before Shipping ${s.subject}`,
+  (s) => `${s.subjectTitle}: A Checklist That Holds Up Under Load`,
+];
 
-const angleAdvice = {
-  'planning checklist': 'A planning checklist should define the business goal, primary users, required integrations, data ownership, content workflow, launch risks, and what success will be measured against after release.',
-  'implementation guide': 'An implementation guide should move from data model to interface, then to APIs, QA, deployment, analytics, and post-launch maintenance so the team can deliver without guessing.',
-  'SEO strategy': 'An SEO strategy should map keywords to useful pages, connect internal links, add schema only where it is accurate, and keep every article tied to a real service or case study.',
-  'technical blueprint': 'A technical blueprint should name the stack, hosting model, database shape, caching plan, background jobs, external APIs, and the monitoring needed once people depend on the product.',
-  'performance audit': 'A performance audit should separate server latency, database cost, image weight, JavaScript execution, third-party scripts, caching headers, and layout stability before choosing fixes.',
-  'security checklist': 'A security checklist should cover authentication, authorization, validation, upload rules, secrets, dependency updates, audit logs, backups, and operational access control.',
-  'migration plan': 'A migration plan should include data profiling, dry runs, checksum checks, fallback steps, stakeholder timing, redirect mapping, and a release window that avoids unnecessary business disruption.',
-  'content strategy': 'A content strategy should answer buyer questions, show local proof, avoid repeated thin pages, refresh older posts, and use Search Console data to improve pages with real demand.',
-  'integration guide': 'An integration guide should document request formats, failure modes, credentials, webhook behavior, retry policy, logging, and the screens support teams need when something goes wrong.',
-  'maintenance roadmap': 'A maintenance roadmap should schedule updates, backups, monitoring reviews, SEO refreshes, dependency checks, content pruning, and periodic performance testing.',
-};
+// Cross-cutting sections any article can include for breadth.
+const sharedSections = [
+  { h: 'Start with the problem, not the tool', p: 'Before choosing a technology, write down the workflow it has to support, the people who depend on it, and what success looks like in a few months. The clearest projects are the ones where everyone can describe the goal in plain language before any code is written.' },
+  { h: 'Make it measurable', p: 'A feature you cannot measure is a feature you cannot improve. Decide early what you will track — response times, error rates, conversions, or completed tasks — and make sure the data is collected from day one rather than added after something breaks.' },
+  { h: 'Plan for the unhappy path', p: 'Most production pain lives outside the happy path: timeouts, bad input, partial failures, and third-party outages. Designing for these cases up front is far cheaper than patching them under pressure after launch.' },
+  { h: 'Keep it maintainable', p: 'Code is read far more often than it is written. Clear names, small functions, and a few honest comments save the next person — often your future self — hours of confusion. Maintainability is a feature, even when no user ever sees it.' },
+  { h: 'Document the decisions, not just the code', p: 'The hardest thing to recover later is not how something works but why it was built that way. A short note explaining the tradeoff behind a decision is one of the highest-value things you can leave behind.' },
+  { h: 'Test where it counts', p: 'You do not need to test everything, but you should test the parts that would cause real damage if they broke. Money, permissions, and data integrity deserve careful coverage; cosmetic details rarely do.' },
+  { h: 'Review performance with real data', p: 'Synthetic benchmarks can be misleading. Whenever possible, profile with realistic data volumes and real device conditions, because problems that are invisible at small scale often dominate once the system is busy.' },
+  { h: 'Build a simple rollback path', p: 'Confidence to ship comes from knowing you can undo. A tested rollback — for code, configuration, and data — turns a scary deploy into a routine one and shortens the recovery time when something does go wrong.' },
+];
 
-const audienceNeeds = {
-  'Qatar startups': 'Startups in Qatar usually need a lean release, visible traction signals, analytics, and a stack that can change quickly without throwing away the first build.',
-  'Doha businesses': 'Doha businesses often need practical lead generation, trustworthy service pages, WhatsApp or form workflows, and fast mobile pages for customers comparing vendors.',
-  'Qatar ecommerce teams': 'Ecommerce teams in Qatar need product data discipline, payment reliability, delivery workflows, Arabic and English content, and search pages that load quickly.',
-  'media companies in Qatar': 'Media companies in Qatar need publishing speed, editorial permissions, archive search, ad readiness, analytics, and infrastructure that handles traffic spikes.',
-  'real estate companies in Doha': 'Real estate teams in Doha need property search, map views, CRM handoff, lead quality tracking, schema for listings, and simple ways to keep inventory current.',
-  'hospitality brands in Qatar': 'Hospitality brands in Qatar need menus, bookings, delivery links, location pages, review signals, and mobile-first content that helps customers act quickly.',
-  'public-sector teams': 'Public-sector teams need accessibility, clear information architecture, audit trails, secure forms, bilingual content, and dependable hosting.',
-  'service companies in Doha': 'Service companies in Doha need pages that explain offers clearly, show proof, capture enquiries, and connect technical features to business outcomes.',
-  'retailers in Qatar': 'Retailers in Qatar need campaign pages, inventory clarity, product discovery, checkout confidence, and analytics that connect traffic to revenue.',
-  'enterprise teams in Qatar': 'Enterprise teams in Qatar need roles, reporting, integrations, compliance awareness, change management, and support processes around the software.',
-};
+const closes = [
+  'None of this is glamorous, and that is the point. Reliable software is usually the result of boring discipline applied consistently rather than any single clever trick.',
+  'The goal is not perfection on launch day. It is a system that is easy to understand, safe to change, and honest about its limits as it grows.',
+  'Treat this as a starting checklist rather than a finished recipe. Adapt it to your context, measure the results, and refine the parts that matter most for your users.',
+  'Get the fundamentals right and the advanced techniques become optional. Most real-world problems are solved by doing the basics consistently and well.',
+  'Whatever stack you choose, the same principle applies: clarity, measurement, and respect for the people who will maintain the work after you.',
+];
 
-function pick(items, index) {
-  return items[index % items.length];
+const clusters = [
+  {
+    key: 'laravel',
+    category: 'Laravel',
+    images: ['/images/al-sharq.webp', '/images/alsharqtech.webp', '/images/blog-5.webp'],
+    subjects: ['Laravel application architecture', 'Laravel queues and background jobs', 'a Laravel REST API', 'Laravel database migrations', 'Eloquent query optimization', 'Laravel service classes', 'Laravel validation and form requests', 'Laravel authentication flows', 'Laravel deployment pipelines', 'Laravel event and listener design'],
+    intros: [
+      'Laravel makes a lot of things easy, which is exactly why teams sometimes skip the planning that keeps an application healthy as it grows. The framework rewards good structure and quietly punishes shortcuts taken under deadline pressure.',
+      'A Laravel project usually starts clean and slowly accumulates complexity. The difference between a codebase that ages well and one that becomes painful is rarely the framework — it is the conventions the team agrees on early.',
+      'Most Laravel problems I am called in to fix are not framework limitations. They are decisions about structure, queries, and responsibilities that made sense for a small app but stopped scaling as the product grew.',
+      'The strength of Laravel is how much it gives you out of the box. The risk is leaning on those conveniences without understanding what happens underneath when traffic and data grow.',
+    ],
+    sections: [
+      { h: 'Keep controllers thin', p: 'Controllers should coordinate, not contain the logic. Pushing business rules into dedicated service or action classes keeps controllers readable and makes the same logic reusable from jobs, commands, and tests.' },
+      { h: 'Respect the database', p: 'Eloquent is convenient, but convenience can hide expensive queries. Eager-load relationships you know you will use, add indexes for the columns you filter on, and watch for the N+1 queries that quietly multiply under load.' },
+      { h: 'Use queues for slow work', p: 'Anything that does not need to finish before the user gets a response — emails, notifications, image processing, third-party calls — belongs on a queue. This keeps requests fast and isolates failures in external services.' },
+      { h: 'Validate at the edge', p: 'Form requests centralize validation and keep controllers clean. Validate every input as it enters the application and never assume the frontend already checked it, because the frontend is not the only client.' },
+      { h: 'Cache the expensive parts', p: 'Identify the queries and computations that are both slow and frequent, and cache those specifically. Tie cache keys to the data they represent so you can invalidate precisely when that data changes.' },
+      { h: 'Lean on the framework, carefully', p: 'Laravel ships with authentication, authorization, queues, scheduling, and notifications. Use them instead of reinventing the wheel, but understand each one well enough to debug it when something behaves unexpectedly in production.' },
+      { h: 'Make deploys boring', p: 'A good Laravel deploy caches config and routes, runs migrations safely, restarts queue workers, and can roll back cleanly. The more automated and repeatable it is, the less risk each release carries.' },
+    ],
+    lists: [
+      { intro: 'A quick health check I run on most Laravel codebases:', items: ['Are controllers thin, with logic in services or actions?', 'Are slow tasks moved onto queues?', 'Do the busiest queries have appropriate indexes?', 'Is every user input validated through a form request?', 'Is there a tested rollback for the last deploy?'] },
+    ],
+  },
+  {
+    key: 'nextjs',
+    category: 'Next.js',
+    images: ['/images/blog-4.webp', '/images/blog-1.webp'],
+    subjects: ['Next.js App Router architecture', 'server and client components', 'Next.js metadata and SEO', 'Next.js image optimization', 'data fetching in Next.js', 'Next.js route structure', 'rendering strategy in Next.js', 'Next.js performance tuning'],
+    intros: [
+      'Next.js gives you a lot of control over how pages are rendered, which is powerful and easy to misuse. Most performance and SEO problems come from rendering choices made without thinking about who reads the page and who crawls it.',
+      'The App Router changed how many Next.js apps are structured. Used well, it keeps pages fast and content server-rendered; used carelessly, it ships far more JavaScript to the browser than a content site ever needs.',
+      'A Next.js site can be both fast and SEO-friendly almost for free, but only if the defaults are respected. The trouble starts when everything becomes a client component and the server rendering advantage quietly disappears.',
+      'Next.js rewards a clear separation between content and interactivity. The pages that perform best are the ones that render their text on the server and reserve client-side code for the parts that genuinely need it.',
+    ],
+    sections: [
+      { h: 'Default to server components', p: 'Keep pages as server components unless they need state or interactivity. Server components ship no JavaScript for static content, which improves load time and ensures crawlers see the full text in the initial HTML.' },
+      { h: 'Push interactivity to the leaves', p: 'When you need a client component, make it small and specific — a single form, a filter, a toggle. Wrapping an entire page in a client component sends unnecessary JavaScript and undermines the framework\'s strengths.' },
+      { h: 'Give every page real metadata', p: 'Each route should export a unique title, description, and canonical URL that match its content. Generic site-wide metadata leaking onto every page is one of the most common and most fixable SEO mistakes.' },
+      { h: 'Optimize images deliberately', p: 'Use the Image component with explicit dimensions, mark only the hero as priority, and lazy-load the rest. Correctly sized modern-format images are usually the single biggest performance win on a content page.' },
+      { h: 'Fetch data close to where it is used', p: 'Co-locating data fetching with the component that needs it keeps the code readable and lets the framework cache and stream efficiently. Avoid fetching everything at the top and threading it down through props.' },
+      { h: 'Keep the sitemap honest', p: 'Generate the sitemap from the same source as your pages, and include only routes that deserve indexing. A sitemap full of thin or unfinished pages tells search engines the wrong story about the site.' },
+    ],
+    lists: [
+      { intro: 'Before shipping a Next.js page, I confirm:', items: ['Is this a server component unless it truly needs to be client-side?', 'Does it have a unique title, description, and canonical?', 'Is the hero image sized and prioritized, and the rest lazy-loaded?', 'Does the main content appear in the initial HTML?'] },
+    ],
+  },
+  {
+    key: 'seo',
+    category: 'Technical SEO',
+    images: ['/images/blog-1.webp', '/images/blog-3.webp'],
+    subjects: ['technical SEO', 'on-page SEO', 'structured data', 'a content SEO strategy', 'internal linking', 'crawlability and indexing', 'local SEO', 'an SEO content audit'],
+    intros: [
+      'Technical SEO is less about tricks and more about removing friction. The job is to make sure search engines can find your pages, understand them, and trust that they deserve to rank.',
+      'Most SEO problems I see are not penalties. They are pages that contradict themselves — a canonical pointing one way, a sitemap another, and content that does not match the title.',
+      'Good SEO starts with content people actually want and ends with the technical plumbing that lets search engines reach it. Skip either half and the results disappoint.',
+      'Search engines reward clarity. The clearer your site is about what each page is for, the easier it is for that page to rank for the right query.',
+    ],
+    sections: [
+      { h: 'Match intent before chasing keywords', p: 'A page ranks when it answers what the searcher actually wants, not when it repeats a phrase often enough. Start by understanding the question behind the query, then write the page that genuinely answers it.' },
+      { h: 'Keep signals consistent', p: 'Your title, heading, canonical URL, sitemap entry, and on-page content should all tell the same story. Contradictions between these signals are a quiet but common reason good pages never get indexed.' },
+      { h: 'Use structured data honestly', p: 'Schema markup helps search engines understand a page, but only describe what is actually visible on it. Marking up content that is not there is the kind of mismatch that costs trust rather than earning rich results.' },
+      { h: 'Link internally with purpose', p: 'Internal links pass context and help crawlers discover pages. Link related articles to each other with descriptive text so both readers and search engines understand how your content fits together.' },
+      { h: 'Earn local relevance where it is real', p: 'For service businesses, local context matters — city, country, and genuine local detail. Add it where it is true and useful, not as a keyword sprinkled across pages that have nothing local to say.' },
+      { h: 'Prune what dilutes the site', p: 'A handful of strong pages outranks a pile of thin ones. Regularly review weak, duplicate, or outdated pages and improve, merge, or remove them so your best content is not buried in noise.' },
+    ],
+    lists: [
+      { intro: 'A short technical SEO pass usually covers:', items: ['Does each important page have a unique, accurate title and description?', 'Do canonicals and the sitemap agree?', 'Is the content visible in the HTML without JavaScript?', 'Are related pages linked to each other with descriptive text?'] },
+    ],
+  },
+  {
+    key: 'performance',
+    category: 'Performance',
+    images: ['/images/blog-3.webp', '/images/blog-4.webp'],
+    subjects: ['web performance', 'Core Web Vitals', 'frontend performance', 'page load speed', 'image performance', 'JavaScript performance', 'rendering performance'],
+    intros: [
+      'Performance is a feature users feel before they can name it. A fast page feels trustworthy and a slow one feels broken, regardless of how good the underlying work is.',
+      'Most performance problems are not mysterious. They come from a handful of usual suspects: oversized images, too much JavaScript, render-blocking resources, and layout that shifts as the page loads.',
+      'The fastest way to improve performance is to measure the page people actually visit, on the device they actually use, and fix the biggest bottleneck first.',
+      'Speed work rewards honesty about real conditions. A site that feels instant on a developer laptop can feel sluggish on a mid-range phone — and that is the experience search engines measure.',
+    ],
+    sections: [
+      { h: 'Fix the largest element first', p: 'The biggest visible element — usually a hero image or headline — drives the perception of load speed. Sizing it correctly, serving a modern format, and loading it early often moves the numbers more than any other single change.' },
+      { h: 'Ship less JavaScript', p: 'Every kilobyte of JavaScript has to be downloaded, parsed, and executed before the page responds smoothly. Removing unused code and avoiding unnecessary client-side components is one of the most reliable ways to improve responsiveness.' },
+      { h: 'Reserve space to stop layout shift', p: 'Content that jumps as images and ads load is both annoying and penalized. Setting explicit dimensions and reserving space for late-loading elements keeps the layout stable while the page fills in.' },
+      { h: 'Tame third-party scripts', p: 'Analytics, ads, maps, and widgets each add weight and risk. Load only what is needed on first paint, defer the rest, and periodically audit whether each third-party script still earns its cost.' },
+      { h: 'Cache and compress', p: 'Proper cache headers, compression, and a CDN mean repeat visits and far-away users get a much faster experience for very little ongoing effort. These wins are easy to set up and easy to forget.' },
+      { h: 'Measure on real devices', p: 'Lab numbers are a guide, not the truth. Test on a real mid-range phone with a throttled connection, because that is closer to how a large share of your audience actually experiences the site.' },
+    ],
+    lists: [
+      { intro: 'My usual order of attack for a slow page:', items: ['Right-size and prioritize the hero image.', 'Remove or defer non-essential JavaScript and third-party scripts.', 'Reserve space for images and embeds to kill layout shift.', 'Enable caching, compression, and a CDN.', 'Re-measure on a real phone, not the desktop.'] },
+    ],
+  },
+  {
+    key: 'api',
+    category: 'API Development',
+    images: ['/images/blog-5.webp', '/images/blog-3.webp'],
+    subjects: ['REST API design', 'API authentication', 'API error handling', 'API pagination', 'API versioning', 'webhook integrations', 'API rate limiting', 'API documentation'],
+    intros: [
+      'A good API is one another team can use without asking you questions. Most API frustration comes from inconsistency and surprises, not missing features.',
+      'APIs are contracts. Once another team or app depends on yours, changing it carelessly breaks their work — so the discipline of an API is mostly about keeping promises.',
+      'The difference between an API people enjoy and one they dread is rarely the technology. It is consistency, clear errors, and behavior that never surprises the caller.',
+      'Designing an API well means thinking about the developer on the other end. Every inconsistency you leave in becomes a question, a bug, or a support message later.',
+    ],
+    sections: [
+      { h: 'Be consistent everywhere', p: 'Use the same casing, date format, list shape, and error envelope across every endpoint. Consistency lets a developer guess how a new endpoint behaves because every other endpoint taught them the pattern.' },
+      { h: 'Treat errors as part of the design', p: 'Return correct status codes, a stable error code, and a clear message. Validation errors should name the field and the reason, because clients build real user experiences directly on top of these responses.' },
+      { h: 'Choose one pagination style', p: 'Pick page-based or cursor-based pagination, document it, and apply it consistently. Always include enough metadata for the client to know whether more results remain.' },
+      { h: 'Hide the database behind the API', p: 'Use a resource or transformer layer so responses are a deliberate contract, not a direct dump of your tables. This lets you change storage without breaking the clients that depend on you.' },
+      { h: 'Version only when behavior breaks', p: 'Adding an optional field is safe. Removing or renaming one, or changing its meaning, is not. Reserve version bumps for genuine breaking changes and track which clients still use old versions.' },
+      { h: 'Secure and rate-limit by default', p: 'Authenticate every non-public endpoint, validate all input, and rate-limit to protect against abuse and runaway clients. Security and stability are easier to build in than to add after an incident.' },
+    ],
+    lists: [
+      { intro: 'A quick API review checklist:', items: ['Is the response shape consistent with the rest of the API?', 'Do errors return a useful status, code, and message?', 'Is pagination documented and uniform?', 'Are breaking changes behind a new version?'] },
+    ],
+  },
+  {
+    key: 'ai',
+    category: 'AI Engineering',
+    images: ['/images/blog-2.webp', '/images/alsharqtech.webp'],
+    subjects: ['LLM integration', 'a RAG pipeline', 'AI feature design', 'prompt engineering for production', 'AI content workflows', 'an AI support assistant', 'AI data boundaries', 'evaluating AI output'],
+    intros: [
+      'Adding AI to a product should start with a workflow question, not a model question. The useful version of a feature is the one where everyone knows who reviews the output and what happens when the model is unsure.',
+      'The interesting part of AI engineering is rarely the model. It is the plumbing around it: what data it can see, how its output is checked, and how the system behaves when it gets something wrong.',
+      'AI features feel magical in a demo and fragile in production unless they are designed with boundaries. Real usage surfaces edge cases that no prompt anticipates on its own.',
+      'The best AI features I have shipped feel like reliable assistants, not oracles. They are clear about what they can do, honest about uncertainty, and easy for a human to supervise.',
+    ],
+    sections: [
+      { h: 'Define the data boundaries first', p: 'Decide exactly which records the model may access before writing any prompts. Private notes, payment details, and confidential documents need a clear policy so sensitive data is never sent somewhere it should not go.' },
+      { h: 'Make retrieval the real product', p: 'In a RAG system, answer quality depends mostly on what you retrieve. Chunking, metadata filters, and freshness rules matter more than clever prompt wording, because a weak passage produces a weak answer from any model.' },
+      { h: 'Keep a human in the loop', p: 'For anything that gets published or acted on, let a person edit, accept, or reject the output. Designing the review path well is what turns an impressive demo into a tool a team actually trusts.' },
+      { h: 'Show the sources', p: 'When an answer is built from documents, show which ones and when they were published. Visible sources let users judge whether to trust a response and catch when it is leaning on outdated information.' },
+      { h: 'Define acceptable output', p: 'Write down what a good response looks like — no invented facts, a length limit, a citation, a confidence threshold. These rules should live in tests and product behavior, not only in a prompt nobody revisits.' },
+      { h: 'Measure usefulness, not novelty', p: 'Track how often suggestions are accepted, edited, or discarded. If a feature creates more review work than it saves, it needs a narrower scope or better retrieval rather than a bigger model.' },
+    ],
+    lists: [
+      { intro: 'Questions I ask before shipping an AI feature:', items: ['What data can the model access, and is that intentional?', 'Who reviews the output before it is used?', 'How will we know if the quality drops?', 'What happens when the model is uncertain?'] },
+    ],
+  },
+  {
+    key: 'security',
+    category: 'Security',
+    images: ['/images/blog-1.webp', '/images/blog-2.webp'],
+    subjects: ['web application security', 'authentication security', 'authorization design', 'input validation', 'API security', 'secrets management', 'secure file uploads', 'dependency security'],
+    intros: [
+      'Most security incidents are not exotic. They come from missed basics — an unprotected route, a leaked key, an unvalidated upload, or a dependency nobody updated.',
+      'Security is less about a single defense and more about removing the easy openings. Attackers look for the cheapest way in, so closing the common gaps removes most of the risk.',
+      'Good security is mostly boring discipline applied consistently: validate input, check permissions, protect secrets, and keep dependencies current.',
+      'The goal of practical security is to make an attack not worth the effort. A handful of consistent precautions stops the overwhelming majority of real-world attempts.',
+    ],
+    sections: [
+      { h: 'Authenticate and authorize separately', p: 'Authentication proves who someone is; authorization controls what they can do. The most common real-world flaw is an endpoint that confirms the user is logged in but never checks they are allowed to touch that specific record.' },
+      { h: 'Never trust user input', p: 'Validate everything that enters the application, regardless of what the frontend claims to have checked. Use parameterized queries to prevent injection, and escape output so user content cannot become executable code.' },
+      { h: 'Protect secrets carefully', p: 'Keep credentials in environment variables, never in the repository, and make sure production debug output never leaks them. If a key is ever exposed, rotate it immediately rather than hoping nobody noticed.' },
+      { h: 'Lock down file uploads', p: 'Restrict uploads by type and size, store them outside the web root, and never trust the original filename. Uploads are a classic entry point precisely because they are easy to treat as harmless.' },
+      { h: 'Keep dependencies current', p: 'Outdated packages are a leading cause of breaches. Update regularly, watch security advisories, and remove dependencies you no longer use so your attack surface stays as small as possible.' },
+      { h: 'Add the operational basics', p: 'Enforce HTTPS, set sensible security headers, rate-limit authentication endpoints, and keep audit logs for sensitive actions. These low-effort controls quietly prevent a large share of common attacks.' },
+    ],
+    lists: [
+      { intro: 'A baseline security checklist:', items: ['Is every sensitive action authorized, not just authenticated?', 'Is all input validated and every query parameterized?', 'Are secrets out of the repo and is debug mode off in production?', 'Are dependencies updated and unused ones removed?'] },
+    ],
+  },
+  {
+    key: 'hosting',
+    category: 'Hosting',
+    images: ['/images/blog-6.webp', '/images/blog-4.webp'],
+    subjects: ['web hosting choices', 'cloud deployment', 'a deployment pipeline', 'server configuration', 'backups and recovery', 'SSL and domains', 'production monitoring', 'a launch checklist'],
+    intros: [
+      'Hosting decisions are easy to underestimate until something breaks at the worst possible time. Most production emergencies are simple things missed under launch pressure.',
+      'The right hosting setup is the one your team can actually operate. A powerful platform nobody understands is riskier than a simpler one everyone can manage confidently.',
+      'A calm launch comes from boring preparation. Backups, SSL, environment separation, and a tested rollback turn a stressful release into a routine one.',
+      'Choosing where and how to host is a tradeoff between control, cost, and operational effort. The best answer depends on who maintains the system after launch, not on which platform is trendy.',
+    ],
+    sections: [
+      { h: 'Separate environments cleanly', p: 'Production credentials, API keys, and secrets should never be copied from local development without review. Keep environments distinct and confirm debug mode is off before any real traffic arrives.' },
+      { h: 'Get SSL and redirects right', p: 'SSL should be active before launch with HTTP redirecting to HTTPS. Plan DNS changes with TTL in mind so a rollback, if needed, can take effect quickly rather than hours later.' },
+      { h: 'Test your backups', p: 'A backup you have never restored is only a hopeful file. Confirm that database and media backups actually restore, and that you have a rollback path for the deployed code itself.' },
+      { h: 'Automate the deploy', p: 'A repeatable deploy that caches config, runs migrations safely, and restarts workers removes the human error that causes most release incidents. The more boring the deploy, the safer it is.' },
+      { h: 'Watch the system after launch', p: 'Immediately after going live, watch logs, uptime, form submissions, and key pages on mobile. Catching small issues early is far cheaper than hearing about them from frustrated users.' },
+      { h: 'Right-size the infrastructure', p: 'Most sites need far less than teams assume. A well-configured single server handles a surprising amount of traffic; scale when the metrics demand it, not in anticipation of users you do not have yet.' },
+    ],
+    lists: [
+      { intro: 'My pre-launch hosting checklist:', items: ['Is SSL active with HTTP redirecting to HTTPS?', 'Are production secrets separate and debug mode off?', 'Have backups been restored as a test, not just created?', 'Is there a tested rollback for code and data?'] },
+    ],
+  },
+  {
+    key: 'ecommerce',
+    category: 'Ecommerce',
+    images: ['/images/blog-4.webp', '/images/blog-3.webp'],
+    subjects: ['an ecommerce platform', 'ecommerce performance', 'product page SEO', 'checkout design', 'an ecommerce catalog', 'ecommerce search', 'conversion optimization', 'ecommerce data quality'],
+    intros: [
+      'Ecommerce is where performance, SEO, and reliability meet money directly. A slow page or a confusing checkout is not just a UX problem — it is lost revenue you can measure.',
+      'A successful online store depends less on a flashy homepage and more on the unglamorous details: clean product data, fast category pages, and a checkout that never makes the customer hesitate.',
+      'The hardest part of ecommerce is rarely listing products. It is keeping inventory accurate, search relevant, and checkout reliable while traffic and catalog size grow.',
+      'Online retail rewards trust. Fast pages, clear pricing, accurate stock, and a smooth checkout add up to a store customers feel safe buying from.',
+    ],
+    sections: [
+      { h: 'Treat product data as a foundation', p: 'Clean, consistent product data powers search, filtering, recommendations, and SEO all at once. Investing in good titles, attributes, and images pays off across the entire store rather than one page at a time.' },
+      { h: 'Make category and search pages fast', p: 'Shoppers browse far more than they buy, so the pages they browse must be quick. Efficient queries, sensible pagination, and cached results keep large catalogs responsive under real traffic.' },
+      { h: 'Reduce friction at checkout', p: 'Every extra field, surprise cost, or confusing step loses customers. A short, clear checkout with trusted payment options and honest totals is one of the highest-leverage things you can improve.' },
+      { h: 'Optimize product pages for search', p: 'Product pages should have unique descriptions, structured data, useful images, and internal links to related items. Duplicated manufacturer copy across thousands of pages is a common, fixable SEO weakness.' },
+      { h: 'Keep inventory honest', p: 'Nothing erodes trust faster than selling something that is out of stock. Reliable inventory syncing, even when it is unglamorous work, protects both the customer experience and your operations team.' },
+      { h: 'Handle payments defensively', p: 'Design checkout around the states between paid and failed: late callbacks, retries, and refunds. Server-side verification and clear transaction records prevent the support nightmares that come from trusting only a success screen.' },
+    ],
+    lists: [
+      { intro: 'A short ecommerce health check:', items: ['Are category and search pages fast under real load?', 'Is checkout short, clear, and free of surprise costs?', 'Do product pages have unique content and structured data?', 'Is inventory accurate and payment handling defensive?'] },
+    ],
+  },
+  {
+    key: 'database',
+    category: 'Backend',
+    images: ['/images/blog-2.webp', '/images/blog-5.webp'],
+    subjects: ['database indexing', 'database schema design', 'query optimization', 'database scaling', 'a database migration', 'data modeling', 'database backups', 'handling large tables'],
+    intros: [
+      'The database is where small design decisions quietly compound. A schema that felt fine with a thousand rows can dominate your performance once it holds millions.',
+      'Most "the app got slow" problems trace back to the database — a missing index, an N+1 query, or a schema that made an easy thing expensive. The fixes are usually straightforward once you can see them.',
+      'Databases reward forethought more than almost any other part of a system, because changing them later is harder than changing code. Good structure early saves painful migrations down the line.',
+      'You do not need to be a database expert to avoid the common traps. A handful of habits around indexing, queries, and modeling prevent most performance problems before they start.',
+    ],
+    sections: [
+      { h: 'Index the columns you query', p: 'Add indexes for the columns you filter, join, and sort on most often, and index foreign keys almost by default. The goal is to eliminate full table scans on large, busy tables.' },
+      { h: 'Do not over-index', p: 'Every index speeds reads but slows writes and uses storage. Choose the few indexes that serve your real query patterns instead of blanketing every column, and revisit them as those patterns change.' },
+      { h: 'Find the slow queries', p: 'Use the slow query log and the EXPLAIN command instead of guessing. Seeing whether a query uses an index or scans the whole table turns vague performance complaints into specific, fixable problems.' },
+      { h: 'Model for how data is used', p: 'Design the schema around the questions the application actually asks. Normalize to keep data consistent, then denormalize deliberately where a critical read path needs the speed — but only with a clear reason.' },
+      { h: 'Migrate carefully on large tables', p: 'Schema changes on big tables can lock them and cause downtime. Plan migrations to run in safe steps, test them on realistic data volumes, and always have a way back if something behaves unexpectedly.' },
+      { h: 'Back up and actually restore', p: 'Backups only count if they restore. Schedule them, store them safely, and periodically rehearse a restore so that recovering from a real incident is a known procedure rather than an experiment.' },
+    ],
+    lists: [
+      { intro: 'A quick database review:', items: ['Are the busiest queries backed by appropriate indexes?', 'Have you checked EXPLAIN on the slow ones?', 'Does the schema match how the app reads and writes?', 'Have backups been restored as a real test?'] },
+    ],
+  },
+  {
+    key: 'mobile',
+    category: 'Mobile Apps',
+    images: ['/images/blog-5.webp', '/images/blog-6.webp'],
+    subjects: ['a mobile app backend', 'mobile API design', 'offline-friendly apps', 'push notifications', 'mobile app performance', 'cross-platform development', 'mobile authentication', 'syncing data to mobile'],
+    intros: [
+      'Mobile apps add a constraint web teams sometimes forget: not everyone updates at once. A backend deploys in minutes, but an app version can live on phones for months.',
+      'Building for mobile means designing for unreliable networks, delayed updates, and limited battery. The backend has to be forgiving in ways a web-only API does not.',
+      'A great mobile experience depends heavily on the backend behind it. Compact responses, graceful offline behavior, and stable contracts matter more than any single screen.',
+      'Mobile development rewards respect for the device and the network. The apps that feel reliable are the ones that assume connections will drop and plan for it.',
+    ],
+    sections: [
+      { h: 'Keep responses compact', p: 'Mobile networks are slower and less reliable than office wifi. Returning only the fields a screen needs reduces load time, saves data, and makes the app feel responsive even on a weak connection.' },
+      { h: 'Version the API for slow updates', p: 'Because users update apps on their own schedule, the backend must keep older versions working. Reserve breaking changes for new versions and track which app versions still call old endpoints.' },
+      { h: 'Plan for offline and retries', p: 'Assume requests will time out and connections will drop. Idempotent endpoints and sensible retry behavior prevent duplicate orders and let the app recover gracefully instead of confusing the user.' },
+      { h: 'Use notifications with restraint', p: 'Push notifications are powerful and easy to overuse. Clear rules about what is urgent versus merely informational keep notifications welcome rather than something users disable entirely.' },
+      { h: 'Handle authentication smoothly', p: 'Token refresh, secure storage, and graceful re-login matter enormously on mobile, where a clumsy auth flow is a daily annoyance. Get this right and most of the app feels trustworthy.' },
+      { h: 'Test on real conditions', p: 'Emulators on fast connections hide the problems real users hit. Test on actual devices with throttled networks to catch the slow, flaky behavior that defines the real mobile experience.' },
+    ],
+    lists: [
+      { intro: 'A mobile backend checklist:', items: ['Are responses trimmed to what each screen needs?', 'Is the API versioned for slowly-updating clients?', 'Are key endpoints idempotent and retry-safe?', 'Is the auth and token-refresh flow smooth?'] },
+    ],
+  },
+  {
+    key: 'localization',
+    category: 'Localization',
+    images: ['/images/alarab.webp', '/images/blog-1.webp'],
+    subjects: ['a bilingual website', 'Arabic and English content', 'right-to-left layouts', 'multilingual SEO', 'content localization', 'a translation workflow', 'bilingual content modeling'],
+    intros: [
+      'Bilingual Arabic and English sites are normal in Qatar, yet they are often treated as a translation bolted on at the end. Done that way, the result is broken layouts and confused search engines.',
+      'Localization is an architecture decision, not a final step. Sites that handle two languages well were designed for both from the start, not translated after launch.',
+      'Supporting Arabic and English properly means more than swapping text. Layout direction, URLs, metadata, and content modeling all change, and ignoring any of them shows.',
+      'A truly bilingual site feels native in both languages. That experience comes from decisions made early about layout, URLs, and how translations are stored and managed.',
+    ],
+    sections: [
+      { h: 'Mirror the layout, not just the text', p: 'Arabic reads right-to-left, which affects navigation, icons, forms, and spacing — not only paragraph alignment. Building with logical CSS properties lets one layout serve both directions instead of two fragile ones.' },
+      { h: 'Give each language a real URL', p: 'Each language version should have its own crawlable URL, typically a path prefix. Switching languages only with cookies or JavaScript leaves search engines with one ambiguous page instead of two indexable ones.' },
+      { h: 'Tell search engines about the pair', p: 'Use hreflang so Google knows the Arabic and English pages are alternates rather than duplicates. This sends the right version to the right audience and stops the two from competing with each other.' },
+      { h: 'Model translations as first-class data', p: 'Store a shared identity for each piece of content with per-language fields, rather than copied rows that drift apart. This keeps versions linked and makes it obvious what still needs translating.' },
+      { h: 'Localize the details too', p: 'Real localization covers dates, numbers, currency, validation messages, and metadata. A page that translates the body but leaves buttons and errors in one language feels unfinished to readers and search engines alike.' },
+      { h: 'Plan the translation workflow', p: 'Decide how content gets translated, reviewed, and kept in sync as it changes. A clear workflow prevents the common situation where one language slowly falls behind the other and quality quietly degrades.' },
+    ],
+    lists: [
+      { intro: 'A bilingual readiness check:', items: ['Does the layout mirror correctly for right-to-left?', 'Does each language have its own crawlable URL and hreflang?', 'Are translations stored as linked, first-class data?', 'Are dates, numbers, and messages localized too?'] },
+    ],
+  },
+];
+
+function buildArticle(cluster, subject, audience, year, patternIndex, seed) {
+  const rng = makeRng(seed);
+  const subjectTitle = titleCase(subject.replace(/^(a|an) /, ''));
+  const audienceTitle = titleCase(audience);
+
+  const title = headlineCase(
+    titlePatterns[patternIndex]({ subject, subjectTitle, audience, audienceTitle, year }),
+  );
+
+  // Body: intro + 3 cluster sections + 1 shared section + optional list + close.
+  const intro = pickOne(rng, cluster.intros);
+  const clusterSections = pickDistinct(rng, cluster.sections, 3 + Math.floor(rng() * 2));
+  const shared = pickDistinct(rng, sharedSections, 1 + Math.floor(rng() * 2));
+  const close = pickOne(rng, closes);
+  const list = cluster.lists.length && rng() > 0.4 ? pickOne(rng, cluster.lists) : null;
+  const img = pickOne(rng, cluster.images);
+
+  // Interleave shared sections among the cluster-specific ones for variety.
+  const allSections = clusterSections.slice();
+  shared.forEach((s, i) => allSections.splice(Math.min((i + 1) * 2, allSections.length), 0, s));
+
+  const lead = `<p>${intro} This guide looks at ${subject} with ${audience} in mind, focusing on the practical decisions that hold up once real users and real data arrive.</p>`;
+
+  const sectionHtml = allSections
+    .map((s) => `<h3>${s.h}</h3>\n      <p>${s.p}</p>`)
+    .join('\n      ');
+
+  const listHtml = list
+    ? `\n      <p>${list.intro}</p>\n      <ul>\n        ${list.items.map((it) => `<li>${it}</li>`).join('\n        ')}\n      </ul>`
+    : '';
+
+  const closeHtml = `<p>${close}</p>`;
+
+  const content = `\n      ${lead}\n      ${sectionHtml}${listHtml}\n      ${closeHtml}\n    `;
+
+  const excerptSentence = intro.split('. ')[0];
+  const excerpt = `${excerptSentence}. A practical look at ${subject} for ${audience}.`;
+
+  return { title, content, img, category: cluster.category, excerpt };
 }
 
-function inferService(title, category) {
-  const lowerTitle = title.toLowerCase();
+function buildGeneratedPosts(needed, existingSlugs) {
+  const out = [];
+  const seenTitles = new Set();
+  const seenSlugs = new Set(existingSlugs);
 
-  return serviceAreas.find((service) => lowerTitle.includes(service.split(' ')[0].toLowerCase())) || category || 'software engineering';
+  let counter = 0;
+  let guard = 0;
+  const maxGuard = needed * 50;
+
+  while (out.length < needed && guard < maxGuard) {
+    guard++;
+    const cluster = clusters[counter % clusters.length];
+    const rng = makeRng(counter * 2654435761 + 1);
+
+    const subject = pickOne(rng, cluster.subjects);
+    const audience = pickOne(rng, audiences);
+    const year = 2026 + Math.floor(rng() * 3);
+    const patternIndex = Math.floor(rng() * titlePatterns.length);
+
+    const article = buildArticle(cluster, subject, audience, year, patternIndex, counter * 97 + 13);
+    counter++;
+
+    if (seenTitles.has(article.title)) continue;
+    let slug = slugify(article.title);
+    if (!slug || seenSlugs.has(slug)) {
+      slug = `${slug}-${out.length + 1}`;
+    }
+    if (seenSlugs.has(slug)) continue;
+
+    seenTitles.add(article.title);
+    seenSlugs.add(slug);
+
+    out.push({
+      slug,
+      title: article.title,
+      category: article.category,
+      excerpt: article.excerpt,
+      content: article.content.trim(),
+      img: article.img,
+    });
+  }
+
+  return out;
 }
 
-function makeContent(topic, index) {
-  const [, title, category, excerpt, , topicService, topicAudience, topicAngle, trendMeta] = topic;
-  const service = topicService || inferService(title, category);
-  const audience = topicAudience || pick(audiences, index);
-  const angle = topicAngle || pick(angles, index);
-  const primaryKeyword = trendMeta?.keyword || `${service} ${audience}`.replace(/\s+/g, ' ').trim();
-  const proof = pick(cvProofPoints, index);
-  const secondProof = pick(cvProofPoints, index + 3);
-  const serviceNote = serviceAdvice[service] || 'The technical approach should balance maintainability, search visibility, security, performance, and simple operations after launch.';
-  const angleNote = angleAdvice[angle] || angleAdvice['implementation guide'];
-  const audienceNote = audienceNeeds[audience] || 'The audience needs a practical digital product that is easy to understand, easy to maintain, and useful for real business workflows.';
-  const internalLink = index % 3 === 0 ? '/portfolio' : index % 3 === 1 ? '/contact' : '/resume';
-  const internalLabel = index % 3 === 0 ? 'related portfolio projects' : index % 3 === 1 ? 'contact page' : 'resume and technical background';
-  const riskFocus = pick([
-    'unclear requirements, weak ownership of content, slow hosting, and untested third-party integrations',
-    'duplicate landing pages, missing schema, heavy images, and forms that do not explain errors clearly',
-    'launching without redirects, analytics events, backup checks, or a rollback plan',
-    'choosing a stack for fashion instead of maintainability, team skill, and production support',
-    'publishing many pages before there is enough original detail, proof, or local relevance',
-  ], index);
-  const metricFocus = pick([
-    'qualified enquiries, indexed pages, Core Web Vitals, form completion rate, and organic impressions',
-    'API error rates, checkout completion, search clicks, page speed, and support tickets',
-    'editorial speed, publishing errors, crawl coverage, mobile usability, and uptime',
-    'lead quality, conversion rate, ranking movement, server response time, and content freshness',
-    'deployment frequency, rollback time, database query cost, search visibility, and user task completion',
-  ], index + 2);
-  const forecast = trendMeta?.prediction || `buyers will compare ${service} by proof, maintainability, speed, and how clearly the page answers real Qatar project questions`;
-  const discussion = trendMeta?.discussion || `${service}, local search intent, performance, integrations, and content quality`;
-  const outcome = trendMeta?.outcome || 'make the project easier to trust';
-  const year = trendMeta?.year || 2026;
-  const lens = trendMeta?.lens || pick(trendLenses, index);
-  const forecastAngle = trendMeta?.forecastAngle || pick(forecastAngles, index);
-  const searchQuestions = [
-    `Who can help with ${primaryKeyword}?`,
-    `What does ${service} cost or require for ${audience}?`,
-    `Which risks should a Qatar team check before starting ${service}?`,
-    `How does ${service} connect to ${lens}, SEO, mobile experience, and operations?`,
-  ];
-  const contentAngles = [
-    'comparison pages that explain tradeoffs instead of promising everything',
-    'case-study notes that show the starting problem, technical decision, and measurable result',
-    'FAQ blocks written from sales calls, Search Console queries, and support conversations',
-    'service pages that mention Qatar only where it adds real context, such as language, payments, hosting, or customer behavior',
-  ];
-  const buildSteps = [
-    `Create one landing page around ${primaryKeyword} with a specific audience and clear next action.`,
-    `Add supporting articles for ${pick(searchQuestions, index + 1).toLowerCase()}`,
-    `Use schema, internal links, and refreshed examples so the page can be understood by search engines and AI answer systems.`,
-    `Connect forms, WhatsApp, analytics, and CRM notes so interest in ${primaryKeyword} becomes a measurable enquiry path.`,
-  ];
-  const sectionSet = pick([
-    ['What people may search next', 'How to build the page', 'Technical proof to include', 'Signals to measure'],
-    ['Why the topic is rising', 'Buyer questions', 'Architecture decisions', 'Content plan'],
-    ['Search intent', 'Implementation plan', 'Operational risks', 'Refresh schedule'],
-    ['Market conversation', 'Page structure', 'Backend requirements', 'Success metrics'],
-  ], index);
+/* ============================================================================
+ * 3) Assemble the full set, schedule generated posts one per day, write stores.
+ * ========================================================================== */
+function isoDate(d) {
+  return d.toISOString().slice(0, 10);
+}
 
-  return `
-  <p>${title} is written for a near-future search conversation, not only for today&apos;s keyword list. ${excerpt} The main phrase to own is <strong>${primaryKeyword}</strong>, but the article should also answer the practical doubts a buyer has before contacting a developer.</p>
-  <h3>${sectionSet[0]}</h3>
-  <p>By ${year}, ${forecast}. For ${audience}, the conversation will likely include ${discussion}, with special pressure around ${lens} and ${forecastAngle}. ${audienceNote}</p>
-  <h3>${sectionSet[1]}</h3>
-  <p>Useful content should answer questions such as "${pick(searchQuestions, index)}" and "${pick(searchQuestions, index + 2)}" without stuffing keywords. A strong page can include ${pick(contentAngles, index)}, plus original notes from real implementation work. ${proof}</p>
-  <h3>${sectionSet[2]}</h3>
-  <p>${serviceNote} ${angleNote} The technical goal is to ${outcome}, while keeping ${lens} visible enough for leaders, developers, and operations teams to make decisions after launch.</p>
-  <h3>Practical checklist</h3>
-  <ul>
-    <li>${buildSteps[0]}</li>
-    <li>${buildSteps[1]}</li>
-    <li>${buildSteps[2]}</li>
-    <li>${buildSteps[3]}</li>
-  </ul>
-  <h3>${sectionSet[3]}</h3>
-  <p>The biggest risks are ${riskFocus}. After publishing, track ${metricFocus}. ${secondProof}</p>
-  <h3>Practical next step</h3>
-  <p>For a site like ziamuhammad.com, this article should connect naturally to <a href="${internalLink}">${internalLabel}</a>, then be refreshed when there is a new project result, search query, or technical lesson worth adding. That is the kind of content growth Google is more likely to trust than a large set of repeated pages.</p>
-`;
+const evergreen = evergreenPosts.map((p) => ({
+  slug: p.slug,
+  title: p.title.trim(),
+  date: p.date,
+  category: p.category.trim(),
+  excerpt: p.excerpt.trim(),
+  content: p.content.trim(),
+  img: p.img,
+}));
+
+const neededGenerated = TARGET_TOTAL - evergreen.length;
+const generated = buildGeneratedPosts(neededGenerated, evergreen.map((p) => p.slug));
+
+// Schedule one generated post per day starting GENERATED_START.
+generated.forEach((post, i) => {
+  const d = new Date(GENERATED_START);
+  d.setUTCDate(GENERATED_START.getUTCDate() + i);
+  post.date = isoDate(d);
+});
+
+const all = [...evergreen, ...generated];
+
+// Safety: enforce unique slugs across the whole set.
+const slugSet = new Set();
+for (const post of all) {
+  if (slugSet.has(post.slug)) {
+    throw new Error(`Duplicate slug detected: "${post.slug}"`);
+  }
+  slugSet.add(post.slug);
 }
 
 const db = new Database(dbPath);
@@ -885,52 +1057,19 @@ const insert = db.prepare(`
     img = excluded.img
 `);
 
-const seedDate = new Date('2026-05-15T00:00:00.000Z');
-const allTopics = buildScheduledTopics();
-const seededPosts = [];
-
 db.transaction(() => {
   db.prepare('DELETE FROM posts').run();
-
-  allTopics.forEach((topic, index) => {
-    const [slug, title, category, excerpt, scheduledDate] = topic;
-    const date = scheduledDate ? new Date(`${scheduledDate}T00:00:00.000Z`) : new Date(seedDate);
-
-    if (!scheduledDate) {
-      date.setUTCDate(seedDate.getUTCDate() - index * 3);
-    }
-
-    const post = {
-      slug,
-      title,
-      date: date.toISOString().slice(0, 10),
-      category,
-      excerpt,
-      content: makeContent(topic, index),
-      img: images[index % images.length],
-    };
-
-    insert.run(post);
-    seededPosts.push({ id: index + 1, ...post });
-  });
+  all.forEach((post) => insert.run(post));
 })();
 
 db.close();
 
-const jsonPath = path.join(dbDir, 'blog-posts.json');
-const jsonPosts = seededPosts
-  .sort((first, second) => second.date.localeCompare(first.date) || second.id - first.id)
-  .map((post) => ({
-    slug: post.slug,
-    title: post.title,
-    date: post.date,
-    category: post.category,
-    excerpt: post.excerpt,
-    content: post.content,
-    img: post.img,
-  }));
-
+const jsonPosts = [...all].sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug));
 fs.writeFileSync(jsonPath, `${JSON.stringify(jsonPosts, null, 2)}\n`);
 
-console.log(`Seeded ${allTopics.length} blog posts into ${path.relative(process.cwd(), dbPath)}`);
-console.log(`Wrote ${jsonPosts.length} blog posts into ${path.relative(process.cwd(), jsonPath)}`);
+const liveToday = all.filter((p) => p.date <= isoDate(new Date())).length;
+
+console.log(`Seeded ${all.length} posts into ${path.relative(process.cwd(), dbPath)}`);
+console.log(`  - ${evergreen.length} evergreen (live now), ${generated.length} generated (drip one per day)`);
+console.log(`  - ${liveToday} live today; the rest publish automatically one per day from ${isoDate(GENERATED_START)}`);
+console.log(`Wrote ${jsonPosts.length} posts into ${path.relative(process.cwd(), jsonPath)}`);

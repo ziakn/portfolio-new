@@ -76,6 +76,9 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: 'https://ziamuhammad.com',
+    types: {
+      'application/rss+xml': 'https://ziamuhammad.com/feed.xml',
+    },
   },
   other: {
     'google-adsense-account': 'ca-pub-9790243158087298',

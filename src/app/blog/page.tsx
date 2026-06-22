@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import Script from 'next/script';
 import { formatPostDate, getPosts } from '@/data/posts';
 
 export const revalidate = 0;
@@ -21,8 +22,53 @@ export const metadata: Metadata = {
 export default function BlogPage() {
   const posts = getPosts();
 
+  const blogJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: 'Qatar Software Engineering Blog',
+    description:
+      'Practical articles on Laravel, Next.js, SEO, AI integrations, APIs, and digital platforms for Qatar businesses by Zia Muhammad.',
+    url: 'https://ziamuhammad.com/blog',
+    inLanguage: 'en',
+    author: {
+      '@type': 'Person',
+      name: 'Zia Muhammad',
+      url: 'https://ziamuhammad.com',
+    },
+    blogPost: posts.slice(0, 20).map((post) => ({
+      '@type': 'BlogPosting',
+      headline: post.title,
+      description: post.excerpt,
+      url: `https://ziamuhammad.com/blog/${post.slug}`,
+      datePublished: post.date,
+      image: `https://ziamuhammad.com${post.img}`,
+      articleSection: post.category,
+    })),
+  };
+
+  const itemListJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: posts.slice(0, 50).map((post, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: `https://ziamuhammad.com/blog/${post.slug}`,
+      name: post.title,
+    })),
+  };
+
   return (
     <article className="blog active">
+      <Script
+        id="blog-json-ld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogJsonLd).replace(/</g, '\\u003c') }}
+      />
+      <Script
+        id="blog-itemlist-json-ld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd).replace(/</g, '\\u003c') }}
+      />
       <header>
         <h1 className="h1 article-title">Blog</h1>
       </header>
