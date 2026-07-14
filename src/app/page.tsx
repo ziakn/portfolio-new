@@ -6,7 +6,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Software Engineer in Doha, Qatar | Laravel, React, Next.js',
   description:
-    'Zia Muhammad is a Full Stack Software Engineer in Doha, Qatar offering Laravel, React, Next.js, APIs, AI integrations, hosting, and technical SEO for Qatar businesses.',
+    'Full Stack Software Engineer in Doha, Qatar. I build Laravel, React, and Next.js platforms with APIs, AI integration, and technical SEO. Get in touch.',
   keywords: [
     'Software Engineer in Doha',
     'Software Engineer Qatar',

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed:blogs": "node scripts/seed-blog-db.js"
+    "blog": "node scripts/blog-db.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^12.10.0",

@@ -4,6 +4,7 @@ import Sidebar from '@/components/Sidebar';
 import Navbar from '@/components/Navbar';
 import SiteFooter from '@/components/SiteFooter';
 import { Poppins } from 'next/font/google';
+import { jsonLd, siteGraph } from '@/data/schema';
 import './globals.css';
 
 const poppins = Poppins({
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
     template: '%s | Zia Muhammad',
   },
   description:
-    'Zia Muhammad – Full Stack Software Engineer in Doha, Qatar with 7+ years of experience. Expert in Laravel, React.js, Next.js, REST APIs, and LLM Integrations (OpenAI, Gemini). Scaled Al Sharq News to 85M+ yearly views.',
+    'Zia Muhammad – Full Stack Software Engineer in Doha, Qatar. 7+ years building Laravel, React, and Next.js platforms, REST APIs, and LLM integrations.',
   keywords: [
     'Full Stack Developer Qatar',
     'Software Engineer Qatar',
@@ -42,14 +43,6 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'Zia Muhammad | Software Engineer',
     locale: 'en_US',
-    images: [
-      {
-        url: '/images/Profile-W.webp',
-        width: 800,
-        height: 800,
-        alt: 'Zia Muhammad – Full Stack Software Engineer',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
@@ -132,129 +125,12 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
 
-        {/* JSON-LD Structured Data */}
-        <Script id="json-ld-person" type="application/ld+json" strategy="afterInteractive">
-          {`
-            {
-              "@context": "https://schema.org",
-              "@type": "Person",
-              "name": "Zia Muhammad",
-              "url": "https://ziamuhammad.com",
-               "image": "https://ziamuhammad.com/images/Profile-W.webp",
-              "sameAs": [
-                "https://twitter.com/ziamuhmmad2",
-                "https://www.linkedin.com/in/zia-software/",
-                "https://github.com/ziakn"
-              ],
-              "jobTitle": "Full Stack Software Engineer",
-              "worksFor": {
-                "@type": "Organization",
-                "name": "Dar Al-Sharq Group"
-              },
-              "address": {
-                "@type": "PostalAddress",
-                "addressLocality": "Doha",
-                "addressCountry": "Qatar"
-              }
-            }
-          `}
-        </Script>
-        <Script id="json-ld-website" type="application/ld+json" strategy="afterInteractive">
-          {`
-            {
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              "name": "Zia Muhammad Portfolio",
-              "url": "https://ziamuhammad.com",
-              "potentialAction": {
-                "@type": "SearchAction",
-                "target": "https://ziamuhammad.com/blog?q={search_term_string}",
-                "query-input": "required name=search_term_string"
-              }
-            }
-          `}
-        </Script>
-        <Script id="json-ld-local-business" type="application/ld+json" strategy="afterInteractive">
-          {`
-            {
-              "@context": "https://schema.org",
-              "@type": "ProfessionalService",
-              "name": "Zia Muhammad Software Engineering",
-              "url": "https://ziamuhammad.com",
-              "image": "https://ziamuhammad.com/images/Profile-W.webp",
-              "description": "Full Stack Software Engineer in Doha, Qatar offering Laravel, React, Next.js, API, AI integration, hosting, and technical SEO services.",
-              "areaServed": {
-                "@type": "Country",
-                "name": "Qatar"
-              },
-              "address": {
-                "@type": "PostalAddress",
-                "addressLocality": "Doha",
-                "addressCountry": "Qatar"
-              },
-              "telephone": "+97450684583",
-              "email": "mailto:ziakn03@gmail.com",
-              "priceRange": "$$",
-              "sameAs": [
-                "https://twitter.com/ziamuhmmad2",
-                "https://www.linkedin.com/in/zia-software/",
-                "https://github.com/ziakn"
-              ],
-              "hasOfferCatalog": {
-                "@type": "OfferCatalog",
-                "name": "Software engineering services in Qatar",
-                "itemListElement": [
-                  { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Laravel Development" } },
-                  { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Next.js Development" } },
-                  { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Technical SEO" } },
-                  { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "AI Integration" } }
-                ]
-              }
-            }
-          `}
-        </Script>
-        <Script id="json-ld-organization" type="application/ld+json" strategy="afterInteractive">
-          {`
-            {
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              "name": "Dar Al-Sharq Group",
-              "url": "https://daralsharq.net/",
-              "logo": "https://daralsharq.net/logo.png",
-              "sameAs": [
-                "https://twitter.com/daralsharq",
-                "https://www.linkedin.com/company/dar-al-sharq-group"
-              ],
-              "address": {
-                "@type": "PostalAddress",
-                "addressLocality": "Doha",
-                "addressCountry": "Qatar"
-              }
-            }
-          `}
-        </Script>
-        <Script id="json-ld-webpage" type="application/ld+json" strategy="afterInteractive">
-          {`
-            {
-              "@context": "https://schema.org",
-              "@type": "WebPage",
-              "name": "Zia Muhammad | Full Stack Software Engineer",
-              "url": "https://ziamuhammad.com",
-              "description": "Full Stack Software Engineer with 7+ years of experience scaling high-traffic platforms in Qatar.",
-              "isPartOf": {
-                "@type": "WebSite",
-                "name": "Zia Muhammad Portfolio",
-                "url": "https://ziamuhammad.com"
-              },
-              "significantLinks": [
-                "https://ziamuhammad.com/resume",
-                "https://ziamuhammad.com/portfolio",
-                "https://ziamuhammad.com/blog",
-                "https://ziamuhammad.com/contact"
-              ]
-            }
-          `}
-        </Script>
+        {/* JSON-LD: one linked @graph for the whole site. Rendered server-side
+            (not via next/script) so crawlers see it without executing JS. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLd(siteGraph) }}
+        />
 
         {/* Ionicons */}
         <Script

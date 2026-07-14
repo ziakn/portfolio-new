@@ -33,3 +33,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# sqlite runtime files (the .sqlite itself is committed)
+*.sqlite-wal
+*.sqlite-shm

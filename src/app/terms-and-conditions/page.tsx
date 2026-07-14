@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Terms and Conditions',
-  description: 'Terms and Conditions for Zia Muhammad Portfolio.',
+  description:
+    'Terms and Conditions for ziamuhammad.com, covering site use, intellectual property, external links, and the publishing of portfolio and article content.',
   alternates: { canonical: 'https://ziamuhammad.com/terms-and-conditions' },
 };
 

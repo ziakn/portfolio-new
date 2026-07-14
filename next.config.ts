@@ -5,6 +5,15 @@ const nextConfig: NextConfig = {
     qualities: [75, 100],
   },
   serverExternalPackages: ['better-sqlite3'],
+  // The blog database is read at runtime but never imported, so file tracing
+  // cannot infer it. Without this, the deployed bundle omits it and blog
+  // routes fail once a scheduled post revalidates.
+  outputFileTracingIncludes: {
+    '/blog': ['./data/posts.sqlite'],
+    '/blog/[slug]': ['./data/posts.sqlite'],
+    '/sitemap.xml': ['./data/posts.sqlite'],
+    '/feed.xml': ['./data/posts.sqlite'],
+  },
   turbopack: {
     root: process.cwd(),
   },

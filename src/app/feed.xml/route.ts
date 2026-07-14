@@ -1,6 +1,6 @@
 import { getPosts } from '@/data/posts';
 
-export const revalidate = 0;
+export const revalidate = 3600;
 
 const baseUrl = 'https://ziamuhammad.com';
 

@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Tasbih App Privacy Policy',
   description:
-    'Privacy Policy for the Tasbih mobile app covering local data storage, advertising (Google AdMob), analytics (Firebase), optional account sync, permissions, and your choices.',
+    'Privacy Policy for the Tasbih dhikr counter app: local data storage, Google AdMob ads, Firebase analytics, optional sync, permissions, and your choices.',
   alternates: { canonical: 'https://ziamuhammad.com/tasbih-privacy-policy' },
 };
 
@@ -11,7 +11,7 @@ export default function TasbihPrivacyPolicy() {
   return (
     <article className="about active">
       <header>
-        <h2 className="h2 article-title">Tasbih App Privacy Policy</h2>
+        <h1 className="h1 article-title">Tasbih App Privacy Policy</h1>
       </header>
       <section className="about-text">
         <p>Last updated: June 21, 2026</p>

@@ -10,8 +10,8 @@ import {
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import Script from 'next/script';
 import type { Metadata } from 'next';
+import { breadcrumbGraph, ids, jsonLd, siteUrl } from '@/data/schema';
 
 export const revalidate = 3600;
 
@@ -26,30 +26,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return { title: 'Post Not Found' };
 
   return {
-    title: post.title,
-    description: post.excerpt,
-    keywords: [post.title, ...getPostKeywords(post)],
-    authors: [{ name: 'Zia Muhammad', url: 'https://ziamuhammad.com' }],
+    title: post.metaTitle,
+    description: post.metaDescription,
+    keywords: getPostKeywords(post),
+    authors: [{ name: post.author, url: siteUrl }],
     category: post.category,
     alternates: {
-      canonical: `https://ziamuhammad.com/blog/${slug}`,
+      canonical: post.canonical,
     },
     openGraph: {
       type: 'article',
-      title: post.title,
-      description: post.excerpt,
-      url: `https://ziamuhammad.com/blog/${slug}`,
-      images: [{ url: post.img }],
+      title: post.metaTitle,
+      description: post.metaDescription,
+      url: post.canonical,
       publishedTime: post.date,
       modifiedTime: post.date,
-      authors: ['Zia Muhammad'],
-      tags: [post.category, 'Qatar software engineering', 'Next.js', 'Laravel'],
+      authors: [post.author],
+      tags: getPostKeywords(post),
+      ...(post.ogImage ? { images: [{ url: post.ogImage }] } : {}),
     },
     twitter: {
       card: 'summary_large_image',
-      title: post.title,
-      description: post.excerpt,
-      images: [post.img],
+      title: post.metaTitle,
+      description: post.metaDescription,
+      ...(post.ogImage ? { images: [post.ogImage] } : {}),
     },
   };
 }
@@ -71,67 +71,51 @@ export default async function BlogPostPage({ params }: Props) {
   const relatedPosts = getRelatedPosts(slug);
   const wordCount = getWordCount(post.content);
   const readingTime = getReadingTimeMinutes(post.content);
-  const postUrl = `https://ziamuhammad.com/blog/${post.slug}`;
-  const articleJsonLd = {
+  const postUrl = `${siteUrl}/blog/${post.slug}`;
+
+  // The WebPage and BlogPosting for this post, linked by @id into the site-wide
+  // graph declared in the root layout (Person, WebSite, logo).
+  const postGraph = {
     '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: post.title,
-    description: post.excerpt,
-    image: `https://ziamuhammad.com${post.img}`,
-    url: postUrl,
-    datePublished: post.date,
-    dateModified: post.date,
-    inLanguage: 'en',
-    isAccessibleForFree: true,
-    articleSection: post.category,
-    keywords: getPostKeywords(post).join(', '),
-    wordCount: wordCount || undefined,
-    timeRequired: `PT${readingTime}M`,
-    author: {
-      '@type': 'Person',
-      name: 'Zia Muhammad',
-      url: 'https://ziamuhammad.com',
-      address: {
-        '@type': 'PostalAddress',
-        addressLocality: 'Doha',
-        addressCountry: 'Qatar',
-      },
-    },
-    publisher: {
-      '@type': 'Person',
-      name: 'Zia Muhammad',
-      url: 'https://ziamuhammad.com',
-      logo: {
-        '@type': 'ImageObject',
-        url: 'https://ziamuhammad.com/images/Profile-W.webp',
-      },
-    },
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': postUrl,
-    },
-  };
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
+    '@graph': [
       {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: 'https://ziamuhammad.com',
-      },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: 'Blog',
-        item: 'https://ziamuhammad.com/blog',
-      },
-      {
-        '@type': 'ListItem',
-        position: 3,
+        '@type': 'WebPage',
+        '@id': `${postUrl}#webpage`,
+        url: postUrl,
         name: post.title,
-        item: `https://ziamuhammad.com/blog/${post.slug}`,
+        description: post.excerpt,
+        isPartOf: { '@id': ids.website },
+        inLanguage: 'en',
+        breadcrumb: { '@id': `${postUrl}#breadcrumb` },
+      },
+      {
+        '@type': 'BlogPosting',
+        '@id': `${postUrl}#article`,
+        headline: post.title,
+        description: post.excerpt,
+        image: `${siteUrl}${post.img}`,
+        url: postUrl,
+        datePublished: post.date,
+        dateModified: post.date,
+        inLanguage: 'en',
+        isAccessibleForFree: true,
+        articleSection: post.category,
+        keywords: getPostKeywords(post).join(', '),
+        wordCount: wordCount || undefined,
+        timeRequired: `PT${readingTime}M`,
+        author: { '@id': ids.person },
+        publisher: { '@id': ids.person },
+        isPartOf: { '@id': `${postUrl}#webpage` },
+        mainEntityOfPage: { '@id': `${postUrl}#webpage` },
+      },
+      {
+        ...breadcrumbGraph([
+          { name: 'Home', path: '' },
+          { name: 'Blog', path: '/blog' },
+          { name: post.title, path: `/blog/${post.slug}` },
+        ]),
+        '@context': undefined,
+        '@id': `${postUrl}#breadcrumb`,
       },
     ],
   };
@@ -161,15 +145,9 @@ export default async function BlogPostPage({ params }: Props) {
       </figure>
 
       <section className="about-text">
-        <Script
-          id="breadcrumb-json-ld"
+        <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c') }}
-        />
-        <Script
-          id="article-json-ld"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd).replace(/</g, '\\u003c') }}
+          dangerouslySetInnerHTML={{ __html: jsonLd(postGraph) }}
         />
         <div dangerouslySetInnerHTML={{ __html: post.content }} />
       </section>

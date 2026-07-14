@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Disclaimer',
-  description: 'Disclaimer for Zia Muhammad Portfolio.',
+  description:
+    'Disclaimer for ziamuhammad.com. Articles and portfolio notes are published for general information only, without warranty. Read the full terms here.',
   alternates: { canonical: 'https://ziamuhammad.com/disclaimer' },
 };
 

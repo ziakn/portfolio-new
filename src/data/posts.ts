@@ -1,4 +1,5 @@
-import posts from './curated-posts';
+import { getDb } from './db';
+import { siteUrl } from './schema';
 
 export interface BlogPost {
   slug: string;
@@ -8,62 +9,109 @@ export interface BlogPost {
   excerpt: string;
   content: string;
   img: string;
+  metaTitle: string;
+  metaDescription: string;
+  focusKeyword: string | null;
+  keywords: string[];
+  canonical: string;
+  ogImage: string | null;
+  author: string;
+}
+
+interface PostRow {
+  slug: string;
+  title: string;
+  publish_date: string;
+  category: string;
+  excerpt: string;
+  content: string;
+  img: string;
+  meta_title: string | null;
+  meta_description: string | null;
+  focus_keyword: string | null;
+  keywords: string | null;
+  canonical: string | null;
+  og_image: string | null;
+  author: string;
 }
 
 const siteTimeZone = 'Asia/Qatar';
-const allPosts = posts as BlogPost[];
 
+// A post is live once its publish date has arrived in Qatar. Future-dated posts
+// are excluded from every read path — index, sitemap, feed, and the post route
+// itself (which 404s) — so a scheduled post cannot be reached early by URL.
 function getCurrentPublishDate(): string {
-  const parts = new Intl.DateTimeFormat('en', {
-    timeZone: siteTimeZone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(new Date());
-
-  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
-
-  return `${values.year}-${values.month}-${values.day}`;
+  return new Intl.DateTimeFormat('en-CA', { timeZone: siteTimeZone }).format(new Date());
 }
 
-export function getPosts(): BlogPost[] {
-  const publishDate = getCurrentPublishDate();
+function toPost(row: PostRow): BlogPost {
+  return {
+    slug: row.slug,
+    title: row.title,
+    date: row.publish_date,
+    category: row.category,
+    excerpt: row.excerpt,
+    content: row.content,
+    img: row.img,
+    metaTitle: row.meta_title?.trim() || row.title,
+    metaDescription: row.meta_description?.trim() || row.excerpt,
+    focusKeyword: row.focus_keyword?.trim() || null,
+    keywords: row.keywords
+      ? row.keywords.split(',').map((keyword) => keyword.trim()).filter(Boolean)
+      : [],
+    canonical: row.canonical?.trim() || `${siteUrl}/blog/${row.slug}`,
+    ogImage: row.og_image?.trim() || null,
+    author: row.author,
+  };
+}
 
-  return allPosts.filter((post) => post.date <= publishDate);
+const SELECT = `SELECT slug, title, publish_date, category, excerpt, content, img,
+                       meta_title, meta_description, focus_keyword, keywords,
+                       canonical, og_image, author
+                FROM posts`;
+
+export function getPosts(): BlogPost[] {
+  const rows = getDb()
+    .prepare(`${SELECT} WHERE publish_date <= ? ORDER BY publish_date DESC`)
+    .all(getCurrentPublishDate()) as PostRow[];
+
+  return rows.map(toPost);
 }
 
 export function getPost(slug: string): BlogPost | undefined {
-  const publishDate = getCurrentPublishDate();
+  const row = getDb()
+    .prepare(`${SELECT} WHERE slug = ? AND publish_date <= ?`)
+    .get(slug, getCurrentPublishDate()) as PostRow | undefined;
 
-  return allPosts.find((post) => post.slug === slug && post.date <= publishDate);
+  return row ? toPost(row) : undefined;
 }
 
+// Prefer posts in the same category (better topical internal linking), then
+// fill remaining slots with the most recent other live posts.
 export function getRelatedPosts(slug: string, limit = 3): BlogPost[] {
   const publishDate = getCurrentPublishDate();
-  const current = allPosts.find((post) => post.slug === slug);
+  const rows = getDb()
+    .prepare(
+      `${SELECT} WHERE publish_date <= ? AND slug != ?
+       ORDER BY category = (SELECT category FROM posts WHERE slug = ?) DESC,
+                publish_date DESC
+       LIMIT ?`,
+    )
+    .all(publishDate, slug, slug, limit) as PostRow[];
 
-  const live = allPosts.filter((post) => post.slug !== slug && post.date <= publishDate);
-
-  // Prefer posts in the same category (better topical internal linking),
-  // then fill the remaining slots with the most recent other posts.
-  const sameCategory = current
-    ? live.filter((post) => post.category === current.category)
-    : [];
-  const others = live.filter((post) => !sameCategory.includes(post));
-
-  return [...sameCategory, ...others].slice(0, limit);
+  return rows.map(toPost);
 }
 
 export function getCategories(): string[] {
-  return Array.from(new Set(getPosts().map((post) => post.category))).sort();
+  const rows = getDb()
+    .prepare('SELECT DISTINCT category FROM posts WHERE publish_date <= ? ORDER BY category')
+    .all(getCurrentPublishDate()) as { category: string }[];
+
+  return rows.map((row) => row.category);
 }
 
 // Base keywords every blog page should carry, plus category-specific terms.
-const baseKeywords = [
-  'Zia Muhammad',
-  'Software Engineer Qatar',
-  'Web Development Qatar',
-];
+const baseKeywords = ['Zia Muhammad', 'Software Engineer Qatar', 'Web Development Qatar'];
 
 const categoryKeywords: Record<string, string[]> = {
   Laravel: ['Laravel Developer Qatar', 'Laravel Development Doha', 'PHP Developer Qatar'],
@@ -84,16 +132,22 @@ const categoryKeywords: Record<string, string[]> = {
   'Case Study': ['Software Case Study', 'Qatar Software Project', 'Engineering Portfolio'],
 };
 
+// Per-post keywords take precedence; the focus keyword always leads.
 export function getPostKeywords(post: BlogPost): string[] {
-  const categoryTerms = categoryKeywords[post.category] ?? [`${post.category} Qatar`];
-  return Array.from(new Set([...categoryTerms, post.category, ...baseKeywords]));
+  const fallback = categoryKeywords[post.category] ?? [`${post.category} Qatar`];
+  const terms = post.keywords.length ? post.keywords : fallback;
+
+  return Array.from(
+    new Set(
+      [post.focusKeyword, ...terms, post.category, ...baseKeywords].filter(
+        (keyword): keyword is string => Boolean(keyword),
+      ),
+    ),
+  );
 }
 
 export function getPlainText(content: string): string {
-  return content
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+  return content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 export function getWordCount(content: string): number {
