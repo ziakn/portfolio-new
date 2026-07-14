@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 };
 
 export default function BlogPage() {
-  const posts = getPosts();
+  const posts = getPosts(true).slice(0, 50);
 
   const blogJsonLd = {
     '@context': 'https://schema.org',

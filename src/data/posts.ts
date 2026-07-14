@@ -70,42 +70,52 @@ const SELECT = `SELECT slug, title, publish_date, category, excerpt, content, im
                        canonical, og_image, author
                 FROM posts`;
 
-export function getPosts(): BlogPost[] {
-  const rows = getDb()
-    .prepare(`${SELECT} WHERE publish_date <= ? ORDER BY publish_date DESC`)
-    .all(getCurrentPublishDate()) as PostRow[];
+export function getPosts(includeFuture = false): BlogPost[] {
+  const query = includeFuture
+    ? `${SELECT} ORDER BY publish_date DESC`
+    : `${SELECT} WHERE publish_date <= ? ORDER BY publish_date DESC`;
+  const params = includeFuture ? [] : [getCurrentPublishDate()];
+  const rows = getDb().prepare(query).all(...params) as PostRow[];
 
   return rows.map(toPost);
 }
 
-export function getPost(slug: string): BlogPost | undefined {
-  const row = getDb()
-    .prepare(`${SELECT} WHERE slug = ? AND publish_date <= ?`)
-    .get(slug, getCurrentPublishDate()) as PostRow | undefined;
+export function getPost(slug: string, includeFuture = false): BlogPost | undefined {
+  const query = includeFuture
+    ? `${SELECT} WHERE slug = ?`
+    : `${SELECT} WHERE slug = ? AND publish_date <= ?`;
+  const params = includeFuture ? [slug] : [slug, getCurrentPublishDate()];
+  const row = getDb().prepare(query).get(...params) as PostRow | undefined;
 
   return row ? toPost(row) : undefined;
 }
 
 // Prefer posts in the same category (better topical internal linking), then
 // fill remaining slots with the most recent other live posts.
-export function getRelatedPosts(slug: string, limit = 3): BlogPost[] {
-  const publishDate = getCurrentPublishDate();
-  const rows = getDb()
-    .prepare(
-      `${SELECT} WHERE publish_date <= ? AND slug != ?
+export function getRelatedPosts(slug: string, limit = 3, includeFuture = false): BlogPost[] {
+  const query = includeFuture
+    ? `${SELECT} WHERE slug != ?
        ORDER BY category = (SELECT category FROM posts WHERE slug = ?) DESC,
                 publish_date DESC
-       LIMIT ?`,
-    )
-    .all(publishDate, slug, slug, limit) as PostRow[];
+       LIMIT ?`
+    : `${SELECT} WHERE publish_date <= ? AND slug != ?
+       ORDER BY category = (SELECT category FROM posts WHERE slug = ?) DESC,
+                publish_date DESC
+       LIMIT ?`;
+  const params = includeFuture
+    ? [slug, slug, limit]
+    : [getCurrentPublishDate(), slug, slug, limit];
+  const rows = getDb().prepare(query).all(...params) as PostRow[];
 
   return rows.map(toPost);
 }
 
-export function getCategories(): string[] {
-  const rows = getDb()
-    .prepare('SELECT DISTINCT category FROM posts WHERE publish_date <= ? ORDER BY category')
-    .all(getCurrentPublishDate()) as { category: string }[];
+export function getCategories(includeFuture = false): string[] {
+  const query = includeFuture
+    ? 'SELECT DISTINCT category FROM posts ORDER BY category'
+    : 'SELECT DISTINCT category FROM posts WHERE publish_date <= ? ORDER BY category';
+  const params = includeFuture ? [] : [getCurrentPublishDate()];
+  const rows = getDb().prepare(query).all(...params) as { category: string }[];
 
   return rows.map((row) => row.category);
 }

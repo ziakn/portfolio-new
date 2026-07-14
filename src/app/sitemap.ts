@@ -24,7 +24,7 @@ function absoluteUrl(path: string) {
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const posts = getPosts();
+  const posts = getPosts(true);
 
   return [
     {
