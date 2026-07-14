@@ -4,7 +4,7 @@ export default function NotFound() {
   return (
     <article className="about active" data-page="about">
       <header>
-        <h2 className="h2 article-title">Page Not Found</h2>
+        <h1 className="h1 article-title">Page Not Found</h1>
       </header>
       <section className="about-text">
         <p style={{ marginBottom: '20px' }}>

@@ -148,63 +148,54 @@ const projects = [
   { 
     title: 'SoloStore', 
     category: 'web development', 
-    href: '#', 
     img: '/images/solostore.webp', 
     desc: 'Single vendor shopping platform optimized for performance, conversion, and seamless UX.' 
   },
   { 
     title: 'Maroon Mall', 
     category: 'web development', 
-    href: '#', 
     img: '/images/project-3.webp', 
     desc: 'Mall aggregator e-commerce platform connecting multiple retailers in a unified shopping portal.' 
   },
   { 
     title: 'Tiollo SaaS', 
     category: 'mobile development', 
-    href: '#', 
     img: '/images/tiollo.webp', 
     desc: 'Multi-vendor food delivery & hotel booking SaaS with advanced dispatching and booking engines.' 
   },
   { 
     title: 'SimplistQ CRM', 
     category: 'applications', 
-    href: '#', 
     img: '/images/project-4.webp', 
     desc: 'Enterprise CRM for invoicing, support, and payment integration (Twyla/Sadad) for corporate clients.' 
   },
   { 
     title: 'SimplistQ Sales', 
     category: 'applications', 
-    href: '#', 
     img: '/images/project-5.webp', 
     desc: 'Internal telesales & staff communications tool for lead management and performance tracking.' 
   },
   { 
     title: 'SSR Qatar', 
     category: 'web development', 
-    href: '#', 
     img: '/images/project-6.webp', 
     desc: 'HR & staffing portal for companies and job seekers with automated matching and profile management.' 
   },
   { 
     title: 'AJT Properties', 
     category: 'web development', 
-    href: '#', 
     img: '/images/project-7.webp', 
     desc: 'Real estate sales & rental platforms with interactive property listings and lead generation.' 
   },
   { 
     title: 'Hamilton Qatar', 
     category: 'applications', 
-    href: '#', 
     img: '/images/project-8.webp', 
     desc: 'Enterprise project management tool for Qatar Civil Defence (QCDD) compliance and monitoring.' 
   },
   { 
     title: 'Eaqaqa', 
     category: 'applications', 
-    href: '#', 
     img: '/images/project-9.webp', 
     desc: 'Academic research publishing system for Qatar University, managing peer reviews and digital archives.' 
   },
@@ -217,6 +208,28 @@ export default function PortfolioPage() {
   const [selectOpen, setSelectOpen] = useState(false);
 
   const filtered = filter === 'all' ? projects : projects.filter((p) => p.category === filter);
+
+  const renderProjectContent = (p: (typeof projects)[number]) => (
+    <>
+      <figure className="project-img">
+        {p.href && (
+          <div className="project-item-icon-box">
+            <ion-icon name="eye-outline"></ion-icon>
+          </div>
+        )}
+        <Image
+          src={p.img}
+          alt={`Screenshot of ${p.title} project: ${p.desc.substring(0, 100)}`}
+          width={600}
+          height={400}
+          loading="lazy"
+          style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+        />
+      </figure>
+      <h3 className="project-title">{p.title}</h3>
+      <p className="project-category">{p.desc}</p>
+    </>
+  );
 
   return (
     <article className="portfolio active" data-page="portfolio">
@@ -293,23 +306,13 @@ export default function PortfolioPage() {
         <ul className="project-list">
           {filtered.map((p) => (
             <li className="project-item active" key={p.title}>
-              <a href={p.href} target="_blank" rel="noopener noreferrer">
-                <figure className="project-img">
-                  <div className="project-item-icon-box">
-                    <ion-icon name="eye-outline"></ion-icon>
-                  </div>
-                  <Image
-                    src={p.img}
-                    alt={`Screenshot of ${p.title} project: ${p.desc.substring(0, 100)}`}
-                    width={600}
-                    height={400}
-                    loading="lazy"
-                    style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                  />
-                </figure>
-                <h3 className="project-title">{p.title}</h3>
-                <p className="project-category">{p.desc}</p>
-              </a>
+              {p.href ? (
+                <a href={p.href} target="_blank" rel="noopener noreferrer">
+                  {renderProjectContent(p)}
+                </a>
+              ) : (
+                <div className="project-card-static">{renderProjectContent(p)}</div>
+              )}
             </li>
           ))}
         </ul>

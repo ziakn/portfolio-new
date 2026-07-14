@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Script from 'next/script';
 import { formatPostDate, getPosts } from '@/data/posts';
 
-export const revalidate = 0;
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Qatar Software Engineering Blog',

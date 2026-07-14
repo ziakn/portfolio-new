@@ -10,7 +10,7 @@ export default function Disclaimer() {
   return (
     <article className="about active">
       <header>
-        <h2 className="h2 article-title">Disclaimer</h2>
+        <h1 className="h1 article-title">Disclaimer</h1>
       </header>
       <section className="about-text">
         <p>

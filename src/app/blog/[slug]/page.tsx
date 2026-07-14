@@ -13,7 +13,7 @@ import Link from 'next/link';
 import Script from 'next/script';
 import type { Metadata } from 'next';
 
-export const revalidate = 0;
+export const revalidate = 3600;
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return { title: 'Post Not Found' };
 
   return {
-    title: `${post.title} | Blog`,
+    title: post.title,
     description: post.excerpt,
     keywords: [post.title, ...getPostKeywords(post)],
     authors: [{ name: 'Zia Muhammad', url: 'https://ziamuhammad.com' }],

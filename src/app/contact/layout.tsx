@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Contact Zia Muhammad | Hire Full Stack Software Engineer in Doha, Qatar',
+  title: 'Contact – Hire a Full Stack Engineer in Doha',
   description:
     'Contact Zia Muhammad – Full Stack Software Engineer in Doha, Qatar. Available for freelance, contract, and full-time opportunities.',
   alternates: { canonical: '/contact' },

@@ -11,7 +11,7 @@ export default function PrivacyPolicy() {
   return (
     <article className="about active">
       <header>
-        <h2 className="h2 article-title">Privacy Policy</h2>
+        <h1 className="h1 article-title">Privacy Policy</h1>
       </header>
       <section className="about-text">
         <p>Last updated: May 29, 2026</p>

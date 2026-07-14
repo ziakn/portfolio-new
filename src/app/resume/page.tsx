@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Script from 'next/script';
 
 export const metadata: Metadata = {
-  title: 'Resume – Zia Muhammad | Full Stack Software Engineer | 7+ Years in Qatar',
+  title: 'Resume – Full Stack Software Engineer, 7+ Years in Qatar',
   description:
     "Zia Muhammad's CV and resume. Full Stack Software Engineer with 7+ years in Doha, Qatar. Expert in Laravel, React.js, Next.js, LLM/AI integrations.",
   alternates: { canonical: 'https://ziamuhammad.com/resume' },

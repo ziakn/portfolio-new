@@ -71,9 +71,6 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  verification: {
-    google: 'G-PKC08M31Q4',
-  },
   alternates: {
     canonical: 'https://ziamuhammad.com',
     types: {

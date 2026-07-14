@@ -10,7 +10,7 @@ export default function TermsAndConditions() {
   return (
     <article className="about active">
       <header>
-        <h2 className="h2 article-title">Terms and Conditions</h2>
+        <h1 className="h1 article-title">Terms and Conditions</h1>
       </header>
       <section className="about-text">
         <p>Welcome to Zia Muhammad Portfolio!</p>

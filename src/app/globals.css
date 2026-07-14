@@ -1067,7 +1067,8 @@ main {
   }
 }
 
-.project-item>a {
+.project-item>a,
+.project-card-static {
   width: 100%;
   min-width: 0;
 }
