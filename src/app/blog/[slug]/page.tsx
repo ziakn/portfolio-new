@@ -123,6 +123,13 @@ export default async function BlogPostPage({ params }: Props) {
   return (
     <article className="blog-post active">
       <header>
+        <nav className="breadcrumbs" style={{ display: 'flex', gap: '8px', fontSize: 'var(--fs-6)', color: 'var(--light-gray-70)', marginBottom: '15px' }}>
+          <Link href="/" style={{ color: 'var(--light-gray-70)', textDecoration: 'none' }}>Home</Link>
+          <span>&gt;</span>
+          <Link href="/blog" style={{ color: 'var(--light-gray-70)', textDecoration: 'none' }}>Blog</Link>
+          <span>&gt;</span>
+          <span style={{ color: 'var(--orange-yellow-crayola)' }}>{post.title}</span>
+        </nav>
         <h1 className="h1 article-title">{post.title}</h1>
         <div className="blog-meta" style={{ marginBottom: '20px' }}>
           <p className="blog-category">{post.category}</p>
