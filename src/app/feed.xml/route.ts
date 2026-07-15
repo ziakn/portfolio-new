@@ -15,7 +15,7 @@ function escapeXml(value: string): string {
 
 export async function GET() {
   // Only the most recent live posts; the feed updates as posts go live daily.
-  const posts = getPosts(true).slice(0, 30);
+  const posts = getPosts().slice(0, 30);
   const lastBuildDate = new Date().toUTCString();
 
   const items = posts

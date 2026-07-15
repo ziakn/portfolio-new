@@ -21,7 +21,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPost(slug, true);
+  const post = getPost(slug);
 
   if (!post) return { title: 'Post Not Found' };
 
@@ -64,11 +64,11 @@ export async function generateStaticParams() {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = getPost(slug, true);
+  const post = getPost(slug);
 
   if (!post) notFound();
 
-  const relatedPosts = getRelatedPosts(slug, 3, true);
+  const relatedPosts = getRelatedPosts(slug, 3);
   const wordCount = getWordCount(post.content);
   const readingTime = getReadingTimeMinutes(post.content);
   const postUrl = `${siteUrl}/blog/${post.slug}`;
