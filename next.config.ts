@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
     '/blog/[slug]': ['./data/posts.sqlite'],
     '/sitemap.xml': ['./data/posts.sqlite'],
     '/feed.xml': ['./data/posts.sqlite'],
+    '/portfolio': ['./data/posts.sqlite'],
+    '/resume': ['./data/posts.sqlite'],
+    '/': ['./data/posts.sqlite'],
+    '/api/contact': ['./data/posts.sqlite'],
+    // The admin panel reads and writes the same database.
+    '/admin/**': ['./data/posts.sqlite'],
   },
   turbopack: {
     root: process.cwd(),

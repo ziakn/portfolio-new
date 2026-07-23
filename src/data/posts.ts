@@ -178,3 +178,178 @@ export function formatPostDate(date: string): string {
     timeZone: 'UTC',
   }).format(new Date(`${date}T00:00:00.000Z`));
 }
+
+// ─── Admin CRUD ──────────────────────────────────────────────────────────────
+// The public helpers above hide future-dated posts; the admin functions below
+// see everything (live + scheduled) and can write.
+
+export interface AdminPostRow {
+  id: number;
+  slug: string;
+  title: string;
+  publish_date: string;
+  category: string;
+  isLive: boolean;
+}
+
+export interface PostInput {
+  slug: string;
+  title: string;
+  publish_date: string;
+  category: string;
+  excerpt: string;
+  content: string;
+  img: string;
+  meta_title?: string | null;
+  meta_description?: string | null;
+  focus_keyword?: string | null;
+  keywords?: string | null;
+  canonical?: string | null;
+  og_image?: string | null;
+  author?: string | null;
+}
+
+export interface PostStats {
+  total: number;
+  live: number;
+  scheduled: number;
+}
+
+export function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80);
+}
+
+export function getPostStats(): PostStats {
+  const now = getCurrentPublishDate();
+  const row = getDb()
+    .prepare(
+      `SELECT
+         COUNT(*) AS total,
+         SUM(CASE WHEN publish_date <= ? THEN 1 ELSE 0 END) AS live
+       FROM posts`,
+    )
+    .get(now) as { total: number; live: number | null };
+  const live = row.live ?? 0;
+  return { total: row.total, live, scheduled: row.total - live };
+}
+
+export interface AdminPostPage {
+  rows: AdminPostRow[];
+  total: number;
+  page: number;
+  perPage: number;
+  totalPages: number;
+}
+
+export function listPostsAdmin(search = '', page = 1, perPage = 25): AdminPostPage {
+  const now = getCurrentPublishDate();
+  const term = search.trim();
+  const where = term ? 'WHERE title LIKE ? OR slug LIKE ? OR category LIKE ?' : '';
+  const likeParams = term ? [`%${term}%`, `%${term}%`, `%${term}%`] : [];
+
+  const totalRow = getDb()
+    .prepare(`SELECT COUNT(*) AS c FROM posts ${where}`)
+    .get(...likeParams) as { c: number };
+  const total = totalRow.c;
+  const totalPages = Math.max(1, Math.ceil(total / perPage));
+  const safePage = Math.min(Math.max(1, page), totalPages);
+  const offset = (safePage - 1) * perPage;
+
+  const rows = getDb()
+    .prepare(
+      `SELECT id, slug, title, publish_date, category
+       FROM posts ${where}
+       ORDER BY publish_date DESC
+       LIMIT ? OFFSET ?`,
+    )
+    .all(...likeParams, perPage, offset) as Omit<AdminPostRow, 'isLive'>[];
+
+  return {
+    rows: rows.map((row) => ({ ...row, isLive: row.publish_date <= now })),
+    total,
+    page: safePage,
+    perPage,
+    totalPages,
+  };
+}
+
+const FULL_SELECT = `SELECT id, slug, title, publish_date, category, excerpt, content, img,
+                            meta_title, meta_description, focus_keyword, keywords,
+                            canonical, og_image, author
+                     FROM posts`;
+
+export function getPostById(id: number): (PostRow & { id: number }) | undefined {
+  return getDb().prepare(`${FULL_SELECT} WHERE id = ?`).get(id) as
+    | (PostRow & { id: number })
+    | undefined;
+}
+
+export function slugExists(slug: string, exceptId?: number): boolean {
+  const row = exceptId
+    ? getDb().prepare('SELECT id FROM posts WHERE slug = ? AND id != ?').get(slug, exceptId)
+    : getDb().prepare('SELECT id FROM posts WHERE slug = ?').get(slug);
+  return Boolean(row);
+}
+
+function normalizeInput(input: PostInput) {
+  return {
+    slug: input.slug,
+    title: input.title,
+    publish_date: input.publish_date,
+    category: input.category,
+    excerpt: input.excerpt,
+    content: input.content,
+    img: input.img,
+    meta_title: input.meta_title?.trim() || null,
+    meta_description: input.meta_description?.trim() || null,
+    focus_keyword: input.focus_keyword?.trim() || null,
+    keywords: input.keywords?.trim() || null,
+    canonical: input.canonical?.trim() || null,
+    og_image: input.og_image?.trim() || null,
+    author: input.author?.trim() || 'Zia Muhammad',
+  };
+}
+
+export function createPost(input: PostInput): number {
+  const info = getDb()
+    .prepare(
+      `INSERT INTO posts (slug, title, publish_date, category, excerpt, content, img,
+                          meta_title, meta_description, focus_keyword, keywords,
+                          canonical, og_image, author)
+       VALUES (@slug, @title, @publish_date, @category, @excerpt, @content, @img,
+               @meta_title, @meta_description, @focus_keyword, @keywords,
+               @canonical, @og_image, @author)`,
+    )
+    .run(normalizeInput(input));
+  return Number(info.lastInsertRowid);
+}
+
+export function updatePost(id: number, input: PostInput): void {
+  getDb()
+    .prepare(
+      `UPDATE posts SET
+         slug=@slug, title=@title, publish_date=@publish_date, category=@category,
+         excerpt=@excerpt, content=@content, img=@img,
+         meta_title=@meta_title, meta_description=@meta_description,
+         focus_keyword=@focus_keyword, keywords=@keywords,
+         canonical=@canonical, og_image=@og_image, author=@author,
+         updated_at=datetime('now')
+       WHERE id=@id`,
+    )
+    .run({ ...normalizeInput(input), id });
+}
+
+export function deletePost(id: number): string | undefined {
+  const row = getDb().prepare('SELECT slug FROM posts WHERE id = ?').get(id) as
+    | { slug: string }
+    | undefined;
+  getDb().prepare('DELETE FROM posts WHERE id = ?').run(id);
+  return row?.slug;
+}
+
+export { getCurrentPublishDate };

@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Script from 'next/script';
 import { formatPostDate, getPosts } from '@/data/posts';
+import SiteAnalytics from '@/components/SiteAnalytics';
 
 export const revalidate = 3600;
 
@@ -59,6 +60,7 @@ export default function BlogPage() {
 
   return (
     <article className="blog active">
+      <SiteAnalytics />
       <Script
         id="blog-json-ld"
         type="application/ld+json"

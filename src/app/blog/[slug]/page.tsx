@@ -12,6 +12,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { breadcrumbGraph, ids, jsonLd, siteUrl } from '@/data/schema';
+import SiteAnalytics from '@/components/SiteAnalytics';
 
 export const revalidate = 3600;
 
@@ -23,7 +24,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = getPost(slug);
 
-  if (!post) return { title: 'Post Not Found' };
+  // Unknown or not-yet-published slug: return a 404-appropriate, non-indexable
+  // head so search engines drop the URL instead of indexing an error page.
+  if (!post) {
+    return {
+      title: 'Post Not Found',
+      robots: { index: false, follow: false },
+    };
+  }
 
   return {
     title: post.metaTitle,
@@ -55,7 +63,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const posts = getPosts(true);
+  // Only pre-render LIVE posts. Scheduled (future-dated) posts must NOT be
+  // materialized here — the page body 404s them until their publish date, so
+  // pre-building them just produces cached "Post Not Found" pages. They are
+  // generated on demand (dynamicParams defaults to true) once they go live.
+  const posts = getPosts(false);
 
   return posts.map((post) => ({
     slug: post.slug,
@@ -122,6 +134,7 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <article className="blog-post active">
+      <SiteAnalytics />
       <header>
         <nav className="breadcrumbs" style={{ display: 'flex', gap: '8px', fontSize: 'var(--fs-6)', color: 'var(--light-gray-70)', marginBottom: '15px' }}>
           <Link href="/" style={{ color: 'var(--light-gray-70)', textDecoration: 'none' }}>Home</Link>

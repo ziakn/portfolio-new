@@ -4,6 +4,7 @@ Allow: /
 Sitemap: https://ziamuhammad.com/sitemap.xml
 
 # Disallow sensitive paths
+Disallow: /admin
 Disallow: /api/
 Disallow: /_next/
 Disallow: /node_modules/

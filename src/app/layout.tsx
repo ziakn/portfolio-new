@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
-import Sidebar from '@/components/Sidebar';
-import Navbar from '@/components/Navbar';
-import SiteFooter from '@/components/SiteFooter';
+import SiteChrome from '@/components/SiteChrome';
 import { Poppins } from 'next/font/google';
 import { jsonLd, siteGraph } from '@/data/schema';
 import './globals.css';
@@ -95,35 +93,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={poppins.variable}>
       <body>
-        <main>
-          <Sidebar />
-          <div className="main-content">
-            <Navbar />
-            {children}
-            <SiteFooter />
-          </div>
-        </main>
+        <SiteChrome>{children}</SiteChrome>
 
-        {/* Google Analytics */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-PKC08M31Q4"
-          strategy="afterInteractive"
-        />
-        <Script id="ga-init" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-PKC08M31Q4');
-          `}
-        </Script>
-
-        {/* Google AdSense */}
-        <Script
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9790243158087298"
-          strategy="afterInteractive"
-          crossOrigin="anonymous"
-        />
+        {/* Google Analytics and AdSense are NOT here — they live in
+            (site)/layout.tsx so they load only on real content pages, never on
+            404 / error pages (which bubble to the root not-found, outside that
+            group). */}
 
         {/* JSON-LD: one linked @graph for the whole site. Rendered server-side
             (not via next/script) so crawlers see it without executing JS. */}
