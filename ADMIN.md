@@ -55,15 +55,44 @@ After any change, the affected public pages are revalidated immediately
   `Disallow: /admin` in `public/robots.txt`. The portfolio sidebar/navbar are
   suppressed on `/admin` via `src/components/SiteChrome.tsx`.
 
-## ⚠️ Hosting requirement (important)
+## Storage: local file vs. Turso (important)
 
-Runtime SQLite writes only persist on a host with a **persistent filesystem and
-a long-lived Node process** (e.g. `next start` behind Apache/Nginx on a VPS,
-which is how this site is served). On a **pure serverless** platform (Vercel
-Functions) the filesystem is read-only and `/tmp` is wiped between invocations,
-so admin edits and contact submissions would NOT persist. If you ever move to
-serverless, the storage layer (`src/data/db.ts`) must be swapped for a hosted
-libSQL/Turso database — the rest of the code stays the same.
+The database driver is `libsql` — a drop-in, better-sqlite3-compatible client
+that talks to either an on-disk SQLite file **or** a hosted Turso/libSQL
+database. `src/data/db.ts` picks the backend from the environment:
+
+| Env                                    | Backend                          | Use                                  |
+| -------------------------------------- | -------------------------------- | ------------------------------------ |
+| `TURSO_DATABASE_URL` (+ `TURSO_AUTH_TOKEN`) set | Remote Turso/libSQL (network) | **Production on Vercel** and any serverless host |
+| unset                                  | Local `data/posts.sqlite` file   | Local development / persistent-FS VPS |
+
+Runtime writes to a **local file** only persist on a host with a persistent
+filesystem and a long-lived Node process. On **serverless** (Vercel Functions)
+the filesystem is read-only and wiped between invocations, so the local file
+can never persist admin edits or contact submissions — you **must** use Turso
+there (the app is otherwise identical; Turso is still plain SQLite).
+
+### One-time Turso setup
+
+```bash
+# 1. Install + log in (https://docs.turso.tech)
+brew install tursodatabase/tap/turso   # or: curl -sSfL https://get.tur.so/install.sh | bash
+turso auth login
+
+# 2. Create the DB seeded from your existing data (posts, admin, projects, …)
+turso db create portfolio --from-file data/posts.sqlite
+
+# 3. Grab the connection details
+turso db show portfolio --url          # → TURSO_DATABASE_URL  (libsql://…)
+turso db tokens create portfolio       # → TURSO_AUTH_TOKEN
+```
+
+Add both values to **Vercel → Project → Settings → Environment Variables**
+(Production, and Preview if you want the admin panel on previews), then redeploy.
+Because the import carried over `admin_users`, your existing login works
+immediately — no need to re-run `admin:create`. The CLI scripts
+(`admin:create`, `blog`, `seed:projects`) also target Turso automatically when
+those two env vars are present in the shell.
 
 ## Not yet editable via the panel
 

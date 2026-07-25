@@ -4,10 +4,11 @@ const nextConfig: NextConfig = {
   images: {
     qualities: [75, 100],
   },
-  serverExternalPackages: ['better-sqlite3'],
-  // The blog database is read at runtime but never imported, so file tracing
-  // cannot infer it. Without this, the deployed bundle omits it and blog
-  // routes fail once a scheduled post revalidates.
+  serverExternalPackages: ['libsql'],
+  // In production the database is remote (Turso), so no file needs bundling.
+  // These traces keep the on-disk fallback working when TURSO_DATABASE_URL is
+  // unset — e.g. a persistent-filesystem host or `next build` reading the
+  // file. Harmless on Vercel (the bundled file simply goes unused).
   outputFileTracingIncludes: {
     '/blog': ['./data/posts.sqlite'],
     '/blog/[slug]': ['./data/posts.sqlite'],

@@ -1,4 +1,4 @@
-import Database from 'better-sqlite3';
+import { openDb } from './db.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -534,7 +534,7 @@ for (let i = 0; i < 2000; i++) {
 
 // Open Database and insert posts
 console.log(`Connecting to database: ${dbPath}`);
-const db = new Database(dbPath);
+const db = openDb();
 
 console.log(`Clearing existing posts...`);
 db.prepare('DELETE FROM posts').run();

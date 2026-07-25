@@ -1,4 +1,4 @@
-import Database from 'better-sqlite3';
+import { openDb } from './db.mjs';
 import path from 'node:path';
 
 const dbPath = path.join(process.cwd(), 'data', 'posts.sqlite');
@@ -392,7 +392,7 @@ return &lt;button className={buttonClass}&gt;Submit&lt;/button&gt;;
 
 // Open Database and insert the 5 long-tail posts
 console.log(`Connecting to database at: ${dbPath}`);
-const db = new Database(dbPath);
+const db = openDb();
 
 let publishDate = new Date('2026-07-15');
 

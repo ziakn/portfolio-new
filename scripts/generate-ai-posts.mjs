@@ -1,4 +1,4 @@
-import Database from 'better-sqlite3';
+import { openDb } from './db.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -142,7 +142,7 @@ FORMATTING RULES:
 
 async function main() {
   console.log(`Connecting to database at: ${dbPath}`);
-  const db = new Database(dbPath);
+  const db = openDb();
 
   // We will insert/upsert these 15 posts starting from today
   let publishDate = new Date('2026-07-15');

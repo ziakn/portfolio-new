@@ -7,7 +7,7 @@
 // If no arguments are given, prompts interactively (password hidden). Re-running
 // with an existing email resets that account's password.
 
-import Database from 'better-sqlite3';
+import { openDb } from './db.mjs';
 import path from 'node:path';
 import { randomBytes, scryptSync } from 'node:crypto';
 import readline from 'node:readline';
@@ -72,7 +72,7 @@ async function main() {
     process.exit(1);
   }
 
-  const db = new Database(dbPath, { fileMustExist: true });
+  const db = openDb({ fileMustExist: true });
   db.exec(SCHEMA);
   const info = db
     .prepare(

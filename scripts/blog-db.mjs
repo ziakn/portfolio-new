@@ -10,7 +10,7 @@
 // After changing the database, commit data/posts.sqlite. Posts dated in the
 // future stay hidden until their publish date arrives (see src/data/posts.ts).
 
-import Database from 'better-sqlite3';
+import { openDb as connect } from './db.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -46,12 +46,16 @@ CREATE INDEX IF NOT EXISTS idx_posts_category ON posts (category);
 `;
 
 function openDb({ create = false } = {}) {
-  if (!create && !fs.existsSync(dbPath)) {
-    console.error(`No database at ${dbPath}. Run: npm run blog init`);
-    process.exit(1);
+  // The local-file guards only apply when running against data/posts.sqlite;
+  // with a remote Turso database there is no file to check or create.
+  if (!process.env.TURSO_DATABASE_URL) {
+    if (!create && !fs.existsSync(dbPath)) {
+      console.error(`No database at ${dbPath}. Run: npm run blog init`);
+      process.exit(1);
+    }
+    fs.mkdirSync(path.dirname(dbPath), { recursive: true });
   }
-  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
-  return new Database(dbPath);
+  return connect();
 }
 
 function upsert(db, post) {

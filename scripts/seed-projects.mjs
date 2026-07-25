@@ -7,7 +7,7 @@
 //   npm run seed:projects
 //   npm run seed:projects -- --force
 
-import Database from 'better-sqlite3';
+import { openDb } from './db.mjs';
 import path from 'node:path';
 
 const dbPath = path.join(process.cwd(), 'data', 'posts.sqlite');
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS projects (
   updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
 );`;
 
-const db = new Database(dbPath, { fileMustExist: true });
+const db = openDb({ fileMustExist: true });
 db.exec(SCHEMA);
 
 const existing = db.prepare('SELECT COUNT(*) AS c FROM projects').get().c;

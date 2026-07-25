@@ -1,13 +1,21 @@
-import Database from 'better-sqlite3';
+import Database from 'libsql';
 import path from 'node:path';
 
-// The blog + admin database lives in the deployment and is now WRITABLE at
-// runtime: the admin panel edits posts, projects, and site content, and the
-// contact form appends submissions. This requires a persistent Node server
-// (the site is served by a long-lived `next start` process behind Apache) so
-// that file writes actually persist between requests. On a purely serverless
-// host the filesystem is read-only and these writes would not survive — see
-// the admin panel notes in the README.
+// The blog + admin database is WRITABLE at runtime: the admin panel edits
+// posts, projects, and site content, and the contact form appends
+// submissions.
+//
+// `libsql` is a drop-in, better-sqlite3-compatible driver that also speaks to
+// a hosted Turso/libSQL database over the network. Storage is chosen from the
+// environment:
+//   • TURSO_DATABASE_URL set  → remote libSQL (Turso). This is how production
+//     runs on Vercel, whose filesystem is read-only and non-persistent, so a
+//     local SQLite file could never persist writes there. Turso is still
+//     plain SQLite, just hosted, so nothing else in the app changes.
+//   • unset                   → the on-disk data/posts.sqlite file, used for
+//     local development (and any persistent-filesystem host).
+const remoteUrl = process.env.TURSO_DATABASE_URL;
+const authToken = process.env.TURSO_AUTH_TOKEN;
 const dbPath = path.join(process.cwd(), 'data', 'posts.sqlite');
 
 let db: Database.Database | undefined;
@@ -65,11 +73,20 @@ CREATE TABLE IF NOT EXISTS site_content (
 
 export function getDb(): Database.Database {
   if (!db) {
-    db = new Database(dbPath, { fileMustExist: true });
-    // WAL lets readers (public pages) and the occasional admin writer coexist
-    // without blocking each other.
-    db.pragma('journal_mode = WAL');
-    db.pragma('foreign_keys = ON');
+    if (remoteUrl) {
+      // Remote libSQL (Turso). `authToken` is a valid runtime option that the
+      // bundled better-sqlite3 typings just don't declare, hence the cast.
+      db = new Database(remoteUrl, { authToken } as unknown as Database.Options);
+    } else {
+      db = new Database(dbPath, { fileMustExist: true });
+      // WAL lets readers (public pages) and the occasional admin writer coexist
+      // without blocking each other. Local-file mode only — the pragmas are a
+      // no-op / unsupported against a remote database.
+      db.pragma('journal_mode = WAL');
+      db.pragma('foreign_keys = ON');
+    }
+    // Additive `CREATE TABLE IF NOT EXISTS` — idempotent and safe on every boot
+    // against either backend.
     db.exec(APP_SCHEMA);
   }
 
