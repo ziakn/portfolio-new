@@ -41,7 +41,13 @@ const siteTimeZone = 'Asia/Qatar';
 // are excluded from every read path — index, sitemap, feed, and the post route
 // itself (which 404s) — so a scheduled post cannot be reached early by URL.
 function getCurrentPublishDate(): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: siteTimeZone }).format(new Date());
+  // Qatar is always AST (UTC+3).
+  const d = new Date();
+  const qatarTime = new Date(d.getTime() + 3 * 60 * 60 * 1000);
+  const year = qatarTime.getUTCFullYear();
+  const month = String(qatarTime.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(qatarTime.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function toPost(row: PostRow): BlogPost {
