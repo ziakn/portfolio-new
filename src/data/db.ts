@@ -77,17 +77,19 @@ export function getDb(): Database.Database {
       // Remote libSQL (Turso). `authToken` is a valid runtime option that the
       // bundled better-sqlite3 typings just don't declare, hence the cast.
       db = new Database(remoteUrl, { authToken } as unknown as Database.Options);
+      db.exec(APP_SCHEMA);
     } else {
-      db = new Database(dbPath, { fileMustExist: true });
-      // WAL lets readers (public pages) and the occasional admin writer coexist
-      // without blocking each other. Local-file mode only — the pragmas are a
-      // no-op / unsupported against a remote database.
-      db.pragma('journal_mode = WAL');
-      db.pragma('foreign_keys = ON');
+      try {
+        db = new Database(dbPath, { fileMustExist: true });
+        db.pragma('journal_mode = WAL');
+        db.pragma('foreign_keys = ON');
+        db.exec(APP_SCHEMA);
+      } catch {
+        // On read-only filesystems (e.g. Vercel serverless without Turso env vars),
+        // opening in write mode or executing PRAGMA/DDL fails. Fall back to read-only.
+        db = new Database(dbPath, { readonly: true });
+      }
     }
-    // Additive `CREATE TABLE IF NOT EXISTS` — idempotent and safe on every boot
-    // against either backend.
-    db.exec(APP_SCHEMA);
   }
 
   return db;
