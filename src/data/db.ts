@@ -20,6 +20,30 @@ const dbPath = path.join(process.cwd(), 'data', 'posts.sqlite');
 
 let db: Database.Database | undefined;
 
+function validateDatabase(candidate: Database.Database): void {
+  // Fail during connection setup rather than on the first page query. This is
+  // especially important for Turso: an invalid URL/token can otherwise leave
+  // every ISR regeneration failing while Vercel continues to serve stale HTML.
+  candidate.prepare('SELECT 1 FROM posts LIMIT 1').get();
+}
+
+function openBundledDatabase(): Database.Database {
+  // Vercel's deployed filesystem is read-only. The committed database is a
+  // content snapshot, so public pages can safely query it without WAL or DDL.
+  if (process.env.VERCEL) {
+    const candidate = new Database(dbPath, { readonly: true, fileMustExist: true });
+    validateDatabase(candidate);
+    return candidate;
+  }
+
+  const candidate = new Database(dbPath, { fileMustExist: true });
+  candidate.pragma('journal_mode = WAL');
+  candidate.pragma('foreign_keys = ON');
+  candidate.exec(APP_SCHEMA);
+  validateDatabase(candidate);
+  return candidate;
+}
+
 // Tables the admin panel owns. `posts` already exists (created by
 // scripts/blog-db.mjs); these are additive and safe to (re)run on every boot.
 const APP_SCHEMA = `
@@ -74,21 +98,25 @@ CREATE TABLE IF NOT EXISTS site_content (
 export function getDb(): Database.Database {
   if (!db) {
     if (remoteUrl) {
-      // Remote libSQL (Turso). `authToken` is a valid runtime option that the
-      // bundled better-sqlite3 typings just don't declare, hence the cast.
-      db = new Database(remoteUrl, { authToken } as unknown as Database.Options);
-      db.exec(APP_SCHEMA);
-    } else {
+      let remoteDb: Database.Database | undefined;
+
       try {
-        db = new Database(dbPath, { fileMustExist: true });
-        db.pragma('journal_mode = WAL');
-        db.pragma('foreign_keys = ON');
-        db.exec(APP_SCHEMA);
-      } catch {
-        // On read-only filesystems (e.g. Vercel serverless without Turso env vars),
-        // opening in write mode or executing PRAGMA/DDL fails. Fall back to read-only.
-        db = new Database(dbPath, { readonly: true });
+        // Remote libSQL (Turso). `authToken` is a valid runtime option that the
+        // bundled better-sqlite3 typings just don't declare, hence the cast.
+        remoteDb = new Database(remoteUrl, { authToken } as unknown as Database.Options);
+        remoteDb.exec(APP_SCHEMA);
+        validateDatabase(remoteDb);
+        db = remoteDb;
+      } catch (error) {
+        remoteDb?.close();
+        console.error(
+          'Turso is unavailable; using the bundled read-only content database.',
+          error instanceof Error ? error.message : error,
+        );
+        db = openBundledDatabase();
       }
+    } else {
+      db = openBundledDatabase();
     }
   }
 

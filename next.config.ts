@@ -10,16 +10,9 @@ const nextConfig: NextConfig = {
   // unset — e.g. a persistent-filesystem host or `next build` reading the
   // file. Harmless on Vercel (the bundled file simply goes unused).
   outputFileTracingIncludes: {
-    '/blog': ['./data/posts.sqlite'],
-    '/blog/[slug]': ['./data/posts.sqlite'],
-    '/sitemap.xml': ['./data/posts.sqlite'],
-    '/feed.xml': ['./data/posts.sqlite'],
-    '/portfolio': ['./data/posts.sqlite'],
-    '/resume': ['./data/posts.sqlite'],
-    '/': ['./data/posts.sqlite'],
-    '/api/contact': ['./data/posts.sqlite'],
-    // The admin panel reads and writes the same database.
-    '/admin/**': ['./data/posts.sqlite'],
+    // All of these routes share data helpers. A global route glob prevents a
+    // newly added server route from deploying without the SQLite fallback.
+    '/*': ['./data/posts.sqlite'],
   },
   turbopack: {
     root: process.cwd(),
