@@ -7,10 +7,11 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run posts:export && next build",
     "start": "next start",
     "lint": "eslint",
     "blog": "node scripts/blog-db.mjs",
+    "posts:export": "node scripts/export-posts-json.mjs",
     "admin:create": "node scripts/setup-admin.mjs",
     "seed:projects": "node scripts/seed-projects.mjs"
   },

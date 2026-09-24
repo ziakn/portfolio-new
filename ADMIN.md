@@ -57,14 +57,14 @@ After any change, the affected public pages are revalidated immediately
 
 ## Storage
 
-The site reads `data/posts.sqlite` directly in every environment with Node's
-built-in SQLite driver. Commit that file whenever blog content changes, then
-deploy the commit.
+Blog articles are exported from `data/posts.sqlite` into JSON during every
+`npm run build`. Complete articles live in `data/posts/YYYY/MM/`; lightweight
+monthly listing indexes live in `public/posts/YYYY/MM/`. The live blog never
+opens SQLite, so scheduled posts are listed from JSON at Qatar midnight.
 
-On a persistent Node server, admin edits and contact submissions write to that
-same file. Vercel Functions mount the file as read-only, so the public blog
-works there but admin edits and contact submissions do not persist. Edit the
-local database and redeploy to publish changes on Vercel.
+On a persistent Node server, admin edits and contact submissions write to the
+SQLite source file. Vercel Functions mount it as read-only, so edit locally and
+deploy to publish changes on Vercel.
 
 ## Not yet editable via the panel
 

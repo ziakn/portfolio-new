@@ -1,7 +1,7 @@
 import { getPosts } from '@/data/posts';
 
-// Feed entries are date-gated in the same way as the public blog.
-export const dynamic = 'force-dynamic';
+// The feed is generated from the committed JSON manifest during deployment.
+export const dynamic = 'force-static';
 
 const baseUrl = 'https://ziamuhammad.com';
 

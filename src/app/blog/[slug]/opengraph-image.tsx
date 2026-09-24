@@ -11,7 +11,7 @@ export function generateStaticParams() {
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = getPost(slug);
+  const post = getPost(slug, true);
 
   return new ImageResponse(
     (

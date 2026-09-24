@@ -14,9 +14,10 @@ import type { Metadata } from 'next';
 import { breadcrumbGraph, ids, jsonLd, siteUrl } from '@/data/schema';
 import SiteAnalytics from '@/components/SiteAnalytics';
 
-// A scheduled post must become reachable as soon as its Qatar publish date
-// arrives. Static/ISR output can otherwise continue serving yesterday's 404.
-export const dynamic = 'force-dynamic';
+// Every article is generated at build time from its JSON file. The public list
+// controls when scheduled articles become visible.
+export const dynamic = 'force-static';
+export const dynamicParams = false;
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -24,7 +25,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPost(slug);
+  const post = getPost(slug, true);
 
   // Unknown or not-yet-published slug: return a 404-appropriate, non-indexable
   // head so search engines drop the URL instead of indexing an error page.
@@ -65,11 +66,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  // Only pre-render LIVE posts. Scheduled (future-dated) posts must NOT be
-  // materialized here — the page body 404s them until their publish date, so
-  // pre-building them just produces cached "Post Not Found" pages. They are
-  // generated on demand (dynamicParams defaults to true) once they go live.
-  const posts = getPosts(false);
+  const posts = getPosts(true);
 
   return posts.map((post) => ({
     slug: post.slug,
@@ -78,7 +75,7 @@ export async function generateStaticParams() {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = getPost(slug);
+  const post = getPost(slug, true);
 
   if (!post) notFound();
 

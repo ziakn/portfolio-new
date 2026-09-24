@@ -1,5 +1,8 @@
 import { getDb } from './db';
 import { siteUrl } from './schema';
+import postIndex from './posts-index.json';
+import fs from 'node:fs';
+import path from 'node:path';
 
 export interface BlogPost {
   slug: string;
@@ -32,8 +35,11 @@ interface PostRow {
   keywords: string | null;
   canonical: string | null;
   og_image: string | null;
-  author: string;
+  author?: string;
 }
+
+const indexedPosts = postIndex as unknown as PostRow[];
+const postsDirectory = path.join(process.cwd(), 'data', 'posts');
 
 const siteTimeZone = 'Asia/Qatar';
 
@@ -67,63 +73,51 @@ function toPost(row: PostRow): BlogPost {
       : [],
     canonical: row.canonical?.trim() || `${siteUrl}/blog/${row.slug}`,
     ogImage: row.og_image?.trim() || null,
-    author: row.author,
+    author: row.author?.trim() || 'Zia Muhammad',
   };
 }
 
-const SELECT = `SELECT slug, title, publish_date, category, excerpt, content, img,
-                       meta_title, meta_description, focus_keyword, keywords,
-                       canonical, og_image, author
-                FROM posts`;
-
 export function getPosts(includeFuture = false): BlogPost[] {
-  const query = includeFuture
-    ? `${SELECT} ORDER BY publish_date DESC`
-    : `${SELECT} WHERE publish_date <= ? ORDER BY publish_date DESC`;
-  const params = includeFuture ? [] : [getCurrentPublishDate()];
-  const rows = getDb().prepare(query).all(...params) as PostRow[];
-
-  return rows.map(toPost);
+  const currentDate = getCurrentPublishDate();
+  return indexedPosts
+    .filter((post) => includeFuture || post.publish_date <= currentDate)
+    .map(toPost);
 }
 
 export function getPost(slug: string, includeFuture = false): BlogPost | undefined {
-  const query = includeFuture
-    ? `${SELECT} WHERE slug = ?`
-    : `${SELECT} WHERE slug = ? AND publish_date <= ?`;
-  const params = includeFuture ? [slug] : [slug, getCurrentPublishDate()];
-  const row = getDb().prepare(query).get(...params) as PostRow | undefined;
+  const listing = indexedPosts.find((post) => post.slug === slug);
+  if (!listing || (!includeFuture && listing.publish_date > getCurrentPublishDate())) return undefined;
 
-  return row ? toPost(row) : undefined;
+  const [year, month] = listing.publish_date.split('-');
+  const filePath = path.join(postsDirectory, year, month, `${slug}.json`);
+  if (!fs.existsSync(filePath)) return undefined;
+  return toPost(JSON.parse(fs.readFileSync(filePath, 'utf8')) as PostRow);
 }
 
 // Prefer posts in the same category (better topical internal linking), then
 // fill remaining slots with the most recent other live posts.
 export function getRelatedPosts(slug: string, limit = 3, includeFuture = false): BlogPost[] {
-  const query = includeFuture
-    ? `${SELECT} WHERE slug != ?
-       ORDER BY category = (SELECT category FROM posts WHERE slug = ?) DESC,
-                publish_date DESC
-       LIMIT ?`
-    : `${SELECT} WHERE publish_date <= ? AND slug != ?
-       ORDER BY category = (SELECT category FROM posts WHERE slug = ?) DESC,
-                publish_date DESC
-       LIMIT ?`;
-  const params = includeFuture
-    ? [slug, slug, limit]
-    : [getCurrentPublishDate(), slug, slug, limit];
-  const rows = getDb().prepare(query).all(...params) as PostRow[];
-
-  return rows.map(toPost);
+  const currentDate = getCurrentPublishDate();
+  const category = indexedPosts.find((post) => post.slug === slug)?.category;
+  return indexedPosts
+    .filter((post) => post.slug !== slug && (includeFuture || post.publish_date <= currentDate))
+    .sort((a, b) => {
+      const categoryOrder = Number(b.category === category) - Number(a.category === category);
+      return categoryOrder || b.publish_date.localeCompare(a.publish_date);
+    })
+    .slice(0, limit)
+    .map(toPost);
 }
 
 export function getCategories(includeFuture = false): string[] {
-  const query = includeFuture
-    ? 'SELECT DISTINCT category FROM posts ORDER BY category'
-    : 'SELECT DISTINCT category FROM posts WHERE publish_date <= ? ORDER BY category';
-  const params = includeFuture ? [] : [getCurrentPublishDate()];
-  const rows = getDb().prepare(query).all(...params) as { category: string }[];
-
-  return rows.map((row) => row.category);
+  const currentDate = getCurrentPublishDate();
+  return Array.from(
+    new Set(
+      indexedPosts
+        .filter((post) => includeFuture || post.publish_date <= currentDate)
+        .map((post) => post.category),
+    ),
+  ).sort();
 }
 
 // Base keywords every blog page should carry, plus category-specific terms.

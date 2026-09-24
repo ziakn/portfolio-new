@@ -1,14 +1,12 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
-import Link from 'next/link';
 import Script from 'next/script';
-import { formatPostDate, getPosts } from '@/data/posts';
+import { getPosts } from '@/data/posts';
 import SiteAnalytics from '@/components/SiteAnalytics';
+import BlogPostList from '@/components/BlogPostList';
 
-// Publication visibility depends on the current Qatar date. Render this route
-// per request so a post scheduled for today becomes visible immediately at
-// midnight instead of waiting for the previous ISR page to expire.
-export const dynamic = 'force-dynamic';
+// The article list loads static monthly JSON indexes in the browser, so a
+// scheduled post appears at Qatar midnight without a server database query.
+export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
   title: 'Qatar Software Engineering Blog',
@@ -87,26 +85,7 @@ export default function BlogPage() {
       </section>
 
       <section className="blog-posts">
-        <ul className="blog-posts-list">
-          {posts.map((post) => (
-            <li className="blog-post-item" key={post.slug}>
-              <Link href={`/blog/${post.slug}`}>
-                <figure className="blog-banner-box">
-                  <Image src={post.img} alt={post.title} width={400} height={250} loading="lazy" />
-                </figure>
-                <div className="blog-content">
-                  <div className="blog-meta">
-                    <p className="blog-category">{post.category}</p>
-                    <span className="dot"></span>
-                    <time dateTime={post.date}>{formatPostDate(post.date)}</time>
-                  </div>
-                  <h3 className="h3 blog-item-title">{post.title}</h3>
-                  <p className="blog-text">{post.excerpt}</p>
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <BlogPostList />
       </section>
     </article>
   );
