@@ -5,26 +5,15 @@ import path from 'node:path';
 // posts, projects, and site content, and the contact form appends
 // submissions.
 //
-// `libsql` is a drop-in, better-sqlite3-compatible driver that also speaks to
-// a hosted Turso/libSQL database over the network. Storage is chosen from the
-// environment:
-//   • TURSO_DATABASE_URL set  → remote libSQL (Turso). This is how production
-//     runs on Vercel, whose filesystem is read-only and non-persistent, so a
-//     local SQLite file could never persist writes there. Turso is still
-//     plain SQLite, just hosted, so nothing else in the app changes.
-//   • unset                   → the on-disk data/posts.sqlite file, used for
-//     local development (and any persistent-filesystem host).
-const remoteUrl = process.env.TURSO_DATABASE_URL;
-const authToken = process.env.TURSO_AUTH_TOKEN;
+// The site always reads the committed SQLite database directly. The libsql
+// package is used only as the local SQLite driver; no network database is used.
 const dbPath = path.join(process.cwd(), 'data', 'posts.sqlite');
 
 let db: Database.Database | undefined;
 
 function validateDatabase(candidate: Database.Database): void {
   // Fail during connection setup rather than on the first page query. This
-  // verifies the complete public-post shape too: an older Turso database can
-  // have a `posts` table but lack SEO columns, which otherwise makes every
-  // public blog route return a 500 after the connection succeeds.
+  // verifies the complete public-post shape used by the blog routes.
   candidate
     .prepare(`SELECT slug, title, publish_date, category, excerpt, content, img,
                      meta_title, meta_description, focus_keyword, keywords,
@@ -104,37 +93,7 @@ CREATE TABLE IF NOT EXISTS site_content (
 
 export function getDb(): Database.Database {
   if (!db) {
-    if (remoteUrl) {
-      let remoteDb: Database.Database | undefined;
-
-      try {
-        // Remote libSQL (Turso). `authToken` is a valid runtime option that the
-        // bundled better-sqlite3 typings just don't declare, hence the cast.
-        remoteDb = new Database(remoteUrl, { authToken } as unknown as Database.Options);
-        remoteDb.exec(APP_SCHEMA);
-        validateDatabase(remoteDb);
-        db = remoteDb;
-      } catch (error) {
-        // A partially initialized native client can also fail while closing.
-        // Do not let that secondary error prevent the known-good bundled
-        // database from serving the public site.
-        try {
-          remoteDb?.close();
-        } catch (closeError) {
-          console.error(
-            'Unable to close the failed Turso connection.',
-            closeError instanceof Error ? closeError.message : closeError,
-          );
-        }
-        console.error(
-          'Turso is unavailable; using the bundled read-only content database.',
-          error instanceof Error ? error.message : error,
-        );
-        db = openBundledDatabase();
-      }
-    } else {
-      db = openBundledDatabase();
-    }
+    db = openBundledDatabase();
   }
 
   return db;

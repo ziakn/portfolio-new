@@ -46,15 +46,11 @@ CREATE INDEX IF NOT EXISTS idx_posts_category ON posts (category);
 `;
 
 function openDb({ create = false } = {}) {
-  // The local-file guards only apply when running against data/posts.sqlite;
-  // with a remote Turso database there is no file to check or create.
-  if (!process.env.TURSO_DATABASE_URL) {
-    if (!create && !fs.existsSync(dbPath)) {
-      console.error(`No database at ${dbPath}. Run: npm run blog init`);
-      process.exit(1);
-    }
-    fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  if (!create && !fs.existsSync(dbPath)) {
+    console.error(`No database at ${dbPath}. Run: npm run blog init`);
+    process.exit(1);
   }
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
   return connect();
 }
 

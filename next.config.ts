@@ -5,10 +5,8 @@ const nextConfig: NextConfig = {
     qualities: [75, 100],
   },
   serverExternalPackages: ['libsql'],
-  // In production the database is remote (Turso), so no file needs bundling.
-  // These traces keep the on-disk fallback working when TURSO_DATABASE_URL is
-  // unset — e.g. a persistent-filesystem host or `next build` reading the
-  // file. Harmless on Vercel (the bundled file simply goes unused).
+  // Every server route reads the committed SQLite database. Include it in the
+  // deployed function bundle, including on Vercel where it is read-only.
   outputFileTracingIncludes: {
     // All of these routes share data helpers. A global route glob prevents a
     // newly added server route from deploying without the SQLite fallback.
