@@ -1,7 +1,9 @@
 import type { MetadataRoute } from 'next';
 import { getPosts } from '@/data/posts';
 
-export const revalidate = 3600;
+// Keep sitemap entries aligned with the live blog list as scheduled posts go
+// live at midnight in Qatar.
+export const dynamic = 'force-dynamic';
 
 const baseUrl = 'https://ziamuhammad.com';
 const siteLastModified = new Date('2026-05-17T00:00:00.000Z');

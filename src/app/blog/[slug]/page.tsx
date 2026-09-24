@@ -14,7 +14,9 @@ import type { Metadata } from 'next';
 import { breadcrumbGraph, ids, jsonLd, siteUrl } from '@/data/schema';
 import SiteAnalytics from '@/components/SiteAnalytics';
 
-export const revalidate = 3600;
+// A scheduled post must become reachable as soon as its Qatar publish date
+// arrives. Static/ISR output can otherwise continue serving yesterday's 404.
+export const dynamic = 'force-dynamic';
 
 type Props = {
   params: Promise<{ slug: string }>;

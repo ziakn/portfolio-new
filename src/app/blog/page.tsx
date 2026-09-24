@@ -5,7 +5,10 @@ import Script from 'next/script';
 import { formatPostDate, getPosts } from '@/data/posts';
 import SiteAnalytics from '@/components/SiteAnalytics';
 
-export const revalidate = 3600;
+// Publication visibility depends on the current Qatar date. Render this route
+// per request so a post scheduled for today becomes visible immediately at
+// midnight instead of waiting for the previous ISR page to expire.
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Qatar Software Engineering Blog',

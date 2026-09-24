@@ -1,6 +1,7 @@
 import { getPosts } from '@/data/posts';
 
-export const revalidate = 3600;
+// Feed entries are date-gated in the same way as the public blog.
+export const dynamic = 'force-dynamic';
 
 const baseUrl = 'https://ziamuhammad.com';
 
