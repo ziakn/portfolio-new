@@ -21,10 +21,17 @@ const dbPath = path.join(process.cwd(), 'data', 'posts.sqlite');
 let db: Database.Database | undefined;
 
 function validateDatabase(candidate: Database.Database): void {
-  // Fail during connection setup rather than on the first page query. This is
-  // especially important for Turso: an invalid URL/token can otherwise leave
-  // every ISR regeneration failing while Vercel continues to serve stale HTML.
-  candidate.prepare('SELECT 1 FROM posts LIMIT 1').get();
+  // Fail during connection setup rather than on the first page query. This
+  // verifies the complete public-post shape too: an older Turso database can
+  // have a `posts` table but lack SEO columns, which otherwise makes every
+  // public blog route return a 500 after the connection succeeds.
+  candidate
+    .prepare(`SELECT slug, title, publish_date, category, excerpt, content, img,
+                     meta_title, meta_description, focus_keyword, keywords,
+                     canonical, og_image, author
+              FROM posts
+              LIMIT 1`)
+    .get();
 }
 
 function openBundledDatabase(): Database.Database {
@@ -108,7 +115,17 @@ export function getDb(): Database.Database {
         validateDatabase(remoteDb);
         db = remoteDb;
       } catch (error) {
-        remoteDb?.close();
+        // A partially initialized native client can also fail while closing.
+        // Do not let that secondary error prevent the known-good bundled
+        // database from serving the public site.
+        try {
+          remoteDb?.close();
+        } catch (closeError) {
+          console.error(
+            'Unable to close the failed Turso connection.',
+            closeError instanceof Error ? closeError.message : closeError,
+          );
+        }
         console.error(
           'Turso is unavailable; using the bundled read-only content database.',
           error instanceof Error ? error.message : error,
