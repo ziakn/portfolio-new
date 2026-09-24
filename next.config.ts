@@ -4,7 +4,6 @@ const nextConfig: NextConfig = {
   images: {
     qualities: [75, 100],
   },
-  serverExternalPackages: ['libsql'],
   // Every server route reads the committed SQLite database. Include it in the
   // deployed function bundle, including on Vercel where it is read-only.
   outputFileTracingIncludes: {

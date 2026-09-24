@@ -57,8 +57,9 @@ After any change, the affected public pages are revalidated immediately
 
 ## Storage
 
-The site reads `data/posts.sqlite` directly in every environment. Commit that
-file whenever blog content changes, then deploy the commit.
+The site reads `data/posts.sqlite` directly in every environment with Node's
+built-in SQLite driver. Commit that file whenever blog content changes, then
+deploy the commit.
 
 On a persistent Node server, admin edits and contact submissions write to that
 same file. Vercel Functions mount the file as read-only, so the public blog

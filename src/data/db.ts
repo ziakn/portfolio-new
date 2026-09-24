@@ -1,17 +1,31 @@
-import Database from 'libsql';
+import { DatabaseSync } from 'node:sqlite';
 import path from 'node:path';
 
 // The blog + admin database is WRITABLE at runtime: the admin panel edits
 // posts, projects, and site content, and the contact form appends
 // submissions.
 //
-// The site always reads the committed SQLite database directly. The libsql
-// package is used only as the local SQLite driver; no network database is used.
+// The site always reads the committed SQLite database directly with Node's
+// built-in SQLite driver. No external or network database is used.
 const dbPath = path.join(process.cwd(), 'data', 'posts.sqlite');
 
-let db: Database.Database | undefined;
+let db: DatabaseSync | undefined;
 
-function validateDatabase(candidate: Database.Database): void {
+// Application data modules validate their own query result shapes. Keep that
+// boundary compatible with the previous SQLite driver, whose results were
+// intentionally cast at each call site.
+interface SqliteStatement {
+  get(...params: unknown[]): unknown;
+  all(...params: unknown[]): unknown[];
+  run(...params: unknown[]): { lastInsertRowid: number | bigint; changes: number | bigint };
+}
+
+interface SqliteDatabase {
+  prepare(sql: string): SqliteStatement;
+  exec(sql: string): void;
+}
+
+function validateDatabase(candidate: DatabaseSync): void {
   // Fail during connection setup rather than on the first page query. This
   // verifies the complete public-post shape used by the blog routes.
   candidate
@@ -23,18 +37,17 @@ function validateDatabase(candidate: Database.Database): void {
     .get();
 }
 
-function openBundledDatabase(): Database.Database {
+function openBundledDatabase(): DatabaseSync {
   // Vercel's deployed filesystem is read-only. The committed database is a
   // content snapshot, so public pages can safely query it without WAL or DDL.
   if (process.env.VERCEL) {
-    const candidate = new Database(dbPath, { readonly: true, fileMustExist: true });
+    const candidate = new DatabaseSync(dbPath, { readOnly: true });
     validateDatabase(candidate);
     return candidate;
   }
 
-  const candidate = new Database(dbPath, { fileMustExist: true });
-  candidate.pragma('journal_mode = WAL');
-  candidate.pragma('foreign_keys = ON');
+  const candidate = new DatabaseSync(dbPath, { enableForeignKeyConstraints: true });
+  candidate.exec('PRAGMA journal_mode = WAL');
   candidate.exec(APP_SCHEMA);
   validateDatabase(candidate);
   return candidate;
@@ -91,7 +104,7 @@ CREATE TABLE IF NOT EXISTS site_content (
 );
 `;
 
-export function getDb(): Database.Database {
+export function getDb(): SqliteDatabase {
   if (!db) {
     db = openBundledDatabase();
   }
