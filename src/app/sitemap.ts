@@ -35,7 +35,9 @@ function sitemapDate(value: string) {
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const posts = getPosts();
+  // Include every pre-rendered detail URL so Search Console can discover the
+  // full article library, including scheduled posts.
+  const posts = getPosts(true);
 
   return [
     {
