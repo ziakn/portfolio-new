@@ -12,6 +12,8 @@
     "lint": "eslint",
     "blog": "node scripts/blog-db.mjs",
     "posts:export": "node scripts/export-posts-json.mjs",
+    "posts:rewrite-duplicates": "node scripts/rewrite-duplicate-posts.mjs",
+    "posts:rewrite-remaining": "node scripts/rewrite-remaining-posts.mjs",
     "admin:create": "node scripts/setup-admin.mjs",
     "seed:projects": "node scripts/seed-projects.mjs"
   },

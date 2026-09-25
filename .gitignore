@@ -30,6 +30,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local secrets
+.env
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
@@ -37,3 +40,4 @@ next-env.d.ts
 # sqlite runtime files (the .sqlite itself is committed)
 *.sqlite-wal
 *.sqlite-shm
+data/ai-rewrite-progress.json
