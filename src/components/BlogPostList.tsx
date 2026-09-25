@@ -52,19 +52,37 @@ export default function BlogPostList() {
 
   useEffect(() => {
     const today = qatarDate();
+    const cacheKey = `zia-blog-list:${today}`;
+
+    try {
+      const cached = window.sessionStorage.getItem(cacheKey);
+      if (cached) {
+        setPosts(JSON.parse(cached) as PostListing[]);
+        return;
+      }
+    } catch {
+      // Storage can be unavailable in privacy-restricted browsers. The
+      // network path below remains the source of truth.
+    }
+
     void Promise.all(
       monthPaths(today).map(async (url) => {
-        const response = await fetch(url);
+        const response = await fetch(url, { cache: 'force-cache' });
         return response.ok ? (response.json() as Promise<PostListing[]>) : [];
       }),
     ).then((months) => {
-      setPosts(
+      const nextPosts =
         months
           .flat()
           .filter((post) => post.date <= today)
           .sort((a, b) => b.date.localeCompare(a.date))
-          .slice(0, 50),
-      );
+          .slice(0, 50);
+      setPosts(nextPosts);
+      try {
+        window.sessionStorage.setItem(cacheKey, JSON.stringify(nextPosts));
+      } catch {
+        // The list still renders when session storage is full or unavailable.
+      }
     });
   }, []);
 

@@ -29,6 +29,37 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      // The listing is date-sensitive. The browser revalidates it, while the
+      // edge cache serves the static page and monthly indexes for one day.
+      {
+        source: '/blog',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=0, must-revalidate, s-maxage=86400, stale-while-revalidate=3600',
+          },
+        ],
+      },
+      {
+        source: '/posts/:year/:month/index.json',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=0, must-revalidate, s-maxage=86400, stale-while-revalidate=3600',
+          },
+        ],
+      },
+      // Article HTML is immutable within a deployment. Keep it at the edge
+      // for 360 days while requiring browsers to revalidate on every visit.
+      {
+        source: '/blog/:slug',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=0, must-revalidate, s-maxage=31104000, stale-while-revalidate=86400',
+          },
+        ],
+      },
     ];
   },
 };
