@@ -19,6 +19,7 @@ export interface BlogPost {
   canonical: string;
   ogImage: string | null;
   author: string;
+  updatedAt: string | null;
 }
 
 interface PostRow {
@@ -36,6 +37,7 @@ interface PostRow {
   canonical: string | null;
   og_image: string | null;
   author?: string;
+  updated_at?: string | null;
 }
 
 const indexedPosts = postIndex as unknown as PostRow[];
@@ -74,6 +76,7 @@ function toPost(row: PostRow): BlogPost {
     canonical: row.canonical?.trim() || `${siteUrl}/blog/${row.slug}`,
     ogImage: row.og_image?.trim() || null,
     author: row.author?.trim() || 'Zia Muhammad',
+    updatedAt: row.updated_at?.trim() || null,
   };
 }
 

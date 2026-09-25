@@ -68,6 +68,9 @@ export const metadata: Metadata = {
       'application/rss+xml': 'https://ziamuhammad.com/feed.xml',
     },
   },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+  },
   other: {
     'google-adsense-account': 'ca-pub-9790243158087298',
     'geo.region': 'QA-DA',

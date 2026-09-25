@@ -14,7 +14,7 @@ const database = new DatabaseSync(path.join(root, 'data', 'posts.sqlite'), { rea
 const posts = database
   .prepare(`SELECT slug, title, publish_date, category, excerpt, content, img,
                    meta_title, meta_description, focus_keyword, keywords,
-                   canonical, og_image, author
+                   canonical, og_image, author, updated_at
             FROM posts
             ORDER BY publish_date DESC, id DESC`)
   .all();

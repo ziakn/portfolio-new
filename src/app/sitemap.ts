@@ -24,6 +24,16 @@ function absoluteUrl(path: string) {
   return new URL(path, baseUrl).toString();
 }
 
+function sitemapDate(value: string) {
+  // SQLite stores UTC timestamps as `YYYY-MM-DD HH:mm:ss`; sitemap metadata
+  // needs an ISO-compatible value that Next can serialize to XML.
+  return new Date(
+    value.includes(' ')
+      ? `${value.replace(' ', 'T')}Z`
+      : `${value}T00:00:00.000Z`,
+  );
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const posts = getPosts();
 
@@ -50,8 +60,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: absoluteUrl('/blog'),
-      lastModified: posts[0]?.date
-        ? new Date(`${posts[0].date}T00:00:00.000Z`)
+      lastModified: posts[0]?.updatedAt || posts[0]?.date
+        ? sitemapDate(posts[0].updatedAt ?? posts[0].date)
         : siteLastModified,
       changeFrequency: 'daily',
       priority: 0.8,
@@ -88,7 +98,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     ...posts.map((post) => ({
       url: absoluteUrl(`/blog/${post.slug}`),
-      lastModified: new Date(`${post.date}T00:00:00.000Z`),
+      lastModified: sitemapDate(post.updatedAt ?? post.date),
       changeFrequency: 'weekly' as const,
       priority: 0.75,
       images: [absoluteUrl(post.img)],
